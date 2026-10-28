@@ -57,6 +57,9 @@
   <data name="peek_copied" xml:space="preserve"><value>COPIADO</value></data>
   <data name="peek_dnd_blocked" xml:space="preserve"><value>☾ NO MOLESTAR ACTIVO</value></data>
   <data name="peek_app_blocked" xml:space="preserve"><value>✕ AVISOS DE ESTA APP DESACTIVADOS</value></data>
+  <data name="peek_ignore" xml:space="preserve"><value>IGNORAR</value></data>
+  <data name="peek_new_from" xml:space="preserve"><value>Nuevo mensaje de {name}</value></data>
+  <data name="peek_new_hidden" xml:space="preserve"><value>Tienes un mensaje nuevo</value></data>
   <data name="osd_volume" xml:space="preserve"><value>VOLUMEN</value></data>
   <data name="osd_speakers" xml:space="preserve"><value>ALTAVOCES</value></data>
   <data name="osd_brightness" xml:space="preserve"><value>BRILLO</value></data>

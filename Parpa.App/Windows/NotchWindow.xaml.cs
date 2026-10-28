@@ -29,9 +29,12 @@ public sealed partial class NotchWindow : Window
     private readonly UISettings _uiSettings = new();
     private readonly Win32.SubclassProc _wndProc;
     private readonly SystemMonitor _system;
+    private readonly NoticeCenter _notices;
+    private readonly FullscreenWatcher _fullscreen;
     private readonly IdleView _idle = new();
     private readonly CompactView _compact = new();
     private readonly OsdView _osd = new();
+    private readonly PeekView _peek = new();
     private readonly OpenView _open = new();
 
     private readonly double _ear = Tokens.Current.Radius("ear");
@@ -41,6 +44,8 @@ public sealed partial class NotchWindow : Window
     private Win32.RECT _region;         // región actual, en coordenadas de la ventana
     private NotchGeometry _geometry;
     private FrameworkElement? _shownView;
+    private Win32.RECT _monitorBounds;  // monitor donde está el notch, en píxeles físicos
+    private bool _hiddenForFullscreen;
 
     public NotchWindow(ParpaSettings settings)
     {
@@ -65,6 +70,7 @@ public sealed partial class NotchWindow : Window
         Shape.AddView(_idle, anchorLeft: false);
         Shape.AddView(_compact, anchorLeft: false);
         Shape.AddView(_osd, anchorLeft: false);
+        Shape.AddView(_peek, anchorLeft: true);
         Shape.AddView(_open, anchorLeft: true);
         Shape.TransitionCompleted += () => UpdateRegion(_geometry, null);
         _idle.Apply(_s, ReducedMotion);
@@ -92,11 +98,29 @@ public sealed partial class NotchWindow : Window
         _system = new SystemMonitor(_vm, _s);
         _system.Start();
 
-        Closed += (_, _) => { _hotkey.Dispose(); _outside.Dispose(); _system.Dispose(); };
+        _notices = new NoticeCenter(_vm, _s);
+        _ = _notices.StartAsync();
+
+        // Pantalla completa en el monitor del notch + hideFull: se aparta (sin tapar ni capturar clics) y los avisos esperan.
+        _fullscreen = new FullscreenWatcher(_hwnd, () => _monitorBounds);
+        _fullscreen.Changed += fullscreen =>
+        {
+            _hiddenForFullscreen = fullscreen && _s.HideFull;
+            Log.Info($"Pantalla completa: {fullscreen} → notch {(_hiddenForFullscreen ? "oculto" : "visible")}");
+            _vm.SetSuppressed(_hiddenForFullscreen);
+            if (_hiddenForFullscreen) Win32.ShowWindow(_hwnd, Win32.SW_HIDE);
+            else ShowWithoutActivation();
+        };
+        _fullscreen.Start();
+
+        Closed += (_, _) => { _hotkey.Dispose(); _outside.Dispose(); _system.Dispose(); _notices.Dispose(); };
     }
 
-    /// <summary>Muestra la ventana sin quitar el foco a la app activa.</summary>
-    public void ShowWithoutActivation() => Win32.ShowWindow(_hwnd, Win32.SW_SHOWNOACTIVATE);
+    /// <summary>Muestra la ventana sin quitar el foco a la app activa (salvo que esté apartada por pantalla completa).</summary>
+    public void ShowWithoutActivation()
+    {
+        if (!_hiddenForFullscreen) Win32.ShowWindow(_hwnd, Win32.SW_SHOWNOACTIVATE);
+    }
 
     private void ConfigureWindow()
     {
@@ -139,6 +163,7 @@ public sealed partial class NotchWindow : Window
     private void Reposition()
     {
         var monitor = MonitorService.Get(_s.Monitor);
+        _monitorBounds = monitor.Bounds;
         var size = Math.Clamp(_s.Size, 80, 120) / 100;
         _scale = monitor.Scale * size;
 
@@ -206,12 +231,16 @@ public sealed partial class NotchWindow : Window
                 _open.Apply(_s);
                 view = _open;
                 break;
+            case NotchState.Peek:
+                _peek.Show(_vm, Tokens.Current.Accent(_s.Accent));
+                view = _peek;
+                break;
             case NotchState.Osd:
                 _osd.Show(_vm.Indicator!, Tokens.Current.Accent(_s.Accent));
                 view = _osd;
                 break;
             case NotchState.Activity:
-                _compact.Show(_vm.Activity!);
+                _compact.Show(_vm.Activity!, _s.Dnd);
                 view = _compact;
                 break;
             default:
@@ -223,6 +252,7 @@ public sealed partial class NotchWindow : Window
         // Solo se anima lo que se ve: en reposo no corre ningún temporizador innecesario.
         _idle.SetAnimating(view == _idle);
         _compact.SetVisible(view == _compact);
+        _peek.SetVisible(view == _peek);
         if (_vm.IsOpen) _outside.Start();
         else _outside.Stop();
 

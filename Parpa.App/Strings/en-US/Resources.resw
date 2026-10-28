@@ -57,6 +57,9 @@
   <data name="peek_copied" xml:space="preserve"><value>COPIED</value></data>
   <data name="peek_dnd_blocked" xml:space="preserve"><value>☾ DO NOT DISTURB IS ON</value></data>
   <data name="peek_app_blocked" xml:space="preserve"><value>✕ ALERTS OFF FOR THIS APP</value></data>
+  <data name="peek_ignore" xml:space="preserve"><value>IGNORE</value></data>
+  <data name="peek_new_from" xml:space="preserve"><value>New message from {name}</value></data>
+  <data name="peek_new_hidden" xml:space="preserve"><value>You have a new message</value></data>
   <data name="osd_volume" xml:space="preserve"><value>VOLUME</value></data>
   <data name="osd_speakers" xml:space="preserve"><value>SPEAKERS</value></data>
   <data name="osd_brightness" xml:space="preserve"><value>BRIGHTNESS</value></data>

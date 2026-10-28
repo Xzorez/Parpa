@@ -35,6 +35,7 @@ public sealed partial class IdleView : UserControl
         Mascot.Visibility = s.Mascot ? Visibility.Visible : Visibility.Collapsed;
         Clock.Visibility = s.Mascot ? Visibility.Collapsed : Visibility.Visible;
         Clock.Text = s.Clock ? ClockService.Format(DateTime.Now, s.H24) : string.Empty;
+        Moon.Visibility = s.Dnd ? Visibility.Visible : Visibility.Collapsed;
         if (_animating) Render();
     }
 

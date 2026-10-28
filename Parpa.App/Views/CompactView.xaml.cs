@@ -25,8 +25,9 @@ public sealed partial class CompactView : UserControl
         DrawEqualizer();
     }
 
-    public void Show(NotchActivity activity)
+    public void Show(NotchActivity activity, bool doNotDisturb)
     {
+        Moon.Visibility = doNotDisturb ? Visibility.Visible : Visibility.Collapsed;
         Width = Tokens.Current.NotchSize(activity.SizeToken).W;
         ActivityGlyph.Glyph = activity.Glyph;
         LabelMain.Text = activity.Label;

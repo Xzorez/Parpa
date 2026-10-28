@@ -6,11 +6,14 @@
     Width="120"
     Height="34">
 
-    <!-- Reposo: mascota 13×5 (puntos 3 px, gap 1,5) o reloj Doto 700 16 px si la mascota está desactivada. -->
-    <Grid>
+    <!-- Reposo: mascota 13×5 (puntos 3 px, gap 1,5) o reloj Doto 700 16 px; luna si No molestar. Gap 10. -->
+    <StackPanel
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Orientation="Horizontal"
+        Spacing="10">
         <c:DotMatrix
             x:Name="Mascot"
-            HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Columns="13"
             Rows="5"
@@ -20,12 +23,17 @@
             OffColor="{StaticResource MatrixOffColor}" />
         <TextBlock
             x:Name="Clock"
-            HorizontalAlignment="Center"
             VerticalAlignment="Center"
             FontFamily="{StaticResource FontDisplay}"
             FontSize="16"
             FontWeight="Bold"
             Foreground="{StaticResource PrimaryBrush}"
             Visibility="Collapsed" />
-    </Grid>
+        <c:DotMatrix
+            x:Name="Moon"
+            VerticalAlignment="Center"
+            Glyph="luna"
+            OnColor="{StaticResource SecondaryColor}"
+            Visibility="Collapsed" />
+    </StackPanel>
 </UserControl>

@@ -72,7 +72,10 @@
     "task_due":       { "es": "TAREA PARA AHORA", "en": "TASK DUE NOW" },
     "copied":         { "es": "COPIADO", "en": "COPIED" },
     "dnd_blocked":    { "es": "☾ NO MOLESTAR ACTIVO", "en": "☾ DO NOT DISTURB IS ON" },
-    "app_blocked":    { "es": "✕ AVISOS DE ESTA APP DESACTIVADOS", "en": "✕ ALERTS OFF FOR THIS APP" }
+    "app_blocked":    { "es": "✕ AVISOS DE ESTA APP DESACTIVADOS", "en": "✕ ALERTS OFF FOR THIS APP" },
+    "ignore":         { "es": "IGNORAR", "en": "IGNORE" },
+    "new_from":       { "es": "Nuevo mensaje de {name}", "en": "New message from {name}" },
+    "new_hidden":     { "es": "Tienes un mensaje nuevo", "en": "You have a new message" }
   },
   "osd": {
     "volume":       { "es": "VOLUMEN", "en": "VOLUME" },
