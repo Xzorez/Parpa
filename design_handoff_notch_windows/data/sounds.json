@@ -1,0 +1,153 @@
+{
+  "envelope": "attack 5ms linear → exponential decay to 0.0001 over dur; gain = level * masterVolume (default 0.6); freq exponential ramp f0→f1",
+  "sounds": {
+    "click": [
+      {
+        "wave": "square",
+        "f0": 1800,
+        "f1": 1800,
+        "start": 0,
+        "dur": 0.025,
+        "level": 0.03
+      }
+    ],
+    "tick": [
+      {
+        "wave": "sine",
+        "f0": 1300,
+        "f1": 900,
+        "start": 0,
+        "dur": 0.05,
+        "level": 0.08
+      }
+    ],
+    "page": [
+      {
+        "wave": "sine",
+        "f0": 660,
+        "f1": 660,
+        "start": 0,
+        "dur": 0.05,
+        "level": 0.06
+      },
+      {
+        "wave": "sine",
+        "f0": 990,
+        "f1": 990,
+        "start": 0.05,
+        "dur": 0.06,
+        "level": 0.06
+      }
+    ],
+    "open": [
+      {
+        "wave": "sine",
+        "f0": 380,
+        "f1": 760,
+        "start": 0,
+        "dur": 0.12,
+        "level": 0.05
+      }
+    ],
+    "close": [
+      {
+        "wave": "sine",
+        "f0": 760,
+        "f1": 380,
+        "start": 0,
+        "dur": 0.1,
+        "level": 0.04
+      }
+    ],
+    "notify": [
+      {
+        "wave": "triangle",
+        "f0": 880,
+        "f1": 880,
+        "start": 0,
+        "dur": 0.12,
+        "level": 0.08
+      },
+      {
+        "wave": "triangle",
+        "f0": 1320,
+        "f1": 1320,
+        "start": 0.09,
+        "dur": 0.16,
+        "level": 0.08
+      }
+    ],
+    "ring": [
+      {
+        "wave": "triangle",
+        "f0": 740,
+        "f1": 740,
+        "start": 0,
+        "dur": 0.1,
+        "level": 0.08
+      },
+      {
+        "wave": "triangle",
+        "f0": 990,
+        "f1": 990,
+        "start": 0.12,
+        "dur": 0.1,
+        "level": 0.08
+      },
+      {
+        "wave": "triangle",
+        "f0": 740,
+        "f1": 740,
+        "start": 0.24,
+        "dur": 0.1,
+        "level": 0.08
+      },
+      {
+        "wave": "triangle",
+        "f0": 990,
+        "f1": 990,
+        "start": 0.36,
+        "dur": 0.1,
+        "level": 0.08
+      }
+    ],
+    "confirm": [
+      {
+        "wave": "sine",
+        "f0": 660,
+        "f1": 660,
+        "start": 0,
+        "dur": 0.07,
+        "level": 0.08
+      },
+      {
+        "wave": "sine",
+        "f0": 990,
+        "f1": 990,
+        "start": 0.07,
+        "dur": 0.12,
+        "level": 0.08
+      }
+    ],
+    "send": [
+      {
+        "wave": "sine",
+        "f0": 500,
+        "f1": 1400,
+        "start": 0,
+        "dur": 0.14,
+        "level": 0.07
+      }
+    ],
+    "decline": [
+      {
+        "wave": "sine",
+        "f0": 440,
+        "f1": 220,
+        "start": 0,
+        "dur": 0.18,
+        "level": 0.08
+      }
+    ]
+  }
+}

@@ -1,0 +1,119 @@
+<Project>
+  <!--
+    Genera Strings/<cultura>/Resources.resw a partir de Data/strings.json antes de compilar.
+    Clave .resw = "<grupo>_<clave>" (p. ej. windows_home). Solo se regenera si strings.json cambia.
+    Los .resw generados se guardan en el repo para que el SDK los recoja al evaluar el proyecto.
+  -->
+  <UsingTask TaskName="GenerateResw" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Source ParameterType="System.String" Required="true" />
+      <OutDir ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text" />
+      <Using Namespace="System.Collections.Generic" />
+      <Using Namespace="System.Globalization" />
+      <Using Namespace="System.Security" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        // Lector JSON mínimo (el inline task no tiene System.Text.Json). Objetos = lista ordenada de pares.
+        var text = File.ReadAllText(Source, Encoding.UTF8);
+        var pos = 0;
+        Func<object> parseValue = null;
+        Action skipWs = () => { while (pos < text.Length && char.IsWhiteSpace(text[pos])) pos++; };
+        Func<string> parseString = () =>
+        {
+            var sb = new StringBuilder();
+            pos++; // "
+            while (text[pos] != '"')
+            {
+                var ch = text[pos++];
+                if (ch != '\\') { sb.Append(ch); continue; }
+                var esc = text[pos++];
+                switch (esc)
+                {
+                    case 'n': sb.Append('\n'); break;
+                    case 't': sb.Append('\t'); break;
+                    case 'r': sb.Append('\r'); break;
+                    case 'b': sb.Append('\b'); break;
+                    case 'f': sb.Append('\f'); break;
+                    case 'u': sb.Append((char)int.Parse(text.Substring(pos, 4), NumberStyles.HexNumber)); pos += 4; break;
+                    default: sb.Append(esc); break;
+                }
+            }
+            pos++; // "
+            return sb.ToString();
+        };
+        parseValue = () =>
+        {
+            skipWs();
+            var ch = text[pos];
+            if (ch == '"') return parseString();
+            if (ch == '{')
+            {
+                var obj = new List<KeyValuePair<string, object>>();
+                pos++; skipWs();
+                if (text[pos] == '}') { pos++; return obj; }
+                while (true)
+                {
+                    skipWs(); var key = parseString(); skipWs(); pos++; // :
+                    obj.Add(new KeyValuePair<string, object>(key, parseValue()));
+                    skipWs();
+                    if (text[pos++] == '}') return obj;
+                }
+            }
+            if (ch == '[')
+            {
+                var arr = new List<object>();
+                pos++; skipWs();
+                if (text[pos] == ']') { pos++; return arr; }
+                while (true)
+                {
+                    arr.Add(parseValue()); skipWs();
+                    if (text[pos++] == ']') return arr;
+                }
+            }
+            var start = pos;
+            while (pos < text.Length && ",}] \t\r\n".IndexOf(text[pos]) < 0) pos++;
+            return text.Substring(start, pos - start);
+        };
+        var root = (List<KeyValuePair<string, object>>)parseValue();
+
+        var cultures = new[] { new[] { "es", "es-ES" }, new[] { "en", "en-US" } };
+        foreach (var c in cultures)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+            sb.AppendLine("<!-- Generado desde Data/strings.json por tools/GenerateResw.targets. No editar a mano. -->");
+            sb.AppendLine("<root>");
+            sb.AppendLine("  <resheader name=\"resmimetype\"><value>text/microsoft-resx</value></resheader>");
+            sb.AppendLine("  <resheader name=\"version\"><value>2.0</value></resheader>");
+            sb.AppendLine("  <resheader name=\"reader\"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>");
+            sb.AppendLine("  <resheader name=\"writer\"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>");
+            foreach (var group in root)
+            {
+                if (group.Key.StartsWith("_")) continue;
+                foreach (var entry in (List<KeyValuePair<string, object>>)group.Value)
+                {
+                    var name = SecurityElement.Escape(group.Key + "_" + entry.Key);
+                    var translations = (List<KeyValuePair<string, object>>)entry.Value;
+                    var value = SecurityElement.Escape((string)translations.Find(t => t.Key == c[0]).Value);
+                    sb.AppendLine("  <data name=\"" + name + "\" xml:space=\"preserve\"><value>" + value + "</value></data>");
+                }
+            }
+            sb.AppendLine("</root>");
+            var dir = Path.Combine(OutDir, c[1]);
+            Directory.CreateDirectory(dir);
+            File.WriteAllText(Path.Combine(dir, "Resources.resw"), sb.ToString(), new UTF8Encoding(true));
+        }
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GenerateResw" BeforeTargets="BeforeBuild"
+          Inputs="$(MSBuildProjectDirectory)\Data\strings.json"
+          Outputs="$(MSBuildProjectDirectory)\Strings\es-ES\Resources.resw;$(MSBuildProjectDirectory)\Strings\en-US\Resources.resw">
+    <GenerateResw Source="$(MSBuildProjectDirectory)\Data\strings.json" OutDir="$(MSBuildProjectDirectory)\Strings" />
+  </Target>
+</Project>

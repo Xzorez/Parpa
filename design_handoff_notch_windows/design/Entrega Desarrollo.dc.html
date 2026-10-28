@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Doto:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#e8e6e1;font-family:Geist,"Segoe UI Variable",system-ui,sans-serif;color:#1c1b19;-webkit-font-smoothing:antialiased}
+a{color:#1c1b19;text-underline-offset:2px}a:hover{color:#5a564f}
+code{font-family:'Geist Mono',monospace;font-size:.88em;background:#dcd9d2;padding:1px 5px;border-radius:4px}
+</style>
+</helmet>
+<main style="max-width:980px;margin:0 auto;padding:56px 32px 96px;display:flex;flex-direction:column;gap:56px">
+
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <div style="font:500 12px 'Geist Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6b675f">Entrega · v1 · 27 oct 2026</div>
+    <h1 style="margin:0;font:600 38px/1.05 Geist,sans-serif;letter-spacing:-.025em">Parpa — especificación para desarrollo</h1>
+    <p style="margin:0;font-size:16px;line-height:1.55;color:#4a4740;max-width:720px;text-wrap:pretty">Todo lo necesario para construir la app nativa a partir del prototipo: medidas, colores, tipografías, animaciones, sonidos, comportamiento y las APIs de Windows que sustituyen a lo que en web solo era simulado. Tecnología recomendada: <strong>WinUI 3 + C# (.NET 8)</strong>.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+      <a href="Notch Prototipo.dc.html" style="font:500 12px 'Geist Mono',monospace;padding:7px 12px;border-radius:999px;background:#1c1b19;color:#fff;text-decoration:none">Prototipo →</a>
+      <a href="Ajustes Notch.dc.html" style="font:500 12px 'Geist Mono',monospace;padding:7px 12px;border-radius:999px;border:1px solid #1c1b19;text-decoration:none">Ajustes →</a>
+      <a href="Bienvenida y Bandeja.dc.html" style="font:500 12px 'Geist Mono',monospace;padding:7px 12px;border-radius:999px;border:1px solid #1c1b19;text-decoration:none">Bienvenida y bandeja →</a>
+    </div>
+  </header>
+
+  <section style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font:600 22px Geist,sans-serif;letter-spacing:-.01em">01 · Por qué WinUI 3</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+      <div style="background:#f4f2ee;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font:600 14px Geist">WinUI 3 / C# — recomendado</span><span style="font-size:13px;line-height:1.5;color:#4a4740">Acceso directo a medios, notificaciones, audio, energía y red. Memoria baja (~60–90 MB), arranque rápido, composición nativa para animar.</span></div>
+      <div style="background:#f4f2ee;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font:600 14px Geist">Tauri — alternativa</span><span style="font-size:13px;line-height:1.5;color:#4a4740">Reutiliza el HTML del prototipo. Requiere puente en Rust para cada API del sistema; WebView2 añade ~100 MB.</span></div>
+      <div style="background:#f4f2ee;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px"><span style="font:600 14px Geist">Electron — descartado</span><span style="font-size:13px;line-height:1.5;color:#4a4740">Demasiado pesado para algo que vive siempre abierto (150–250 MB).</span></div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font:600 22px Geist,sans-serif;letter-spacing:-.01em">02 · Color</h2>
+    <p style="margin:0;font-size:14px;line-height:1.55;color:#4a4740;max-width:700px">Cada color tiene su par oscuro (izquierda) y claro (derecha). El prototipo los aplica como variables <code>--n0…--n11</code>; en tema claro el notch añade una sombra suave para separarse del fondo.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px">
+      <sc-for list="{{ swatches }}" as="c" hint-placeholder-count="8">
+        <div style="display:flex;gap:12px;align-items:center;background:#f4f2ee;border-radius:12px;padding:10px">
+          <div style="display:flex;flex-shrink:0;border-radius:8px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)"><div style="width:30px;height:44px;background:{{ c.d }}"></div><div style="width:18px;height:44px;background:{{ c.l }}"></div></div>
+          <div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font:600 13px Geist">{{ c.n }}</span><span style="font:11px 'Geist Mono',monospace;color:#6b675f">{{ c.d }} · {{ c.l }}</span><span style="font-size:11px;color:#6b675f">{{ c.u }}</span></div>
+        </div>
+      </sc-for>
+    </div>
+    <h3 style="margin:8px 0 0;font:600 15px Geist">Acentos (elegibles en Ajustes)</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px">
+      <sc-for list="{{ accents }}" as="c" hint-placeholder-count="4">
+        <div style="display:flex;gap:12px;align-items:center;background:#f4f2ee;border-radius:12px;padding:10px">
+          <div style="width:44px;height:44px;border-radius:50%;background:{{ c.v }};flex-shrink:0"></div>
+          <div style="display:flex;flex-direction:column;gap:2px"><span style="font:600 13px Geist">{{ c.n }}</span><span style="font:11px 'Geist Mono',monospace;color:#6b675f">{{ c.v }}</span><span style="font:11px 'Geist Mono',monospace;color:#6b675f">≈ {{ c.hex }}</span></div>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin:0;font-size:13px;color:#6b675f">El acento solo marca estados vivos: micro/cámara activos, grabando, llamada entrante, tarea vencida. Nunca fondos grandes.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font:600 22px Geist,sans-serif;letter-spacing:-.01em">03 · Tipografía</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+      <div style="background:#0b0b0c;color:#f2f2f0;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px"><span style="font:900 40px/1 Doto,monospace">21:04</span><span style="font:11px 'Geist Mono',monospace;color:#8d8d92">DOTO 700/900 · 13–40 px · números, reloj, cronómetros, valores de volumen</span></div>
+      <div style="background:#0b0b0c;color:#f2f2f0;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px"><span style="font:500 13px 'Geist Mono',monospace;letter-spacing:.1em">LUZ DE NEÓN · WHATSAPP</span><span style="font:11px 'Geist Mono',monospace;color:#8d8d92">GEIST MONO 400/500 · 9–11 px · etiquetas en mayúsculas, tracking .08–.14em</span></div>
+      <div style="background:#0b0b0c;color:#f2f2f0;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px"><span style="font:500 15px Geist">¿Vienes a la cena del viernes?</span><span style="font:11px 'Geist Mono',monospace;color:#8d8d92">GEIST 400/500/600 · 12–14 px · cuerpo de avisos, notas, tareas</span></div>
+    </div>
+    <p style="margin:0;font-size:13px;line-height:1.5;color:#6b675f">Las tres fuentes son SIL OFL: se pueden empaquetar dentro de la app. Respaldo: Segoe UI Variable / Cascadia Mono.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font:600 22px Geist,sans-serif;letter-spacing:-.01em">04 · Estados y medidas del notch</h2>
+    <p style="margin:0;font-size:14px;line-height:1.55;color:#4a4740;max-width:720px">Pegado al borde superior, centrado en el monitor elegido. Esquinas exteriores cóncavas de 14 px (“orejas”) a ambos lados. Fondo <code>#0b0b0c</code>. El tamaño global se escala 80–120 % desde Ajustes con origen en el centro superior.</p>
+    <div style="display:flex;flex-direction:column;border-radius:12px;overflow:hidden;background:#f4f2ee">
+      <div style="display:grid;grid-template-columns:1.4fr .8fr .8fr .6fr 2fr;gap:12px;padding:10px 14px;font:500 11px 'Geist Mono',monospace;letter-spacing:.06em;color:#6b675f;background:#dcd9d2"><span>ESTADO</span><span>ANCHO</span><span>ALTO</span><span>RADIO</span><span>CUÁNDO</span></div>
+      <sc-for list="{{ states }}" as="s" hint-placeholder-count="10">
+        <div style="display:grid;grid-template-columns:1.4fr .8fr .8fr .6fr 2fr;gap:12px;padding:10px 14px;font-size:13px;border-top:1px solid #e2dfd8;align-items:baseline">
+          <span style="font-weight:600">{{ s.n }}</span><span style="font:12px 'Geist Mono',monospace">{{ s.w }}</span><span style="font:12px 'Geist Mono',monospace">{{ s.h }}</span><span style="font:12px 'Geist Mono',monospace">{{ s.r }}</span><span style="color:#4a4740;line-height:1.45">{{ s.c }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <h3 style="margin:8px 0 0;font:600 15px Geist">Prioridad cuando coinciden</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;font:500 12px 'Geist Mono',monospace">
+      <sc-for list="{{ prio }}" as="p" hint-placeholder-count="6"><span style="padding:6px 10px;border-radius:999px;background:#1c1b19;color:#fff">{{ p.n }}</span><span style="color:#8d8d92;opacity:{{ p.arrow }}">→</span></sc-for>
+    </div>
+    <p style="margin:0;font-size:13px;color:#6b675f">Un aviso nunca interrumpe si el notch está abierto o anclado; se encola y aparece al cerrar. Los indicadores del sistema se descartan si hay un aviso visible.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font:600 22px Geist,sans-serif;letter-spacing:-.01em">05 · Glifos de puntos</h2>
+    <p style="margin:0;font-size:14px;line-height:1.55;color:#4a4740;max-width:720px">Toda la iconografía es una matriz de puntos circulares. Los mapas están en el prototipo (método <code>glyph()</code>); exportarlos a JSON y dibujarlos con un único control.</p>
+    <div style="display:flex;flex-direction:column;border-radius:12px;overflow:hidden;background:#f4f2ee">
+      <sc-for list="{{ grids }}" as="g" hint-placeholder-count="4">
+        <div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 2fr;gap:12px;padding:10px 14px;font-size:13px;border-top:1px solid #e2dfd8"><span style="font-weight:600">{{ g.n }}</span><span style="font:12px 'Geist Mono',monospace">{{ g.m }}</span><span style="font:12px 'Geist Mono',monospace">{{ g.d }}</span><span style="color:#4a4740">{{ g.u }}</span></div>
+      </sc-for>
+    </div>
+    <p style="margin:0;font-size:13px;color:#6b675f">Punto apagado: <code>#2a2a2e</code> sobre fondo, o transparente en glifos sueltos. Mascota: 5 estados de ánimo, parpadeo cada 3–5 s aleatorio.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font:600 22px Geist,sans-serif;letter-spacing:-.01em">06 · Animación</h2>
+    <div style="display:flex;flex-direction:column;border-radius:12px;overflow:hidden;background:#f4f2ee">
+      <div style="display:grid;grid-template-columns:1.3fr 1fr 2fr;gap:12px;padding:10px 14px;font:500 11px 'Geist Mono',monospace;letter-spacing:.06em;color:#6b675f;background:#dcd9d2"><span>MOVIMIENTO</span><span>DURACIÓN</span><span>CURVA / NOTA</span></div>
+      <sc-for list="{{ anims }}" as="a" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:1.3fr 1fr 2fr;gap:12px;padding:10px 14px;font-size:13px;border-top:1px solid #e2dfd8;align-items:baseline"><span style="font-weight:600">{{ a.n }}</span><span style="font:12px 'Geist Mono',monospace">{{ a.d }}</span><span style="font:12px 'Geist Mono',monospace;color:#4a4740;line-height:1.5">{{ a.c }}</span></div>
+      </sc-for>
+    </div>
+    <p style="margin:0;font-size:13px;line-height:1.5;color:#6b675f">En WinUI: animar ancho/alto/radio del mismo <code>Visual</code> con <code>Compositor.CreateVectorKeyFrameAnimation</code> y la curva cúbica; el contenido entra con fundido tras el 40 % del cambio de tamaño. Si Windows tiene “Efectos de animación” desactivado, forzar el modo reducido.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font:600 22px Geist,sans-serif;letter-spacing:-.01em">07 · Sonidos</h2>
+    <p style="margin:0;font-size:14px;line-height:1.55;color:#4a4740;max-width:720px">Sintetizados, sin archivos. Cada tono: oscilador → ganancia con ataque de 5 ms y caída exponencial a 0,0001. Ganancia final = nivel × volumen global (60 % por defecto). Pulsa para oírlos.</p>
+    <div style="display:flex;flex-direction:column;border-radius:12px;overflow:hidden;background:#f4f2ee">
+      <div style="display:grid;grid-template-columns:44px 1fr 2.6fr 1.6fr;gap:12px;padding:10px 14px;font:500 11px 'Geist Mono',monospace;letter-spacing:.06em;color:#6b675f;background:#dcd9d2"><span></span><span>SONIDO</span><span>TONOS (onda · Hz · inicio · dur · nivel)</span><span>USO</span></div>
+      <sc-for list="{{ sounds }}" as="s" hint-placeholder-count="10">
+        <div style="display:grid;grid-template-columns:44px 1fr 2.6fr 1.6fr;gap:12px;padding:8px 14px;font-size:13px;border-top:1px solid #e2dfd8;align-items:center">
+          <div onClick="{{ s.play }}" title="Reproducir" style="width:30px;height:30px;border-radius:50%;background:#1c1b19;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px" style-hover="background:#4a4740">▶</div>
+          <span style="font:600 12px 'Geist Mono',monospace">{{ s.k }}</span><span style="font:11px/1.5 'Geist Mono',monospace;color:#4a4740">{{ s.t }}</span><span style="color:#4a4740">{{ s.u }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin:0;font-size:13px;color:#6b675f">Nativo: NAudio <code>SignalGenerator</code> o generar los 10 WAV una vez al instalar. Silenciar si “No molestar” o modo juego están activos.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font:600 22px Geist,sans-serif;letter-spacing:-.01em">08 · Interacciones</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+      <sc-for list="{{ flows }}" as="f" hint-placeholder-count="6">
+        <div style="background:#f4f2ee;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px">
+          <span style="font:600 14px Geist">{{ f.n }}</span>
+          <sc-for list="{{ f.s }}" as="x"><div style="display:flex;gap:8px;font-size:13px;line-height:1.45;color:#4a4740"><span style="color:#8d8d92;font:12px 'Geist Mono',monospace">—</span><span>{{ x.t }}</span></div></sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font:600 22px Geist,sans-serif;letter-spacing:-.01em">09 · APIs de Windows</h2>
+    <p style="margin:0;font-size:14px;line-height:1.55;color:#4a4740;max-width:720px">Lo que el prototipo simula y cómo se obtiene de verdad.</p>
+    <div style="display:flex;flex-direction:column;border-radius:12px;overflow:hidden;background:#f4f2ee">
+      <sc-for list="{{ apis }}" as="a" hint-placeholder-count="14">
+        <div style="display:grid;grid-template-columns:1fr 2.4fr;gap:14px;padding:10px 14px;font-size:13px;border-top:1px solid #e2dfd8;align-items:baseline"><span style="font-weight:600">{{ a.n }}</span><span style="font:12px/1.5 'Geist Mono',monospace;color:#4a4740">{{ a.v }}</span></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font:600 22px Geist,sans-serif;letter-spacing:-.01em">10 · Ajustes por defecto</h2>
+    <p style="margin:0;font-size:14px;line-height:1.55;color:#4a4740;max-width:720px">Guardar en <code>%APPDATA%\Notch\settings.json</code> con el mismo esquema que el prototipo (clave web <code>punto.settings.v1</code>), para poder importar.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1px;background:#e2dfd8;border-radius:12px;overflow:hidden">
+      <sc-for list="{{ defaults }}" as="d" hint-placeholder-count="24">
+        <div style="background:#f4f2ee;padding:9px 12px;display:flex;justify-content:space-between;gap:10px;font-size:12px"><span style="color:#4a4740">{{ d.k }}</span><span style="font:12px 'Geist Mono',monospace;text-align:right">{{ d.v }}</span></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:16px">
+    <h2 style="margin:0;font:600 22px Geist,sans-serif;letter-spacing:-.01em">11 · Pendiente de decidir</h2>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.5;color:#4a4740">
+      <span>— Comportamiento con varios monitores con distinto DPI y barra de tareas arriba.</span>
+      <span>— Permiso de acceso a notificaciones: qué mostrar si el usuario lo deniega en la bienvenida.</span>
+      <span>— “No molestar” usa estado no documentado de Windows; confirmar en 23H2/24H2 o limitarlo a un modo propio.</span>
+    </div>
+  </section>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  T = {
+    click: [['square', 1800, 1800, 0, .025, .03]],
+    tick: [['sine', 1300, 900, 0, .05, .08]],
+    page: [['sine', 660, 660, 0, .05, .06], ['sine', 990, 990, .05, .06, .06]],
+    open: [['sine', 380, 760, 0, .12, .05]],
+    close: [['sine', 760, 380, 0, .1, .04]],
+    notify: [['triangle', 880, 880, 0, .12, .08], ['triangle', 1320, 1320, .09, .16, .08]],
+    ring: [['triangle', 740, 740, 0, .1, .08], ['triangle', 990, 990, .12, .1, .08], ['triangle', 740, 740, .24, .1, .08], ['triangle', 990, 990, .36, .1, .08]],
+    confirm: [['sine', 660, 660, 0, .07, .08], ['sine', 990, 990, .07, .12, .08]],
+    send: [['sine', 500, 1400, 0, .14, .07]],
+    decline: [['sine', 440, 220, 0, .18, .08]]
+  };
+  USE = { click: 'Botones, conmutadores', tick: 'Rueda / pasos de volumen', page: 'Cambio de ventana', open: 'Expandir', close: 'Contraer', notify: 'Aviso nuevo', ring: 'Llamada entrante (repetir cada 1,2 s)', confirm: 'Tarea hecha, archivo guardado', send: 'Respuesta enviada', decline: 'Rechazar / acción bloqueada' };
+  play(k) {
+    try {
+      const ac = this.ac || (this.ac = new (window.AudioContext || window.webkitAudioContext)());
+      if (ac.state === 'suspended') ac.resume();
+      const now = ac.currentTime;
+      this.T[k].forEach(([w, f0, f1, at, dur, vol]) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = w; o.frequency.setValueAtTime(f0, now + at); o.frequency.exponentialRampToValueAtTime(f1, now + at + dur);
+        g.gain.setValueAtTime(0, now + at); g.gain.linearRampToValueAtTime(vol * .6, now + at + .005); g.gain.exponentialRampToValueAtTime(.0001, now + at + dur);
+        o.connect(g).connect(ac.destination); o.start(now + at); o.stop(now + at + dur + .02);
+      });
+    } catch (e) {}
+  }
+  renderVals() {
+    const L = a => a.map(t => ({ t }));
+    return {
+      swatches: [
+        { n: 'Fondo notch', d: '#0b0b0c', l: '#f6f5f2', u: 'Superficie principal y orejas' },
+        { n: 'Tarjeta', d: '#151517', l: '#ebe9e4', u: 'Tarjetas, campos de texto' },
+        { n: 'Divisor', d: '#1e1e21', l: '#dedbd4', u: 'Líneas entre filas' },
+        { n: 'Borde / punto apagado', d: '#2a2a2e', l: '#cfccc4', u: 'Bordes de botones, matriz inactiva' },
+        { n: 'Terciario', d: '#5a5a60', l: '#9a968e', u: 'Índices, texto deshabilitado' },
+        { n: 'Secundario', d: '#8d8d92', l: '#6b675f', u: 'Etiquetas mono, metadatos' },
+        { n: 'Primario', d: '#f2f2f0', l: '#1c1b19', u: 'Texto y puntos encendidos' }
+      ],
+      accents: [
+        { n: 'Rojo (defecto)', v: 'oklch(0.63 0.22 27)', hex: '#E5383B' },
+        { n: 'Ámbar', v: 'oklch(0.63 0.22 70)', hex: '#D27A00' },
+        { n: 'Verde', v: 'oklch(0.63 0.22 150)', hex: '#00A64F' },
+        { n: 'Azul', v: 'oklch(0.63 0.22 255)', hex: '#2F7BF5' }
+      ],
+      states: [
+        { n: 'Reposo', w: '120', h: '34', r: '16', c: 'Sin actividad. Mascota o reloj.' },
+        { n: 'Actividad compacta', w: '160–290', h: '34', r: '16', c: 'Música 290, llamada 250, descarga 220, micro 190, foco 160.' },
+        { n: 'Minimal', w: '60 % (mín. 96)', h: '24', r: '12', c: 'Ajuste “modo minimal”. Zona de activación 6 px más alta.' },
+        { n: 'Indicador sistema', w: '340', h: '40', r: '16', c: 'Volumen, brillo, batería, Wi-Fi, auriculares. 1,6 s visible.' },
+        { n: 'Aviso', w: '420', h: '112', r: '26', c: 'Mensaje, llamada, tarea. Duración 4,5 s por defecto (2–10).' },
+        { n: 'Soltar archivo', w: '420', h: '84', r: '26', c: 'Arrastre sobre el notch.' },
+        { n: 'Menú burbujas', w: '580', h: '264', r: '30', c: 'Botón central del abierto.' },
+        { n: 'Abierto · Inicio', w: '580', h: '176 / 196', r: '30', c: '196 si hay letra de canción.' },
+        { n: 'Abierto · Portapapeles', w: '580', h: '214', r: '30', c: '' },
+        { n: 'Abierto · Bandeja', w: '580', h: '236', r: '30', c: '' },
+        { n: 'Abierto · Tareas', w: '580', h: '280', r: '30', c: '' },
+        { n: 'Abierto · Notas', w: '580', h: '222', r: '30', c: '' },
+        { n: 'Abierto · Ajustes rápidos', w: '580', h: '246', r: '30', c: '' }
+      ],
+      prio: ['Arrastre', 'Abierto', 'Aviso', 'Indicador sistema', 'Actividad', 'Reposo'].map((n, i, a) => ({ n, arrow: i < a.length - 1 ? 1 : 0 })),
+      grids: [
+        { n: 'Glifo compacto', m: '7 × 7', d: '2 px · gap 1', u: 'Notch cerrado, avisos, indicadores' },
+        { n: 'Glifo burbuja', m: '7 × 7', d: '3 px · gap 1,5', u: 'Menú de burbujas (54 px Ø)' },
+        { n: 'Mascota', m: '13 × 5', d: '3 px · gap 1,5', u: 'Reposo; 4 px en el centro del menú' },
+        { n: 'Barras', m: '12–16 col.', d: '3–5 px', u: 'Ecualizador, progreso, nivel de volumen' }
+      ],
+      anims: [
+        { n: 'Cambio de forma', d: '450 ms', c: 'cubic-bezier(.3, 1.2, .5, 1) — ligero rebote' },
+        { n: 'Modo reducido', d: '150 ms', c: 'ease, sin rebote' },
+        { n: 'Retraso de apertura', d: '250 ms', c: 'Hover mantenido antes de expandir (ajustable)' },
+        { n: 'Retraso de cierre', d: '400 ms', c: 'Tras salir el ratón (ajustable 0–2 s)' },
+        { n: 'Burbujas', d: '300 ms', c: 'Escalado 0.6→1 + opacidad, escalonado 30 ms' },
+        { n: 'Barras de pasos', d: '300 ms', c: 'Ancho del punto activo 4→18 px' },
+        { n: 'Punto en vivo', d: '1 s ciclo', c: 'Opacidad 1 ↔ 0,25, paso (no suave)' },
+        { n: 'Ecualizador', d: '100 ms tick', c: 'Alturas aleatorias suavizadas; para al pausar' }
+      ],
+      sounds: Object.keys(this.T).map(k => ({ k, u: this.USE[k], t: this.T[k].map(([w, f0, f1, at, d, v]) => w + ' ' + f0 + (f1 !== f0 ? '→' + f1 : '') + ' · ' + at + ' · ' + d + ' · ' + v).join('  |  '), play: () => this.play(k) })),
+      flows: [
+        { n: 'Abrir y cerrar', s: L(['Hover 250 ms, clic o atajo (por defecto Win+Alt+N) → abre en la última ventana.', 'Rueda sobre el notch cambia de ventana.', 'Se cierra al salir el ratón, o solo con clic fuera (ajuste). El pin lo mantiene abierto.']) },
+        { n: 'Menú de burbujas', s: L(['Hasta 5 burbujas en semicírculo; reparto 2-1-2 y se reajusta si se ocultan ventanas.', 'Centro: mascota → vuelve a Inicio.', 'Insignia con contador en Bandeja y Tareas.']) },
+        { n: 'Avisos', s: L(['Solo de apps activadas en Ajustes; con No molestar se bloquean (salvo llamadas si se permite).', 'Dos acciones + respuesta rápida en línea para mensajes.', 'Hover pausa el temporizador.']) },
+        { n: 'Arrastrar y soltar', s: L(['Archivo → Bandeja, con acciones rápidas (comprimir, PNG, ZIP, copiar ruta).', 'Texto → Notas. Enlace → Portapapeles.', 'Arrastrar desde la Bandeja a otra app lo saca.']) },
+        { n: 'Indicadores del sistema', s: L(['Sustituyen al OSD de Windows para volumen y brillo (ocultar el nativo es opcional).', 'Batería: aviso al conectar y al 20 % / 10 %.', 'Wi-Fi y auriculares: al cambiar de estado.']) },
+        { n: 'Pantalla completa', s: L(['Con juego o vídeo a pantalla completa, el notch se oculta (ajuste por defecto).', 'Los avisos se encolan hasta salir.']) }
+      ],
+      apis: [
+        { n: 'Ventana', v: 'WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_TOPMOST, sin borde; región recortada a la forma; DPI por monitor (PerMonitorV2)' },
+        { n: 'Sin robar foco', v: 'WS_EX_NOACTIVATE + MA_NOACTIVATE en WM_MOUSEACTIVATE; activar solo al escribir (respuesta, notas)' },
+        { n: 'Monitor', v: 'EnumDisplayMonitors + MonitorFromPoint; reposicionar en WM_DISPLAYCHANGE' },
+        { n: 'Atajo global', v: 'RegisterHotKey (MOD_WIN | MOD_ALT, "N") — la tecla Win sí funciona en nativo' },
+        { n: 'Música', v: 'GlobalSystemMediaTransportControlsSessionManager (título, carátula, posición, play/pausa)' },
+        { n: 'Avisos de apps', v: 'UserNotificationListener (requiere permiso del usuario); filtrar por AppInfo.DisplayInfo.DisplayName' },
+        { n: 'Micro / cámara en uso', v: 'Registro CapabilityAccessManager\\ConsentStore\\{microphone,webcam} → LastUsedTimeStop = 0' },
+        { n: 'Volumen', v: 'Core Audio IAudioEndpointVolume + IAudioEndpointVolumeCallback' },
+        { n: 'Brillo', v: 'WMI WmiMonitorBrightnessEvent (solo portátiles / pantallas compatibles)' },
+        { n: 'Batería', v: 'Windows.System.Power.PowerManager (RemainingChargePercent, PowerSupplyStatus)' },
+        { n: 'Wi-Fi', v: 'NetworkInformation.NetworkStatusChanged' },
+        { n: 'Auriculares', v: 'IMMNotificationClient (dispositivo por defecto) + batería BT por DeviceWatcher' },
+        { n: 'No molestar', v: 'Estado WNF de “Asistente de concentración” (no documentado) o modo propio' },
+        { n: 'Pantalla completa', v: 'SHQueryUserNotificationState → QUNS_BUSY / QUNS_RUNNING_D3D_FULL_SCREEN' },
+        { n: 'Portapapeles', v: 'Clipboard.ContentChanged; historial propio, límite 50' },
+        { n: 'Inicio con Windows', v: 'StartupTask (MSIX) o HKCU\\…\\Run' },
+        { n: 'Icono de bandeja', v: 'Shell_NotifyIcon (librería H.NotifyIcon para WinUI)' }
+      ],
+      defaults: [
+        ['Iniciar con Windows', 'sí'], ['Atajo', 'Win+Alt+N'], ['Rueda cambia ventana', 'sí'], ['Cerrar al', 'salir ratón'], ['Retraso de cierre', '0,4 s'], ['Retraso de apertura', '250 ms'], ['Sensibilidad hover', '6 px'],
+        ['Posición', 'centro'], ['Tamaño', '100 %'], ['Modo minimal', 'no'], ['Ocultar en pantalla completa', 'sí'], ['Tema', 'oscuro'], ['Acento', 'rojo'], ['Mascota', 'sí · curiosa'], ['Animaciones', 'completas'], ['Reloj', '24 h'],
+        ['Duración avisos', '4,5 s'], ['Respuesta rápida', 'sí'], ['Letra de canción', 'sí'], ['Micro siempre visible', 'sí'], ['Apps', 'WhatsApp, Discord, Claude, Spotify'], ['Pomodoro', '25 / 5 / 15 min'],
+        ['Historial portapapeles', '50'], ['Sonidos', 'sí · 60 %'], ['Indicadores', 'volumen, brillo, batería, Wi-Fi, auriculares'], ['No molestar', 'no · desde 23:00']
+      ].map(([k, v]) => ({ k, v }))
+    };
+  }
+}
+</script>
+</body>
+</html>

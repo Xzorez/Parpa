@@ -1,0 +1,17 @@
+<Application
+    x:Class="Parpa.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Sin XamlControlsResources: el notch no usa controles estándar y así ahorra memoria. -->
+
+            <!-- Geist, Geist Mono y Doto (SIL OFL), con las alternativas de tokens.json. -->
+            <FontFamily x:Key="FontUi">ms-appx:///Assets/Fonts/Geist-Variable.ttf#Geist, Segoe UI Variable</FontFamily>
+            <FontFamily x:Key="FontMono">ms-appx:///Assets/Fonts/GeistMono-Variable.ttf#Geist Mono, Cascadia Mono</FontFamily>
+            <FontFamily x:Key="FontDisplay">ms-appx:///Assets/Fonts/Doto-Variable.ttf#Doto, Cascadia Mono</FontFamily>
+
+            <!-- Los colores (PrimaryColor, PrimaryBrush, …) se cargan desde Data/tokens.json en App.OnLaunched. -->
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

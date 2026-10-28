@@ -1,0 +1,232 @@
+{
+  "grid": "7x7",
+  "on": "X",
+  "off": ".",
+  "glyphs": {
+    "musica": [
+      "..XXXXX",
+      "..XXXXX",
+      "..X...X",
+      "..X...X",
+      "XXX.XXX",
+      "XXX.XXX",
+      "......."
+    ],
+    "llamada": [
+      ".XXXXX.",
+      "XXXXXXX",
+      "X.....X",
+      "..XXX..",
+      ".XX.XX.",
+      "XXXXXXX",
+      "XXXXXXX"
+    ],
+    "general": [
+      "X..X..X",
+      ".XXXXX.",
+      ".XX.XX.",
+      "XX...XX",
+      ".XX.XX.",
+      ".XXXXX.",
+      "X..X..X"
+    ],
+    "brillo": [
+      "X..X..X",
+      ".......",
+      "..XXX..",
+      "X.XXX.X",
+      "..XXX..",
+      ".......",
+      "X..X..X"
+    ],
+    "bateria": [
+      ".......",
+      ".......",
+      "XXXXXX.",
+      "XXX..XX",
+      "XXX..XX",
+      "XXXXXX.",
+      "......."
+    ],
+    "wifi": [
+      ".......",
+      ".XXXXX.",
+      "X.....X",
+      "..XXX..",
+      ".X...X.",
+      "...X...",
+      "......."
+    ],
+    "cascos": [
+      ".XXXXX.",
+      "X.....X",
+      "X.....X",
+      "XX...XX",
+      "XX...XX",
+      "XX...XX",
+      "......."
+    ],
+    "luna": [
+      "..XXX..",
+      ".XX....",
+      "XX.....",
+      "XX.....",
+      "XX.....",
+      ".XX....",
+      "..XXX.."
+    ],
+    "sonido": [
+      "...X...",
+      "..XX..X",
+      "XXXX.X.",
+      "XXXX.X.",
+      "XXXX.X.",
+      "..XX..X",
+      "...X..."
+    ],
+    "cara": [
+      ".......",
+      "XX...XX",
+      "XX...XX",
+      ".......",
+      ".X...X.",
+      "..XXX..",
+      "......."
+    ],
+    "linea": [
+      ".......",
+      ".......",
+      ".......",
+      "XXXXXXX",
+      ".......",
+      ".......",
+      "......."
+    ],
+    "juego": [
+      ".......",
+      ".XXXXX.",
+      "XX.X.XX",
+      "X.....X",
+      "XX.X.XX",
+      ".XXXXX.",
+      "......."
+    ],
+    "ojo": [
+      ".......",
+      "..XXX..",
+      ".X...X.",
+      "X..X..X",
+      ".X...X.",
+      "..XXX..",
+      "......."
+    ],
+    "menu": [
+      "X..X..X",
+      ".......",
+      ".......",
+      "X..X..X",
+      ".......",
+      ".......",
+      "X..X..X"
+    ],
+    "notas": [
+      "XXXXXXX",
+      "XXXXXXX",
+      "X.....X",
+      "X.XXX.X",
+      "X....XX",
+      "X...XX.",
+      "XXXXX.."
+    ],
+    "tareas": [
+      "XX.XXXX",
+      "XX.....",
+      ".......",
+      "XX.XXXX",
+      "XX.....",
+      ".......",
+      "XX.XXX."
+    ],
+    "micro": [
+      "..XXX..",
+      "..XXX..",
+      "X.XXX.X",
+      "X.XXX.X",
+      ".X...X.",
+      "..XXX..",
+      "..XXX.."
+    ],
+    "descarga": [
+      "...X...",
+      "...X...",
+      ".X.X.X.",
+      "..XXX..",
+      "...X...",
+      "X.....X",
+      "XXXXXXX"
+    ],
+    "mensaje": [
+      ".XXXXX.",
+      "XXXXXXX",
+      "X.X.X.X",
+      "XXXXXXX",
+      ".XXXXX.",
+      ".XX....",
+      ".X....."
+    ],
+    "claude": [
+      "...X...",
+      ".X.X.X.",
+      "..XXX..",
+      "XXXXXXX",
+      "..XXX..",
+      ".X.X.X.",
+      "...X..."
+    ],
+    "foco": [
+      "..X.X..",
+      "...X...",
+      ".XXXXX.",
+      "XXXXXXX",
+      "XXXXXXX",
+      "XXXXXXX",
+      ".XXXXX."
+    ],
+    "inicio": [
+      "..XXX..",
+      ".XXXXX.",
+      "XXXXXXX",
+      "XXXXXXX",
+      "XXXXXXX",
+      ".XXXXX.",
+      "..XXX.."
+    ],
+    "copias": [
+      "XXXXX..",
+      "X...X..",
+      "X.XXXXX",
+      "X.X...X",
+      "XXX...X",
+      "..X...X",
+      "..XXXXX"
+    ],
+    "bandeja": [
+      "XXX....",
+      "XXXXXXX",
+      "X.....X",
+      "X.....X",
+      "X.....X",
+      "XXXXXXX",
+      "......."
+    ],
+    "sistema": [
+      "......X",
+      "....X.X",
+      "....X.X",
+      "..X.X.X",
+      "..X.X.X",
+      "X.X.X.X",
+      "XXXXXXX"
+    ]
+  }
+}

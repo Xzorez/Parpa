@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Generado desde Data/strings.json por tools/GenerateResw.targets. No editar a mano. -->
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="app_name" xml:space="preserve"><value>Parpa</value></data>
+  <data name="app_tagline" xml:space="preserve"><value>Music, alerts, files and notes. Up top, one gesture away.</value></data>
+  <data name="app_store_short" xml:space="preserve"><value>A little helper at the top of your screen.</value></data>
+  <data name="windows_home" xml:space="preserve"><value>HOME</value></data>
+  <data name="windows_clip" xml:space="preserve"><value>CLIPBOARD</value></data>
+  <data name="windows_shelf" xml:space="preserve"><value>SHELF</value></data>
+  <data name="windows_todo" xml:space="preserve"><value>TASKS</value></data>
+  <data name="windows_notes" xml:space="preserve"><value>NOTES</value></data>
+  <data name="windows_quick" xml:space="preserve"><value>SETTINGS</value></data>
+  <data name="windows_menu" xml:space="preserve"><value>MENU</value></data>
+  <data name="compact_idle" xml:space="preserve"><value>IDLE</value></data>
+  <data name="compact_focus" xml:space="preserve"><value>FOCUS</value></data>
+  <data name="compact_mic_cam" xml:space="preserve"><value>MIC · CAMERA</value></data>
+  <data name="compact_download" xml:space="preserve"><value>DOWNLOAD</value></data>
+  <data name="compact_in_call" xml:space="preserve"><value>IN CALL</value></data>
+  <data name="compact_reply_ready" xml:space="preserve"><value>REPLY READY</value></data>
+  <data name="home_music" xml:space="preserve"><value>MUSIC</value></data>
+  <data name="home_focus" xml:space="preserve"><value>FOCUS</value></data>
+  <data name="home_system" xml:space="preserve"><value>SYSTEM</value></data>
+  <data name="home_next_task" xml:space="preserve"><value>NEXT TASK</value></data>
+  <data name="home_bat" xml:space="preserve"><value>BAT</value></data>
+  <data name="home_vol" xml:space="preserve"><value>VOL</value></data>
+  <data name="home_wifi" xml:space="preserve"><value>WIFI</value></data>
+  <data name="home_start" xml:space="preserve"><value>START</value></data>
+  <data name="home_pause" xml:space="preserve"><value>PAUSE</value></data>
+  <data name="home_done" xml:space="preserve"><value>DONE</value></data>
+  <data name="home_all_settings" xml:space="preserve"><value>ALL SETTINGS</value></data>
+  <data name="home_sounds" xml:space="preserve"><value>SOUNDS</value></data>
+  <data name="quick_wifi" xml:space="preserve"><value>Wi-Fi</value></data>
+  <data name="quick_bluetooth" xml:space="preserve"><value>Bluetooth</value></data>
+  <data name="quick_dnd" xml:space="preserve"><value>Do not disturb</value></data>
+  <data name="quick_focus" xml:space="preserve"><value>Focus mode</value></data>
+  <data name="quick_mic" xml:space="preserve"><value>Mic</value></data>
+  <data name="quick_theme" xml:space="preserve"><value>Theme</value></data>
+  <data name="peek_reply" xml:space="preserve"><value>REPLY</value></data>
+  <data name="peek_later" xml:space="preserve"><value>LATER</value></data>
+  <data name="peek_send" xml:space="preserve"><value>SEND</value></data>
+  <data name="peek_cancel" xml:space="preserve"><value>CANCEL</value></data>
+  <data name="peek_accept" xml:space="preserve"><value>ACCEPT</value></data>
+  <data name="peek_decline" xml:space="preserve"><value>DECLINE</value></data>
+  <data name="peek_open" xml:space="preserve"><value>OPEN</value></data>
+  <data name="peek_show_folder" xml:space="preserve"><value>SHOW IN FOLDER</value></data>
+  <data name="peek_snooze" xml:space="preserve"><value>SNOOZE</value></data>
+  <data name="peek_reply_to" xml:space="preserve"><value>REPLY TO {name}</value></data>
+  <data name="peek_reply_ph" xml:space="preserve"><value>Type a reply…</value></data>
+  <data name="peek_now" xml:space="preserve"><value>NOW</value></data>
+  <data name="peek_incoming_call" xml:space="preserve"><value>INCOMING CALL</value></data>
+  <data name="peek_download_done" xml:space="preserve"><value>DOWNLOAD COMPLETE</value></data>
+  <data name="peek_task_due" xml:space="preserve"><value>TASK DUE NOW</value></data>
+  <data name="peek_copied" xml:space="preserve"><value>COPIED</value></data>
+  <data name="peek_dnd_blocked" xml:space="preserve"><value>☾ DO NOT DISTURB IS ON</value></data>
+  <data name="peek_app_blocked" xml:space="preserve"><value>✕ ALERTS OFF FOR THIS APP</value></data>
+  <data name="osd_volume" xml:space="preserve"><value>VOLUME</value></data>
+  <data name="osd_speakers" xml:space="preserve"><value>SPEAKERS</value></data>
+  <data name="osd_brightness" xml:space="preserve"><value>BRIGHTNESS</value></data>
+  <data name="osd_display_n" xml:space="preserve"><value>DISPLAY {n}</value></data>
+  <data name="osd_charging" xml:space="preserve"><value>CHARGING</value></data>
+  <data name="osd_charger_in" xml:space="preserve"><value>CHARGER CONNECTED</value></data>
+  <data name="osd_battery_low" xml:space="preserve"><value>LOW BATTERY</value></data>
+  <data name="osd_battery_left" xml:space="preserve"><value>{pct} LEFT</value></data>
+  <data name="osd_offline" xml:space="preserve"><value>OFFLINE</value></data>
+  <data name="osd_online" xml:space="preserve"><value>CONNECTED</value></data>
+  <data name="osd_headphones" xml:space="preserve"><value>HEADPHONES</value></data>
+  <data name="osd_dnd_on" xml:space="preserve"><value>DO NOT DISTURB</value></data>
+  <data name="osd_dnd_until" xml:space="preserve"><value>UNTIL {time}</value></data>
+  <data name="drop_file" xml:space="preserve"><value>DROP TO ADD TO SHELF</value></data>
+  <data name="drop_text" xml:space="preserve"><value>DROP TO CREATE A NOTE</value></data>
+  <data name="drop_link" xml:space="preserve"><value>DROP TO SAVE THE LINK</value></data>
+  <data name="shelf_empty_1" xml:space="preserve"><value>DRAG FILES UP TO THE NOTCH</value></data>
+  <data name="shelf_empty_2" xml:space="preserve"><value>THEY STAY HERE UNTIL YOU TAKE THEM OUT</value></data>
+  <data name="shelf_pick_hint" xml:space="preserve"><value>OR TAP ONE FOR ACTIONS</value></data>
+  <data name="shelf_saved" xml:space="preserve"><value>SAVED TO SHELF</value></data>
+  <data name="shelf_new" xml:space="preserve"><value>NEW</value></data>
+  <data name="shelf_folder" xml:space="preserve"><value>FOLDER</value></data>
+  <data name="shelf_act_compress" xml:space="preserve"><value>COMPRESS</value></data>
+  <data name="shelf_act_png" xml:space="preserve"><value>TO PNG</value></data>
+  <data name="shelf_act_merge_pdf" xml:space="preserve"><value>MERGE PDF</value></data>
+  <data name="shelf_act_zip" xml:space="preserve"><value>ZIP</value></data>
+  <data name="shelf_act_copy_path" xml:space="preserve"><value>COPY PATH</value></data>
+  <data name="shelf_act_remove" xml:space="preserve"><value>REMOVE</value></data>
+  <data name="clip_empty" xml:space="preserve"><value>COPY SOMETHING WITH {keys} AND IT SHOWS UP HERE</value></data>
+  <data name="clip_copy" xml:space="preserve"><value>COPY</value></data>
+  <data name="clip_pin" xml:space="preserve"><value>PIN</value></data>
+  <data name="clip_clear" xml:space="preserve"><value>CLEAR ALL</value></data>
+  <data name="todo_today" xml:space="preserve"><value>TODAY</value></data>
+  <data name="todo_new" xml:space="preserve"><value>+ NEW TASK</value></data>
+  <data name="todo_new_ph" xml:space="preserve"><value>What do you need to do?</value></data>
+  <data name="todo_all_done" xml:space="preserve"><value>ALL DONE</value></data>
+  <data name="todo_all_done_2" xml:space="preserve"><value>Nothing left for today.</value></data>
+  <data name="todo_count" xml:space="preserve"><value>{done} / {total}</value></data>
+  <data name="todo_left_one" xml:space="preserve"><value>{n} LEFT</value></data>
+  <data name="todo_left_other" xml:space="preserve"><value>{n} LEFT</value></data>
+  <data name="notes_ph" xml:space="preserve"><value>Jot a quick note…</value></data>
+  <data name="notes_save_hint" xml:space="preserve"><value>CTRL + ENTER</value></data>
+  <data name="notes_save" xml:space="preserve"><value>SAVE</value></data>
+  <data name="notes_back" xml:space="preserve"><value>BACK</value></data>
+  <data name="notes_delete" xml:space="preserve"><value>DELETE</value></data>
+  <data name="notes_empty" xml:space="preserve"><value>No notes yet</value></data>
+  <data name="notes_empty_2" xml:space="preserve"><value>You can also drag text from any app up to the notch.</value></data>
+  <data name="empty_errors_no_music" xml:space="preserve"><value>Nothing playing</value></data>
+  <data name="empty_errors_no_music_2" xml:space="preserve"><value>Hit play in any app and it’ll show up here.</value></data>
+  <data name="empty_errors_notif_denied" xml:space="preserve"><value>I can’t read your notifications</value></data>
+  <data name="empty_errors_notif_denied_2" xml:space="preserve"><value>Windows is blocking access. Without it you won’t see messages or calls here.</value></data>
+  <data name="empty_errors_enable" xml:space="preserve"><value>TURN ON</value></data>
+  <data name="empty_errors_notif_path" xml:space="preserve"><value>OPENS SETTINGS › PRIVACY › NOTIFICATIONS · CAN BE HIDDEN</value></data>
+  <data name="empty_errors_action_failed" xml:space="preserve"><value>Couldn’t {action} “{file}”: another app has it open.</value></data>
+  <data name="empty_errors_retry" xml:space="preserve"><value>RETRY</value></data>
+  <data name="empty_errors_player_unsupported" xml:space="preserve"><value>PLAYER NOT SUPPORTED</value></data>
+  <data name="empty_errors_player_unsupported_2" xml:space="preserve"><value>THIS APP DOESN’T SHARE WHAT’S PLAYING</value></data>
+  <data name="empty_errors_hotkey_taken" xml:space="preserve"><value>SHORTCUT USED BY ANOTHER APP</value></data>
+  <data name="empty_errors_settings_link" xml:space="preserve"><value>SETTINGS ›</value></data>
+  <data name="welcome_hello" xml:space="preserve"><value>HI, I’M PARPA</value></data>
+  <data name="welcome_intro" xml:space="preserve"><value>I’ll live at the top of your screen: music, alerts, files and notes one gesture away. Three steps and you’re set.</value></data>
+  <data name="welcome_s1_title" xml:space="preserve"><value>Where should I sit?</value></data>
+  <data name="welcome_s1_sub" xml:space="preserve"><value>Pick a monitor and position. You can change it later in Settings.</value></data>
+  <data name="welcome_s2_title" xml:space="preserve"><value>A shortcut to call me</value></data>
+  <data name="welcome_s2_sub" xml:space="preserve"><value>Open the notch without touching the mouse.</value></data>
+  <data name="welcome_s3_title" xml:space="preserve"><value>Who can alert you?</value></data>
+  <data name="welcome_s3_sub" xml:space="preserve"><value>Only these apps will show up top.</value></data>
+  <data name="welcome_next" xml:space="preserve"><value>NEXT</value></data>
+  <data name="welcome_back" xml:space="preserve"><value>BACK</value></data>
+  <data name="welcome_skip" xml:space="preserve"><value>SKIP</value></data>
+  <data name="welcome_finish" xml:space="preserve"><value>LET’S GO</value></data>
+  <data name="welcome_left" xml:space="preserve"><value>LEFT</value></data>
+  <data name="welcome_center" xml:space="preserve"><value>CENTER</value></data>
+  <data name="welcome_right" xml:space="preserve"><value>RIGHT</value></data>
+  <data name="tray_open" xml:space="preserve"><value>Open Parpa</value></data>
+  <data name="tray_open_settings" xml:space="preserve"><value>Open settings</value></data>
+  <data name="tray_pause_1h" xml:space="preserve"><value>Pause alerts for 1 hour</value></data>
+  <data name="tray_paused_until" xml:space="preserve"><value>UNTIL {time}</value></data>
+  <data name="tray_minimal" xml:space="preserve"><value>Minimal mode</value></data>
+  <data name="tray_startup" xml:space="preserve"><value>Start with Windows</value></data>
+  <data name="tray_welcome" xml:space="preserve"><value>Show welcome</value></data>
+  <data name="tray_quit" xml:space="preserve"><value>Quit Parpa</value></data>
+  <data name="tray_tooltip_files_one" xml:space="preserve"><value>Parpa · {n} file on the shelf</value></data>
+  <data name="tray_tooltip_files_other" xml:space="preserve"><value>Parpa · {n} files on the shelf</value></data>
+  <data name="settings_title" xml:space="preserve"><value>Settings</value></data>
+  <data name="settings_nav_general" xml:space="preserve"><value>General</value></data>
+  <data name="settings_nav_position" xml:space="preserve"><value>Position</value></data>
+  <data name="settings_nav_look" xml:space="preserve"><value>Appearance</value></data>
+  <data name="settings_nav_alerts" xml:space="preserve"><value>Alerts</value></data>
+  <data name="settings_nav_windows" xml:space="preserve"><value>Windows</value></data>
+  <data name="settings_nav_sound" xml:space="preserve"><value>Sound</value></data>
+  <data name="settings_nav_system" xml:space="preserve"><value>System</value></data>
+  <data name="settings_nav_shortcuts" xml:space="preserve"><value>Shortcuts</value></data>
+  <data name="settings_h_language" xml:space="preserve"><value>LANGUAGE</value></data>
+  <data name="settings_language" xml:space="preserve"><value>Language</value></data>
+  <data name="settings_language_d" xml:space="preserve"><value>Follows your Windows language by default.</value></data>
+  <data name="settings_lang_auto" xml:space="preserve"><value>SYSTEM</value></data>
+  <data name="settings_h_start" xml:space="preserve"><value>STARTUP</value></data>
+  <data name="settings_startup" xml:space="preserve"><value>Start with Windows</value></data>
+  <data name="settings_startup_d" xml:space="preserve"><value>The notch appears when you sign in.</value></data>
+  <data name="settings_hotkey" xml:space="preserve"><value>Shortcut to open</value></data>
+  <data name="settings_hotkey_d" xml:space="preserve"><value>Open the notch from the keyboard, no mouse needed.</value></data>
+  <data name="settings_hotkey_rec" xml:space="preserve"><value>PRESS A COMBINATION</value></data>
+  <data name="settings_hotkey_change" xml:space="preserve"><value>CHANGE</value></data>
+  <data name="settings_wheel" xml:space="preserve"><value>Open with the scroll wheel</value></data>
+  <data name="settings_wheel_d" xml:space="preserve"><value>Scroll over the notch to open it or switch windows.</value></data>
+  <data name="settings_h_openclose" xml:space="preserve"><value>OPEN &amp; CLOSE</value></data>
+  <data name="settings_no_focus" xml:space="preserve"><value>Expand without stealing focus</value></data>
+  <data name="settings_no_focus_d" xml:space="preserve"><value>Keep typing in your app while the notch is open.</value></data>
+  <data name="settings_hover_sens" xml:space="preserve"><value>Sensitivity</value></data>
+  <data name="settings_hover_sens_d" xml:space="preserve"><value>How close the pointer needs to get before it opens.</value></data>
+  <data name="settings_open_time" xml:space="preserve"><value>Open delay</value></data>
+  <data name="settings_open_time_d" xml:space="preserve"><value>Wait before opening on hover.</value></data>
+  <data name="settings_close_on" xml:space="preserve"><value>Close</value></data>
+  <data name="settings_close_on_d" xml:space="preserve"><value>When it goes back to compact.</value></data>
+  <data name="settings_close_mouse" xml:space="preserve"><value>ON MOUSE LEAVE</value></data>
+  <data name="settings_close_click" xml:space="preserve"><value>ON CLICK OUTSIDE</value></data>
+  <data name="settings_close_delay" xml:space="preserve"><value>Close delay</value></data>
+  <data name="settings_close_delay_d" xml:space="preserve"><value>Time to come back with the pointer before it closes.</value></data>
+  <data name="settings_hide_idle" xml:space="preserve"><value>Hide when idle</value></data>
+  <data name="settings_hide_idle_d" xml:space="preserve"><value>With no music, alerts or tasks, the notch disappears.</value></data>
+  <data name="settings_h_dnd" xml:space="preserve"><value>DO NOT DISTURB</value></data>
+  <data name="settings_dnd" xml:space="preserve"><value>Do not disturb</value></data>
+  <data name="settings_dnd_d" xml:space="preserve"><value>Silences alerts and sounds. Calls still come through.</value></data>
+  <data name="settings_monitor" xml:space="preserve"><value>Monitor</value></data>
+  <data name="settings_monitor_hint" xml:space="preserve"><value>TAP A MONITOR TO MOVE THE NOTCH</value></data>
+  <data name="settings_pos" xml:space="preserve"><value>Position on the edge</value></data>
+  <data name="settings_pos_d" xml:space="preserve"><value>Where it docks along the top.</value></data>
+  <data name="settings_offset" xml:space="preserve"><value>Fine offset</value></data>
+  <data name="settings_offset_d" xml:space="preserve"><value>Nudge it to avoid the camera or a toolbar.</value></data>
+  <data name="settings_size" xml:space="preserve"><value>Size</value></data>
+  <data name="settings_size_d" xml:space="preserve"><value>Notch scale; grows on its own on wide monitors.</value></data>
+  <data name="settings_h_visibility" xml:space="preserve"><value>VISIBILITY</value></data>
+  <data name="settings_minimal" xml:space="preserve"><value>Minimal mode</value></data>
+  <data name="settings_minimal_d" xml:space="preserve"><value>When closed, the notch shrinks to a thin line of dots.</value></data>
+  <data name="settings_hide_full" xml:space="preserve"><value>Hide in full screen</value></data>
+  <data name="settings_hide_full_d" xml:space="preserve"><value>Steps aside for games, videos and presentations.</value></data>
+  <data name="settings_mic_always" xml:space="preserve"><value>Always show mic &amp; camera</value></data>
+  <data name="settings_mic_always_d" xml:space="preserve"><value>The red dot stays visible even when the notch is hidden.</value></data>
+  <data name="settings_theme" xml:space="preserve"><value>Theme</value></data>
+  <data name="settings_theme_dark" xml:space="preserve"><value>DARK</value></data>
+  <data name="settings_theme_light" xml:space="preserve"><value>LIGHT</value></data>
+  <data name="settings_theme_auto" xml:space="preserve"><value>AUTO</value></data>
+  <data name="settings_accent" xml:space="preserve"><value>Accent</value></data>
+  <data name="settings_mascot" xml:space="preserve"><value>Mascot</value></data>
+  <data name="settings_mood" xml:space="preserve"><value>Personality</value></data>
+  <data name="settings_mood_d" xml:space="preserve"><value>How it behaves when nothing’s happening.</value></data>
+  <data name="settings_mood_calm" xml:space="preserve"><value>CALM</value></data>
+  <data name="settings_mood_curious" xml:space="preserve"><value>CURIOUS</value></data>
+  <data name="settings_mood_sleepy" xml:space="preserve"><value>SLEEPY</value></data>
+  <data name="settings_anim" xml:space="preserve"><value>Animations</value></data>
+  <data name="settings_anim_full" xml:space="preserve"><value>FULL</value></data>
+  <data name="settings_anim_reduced" xml:space="preserve"><value>REDUCED</value></data>
+  <data name="settings_h_clock" xml:space="preserve"><value>CLOCK</value></data>
+  <data name="settings_clock" xml:space="preserve"><value>Show clock</value></data>
+  <data name="settings_clock_d" xml:space="preserve"><value>Time in the compact and expanded notch.</value></data>
+  <data name="settings_clock_fmt" xml:space="preserve"><value>Format</value></data>
+  <data name="settings_notif_apps" xml:space="preserve"><value>Apps that can alert you</value></data>
+  <data name="settings_notif_dur" xml:space="preserve"><value>Alert duration</value></data>
+  <data name="settings_notif_content" xml:space="preserve"><value>Content</value></data>
+  <data name="settings_content_full" xml:space="preserve"><value>FULL</value></data>
+  <data name="settings_content_sender" xml:space="preserve"><value>SENDER ONLY</value></data>
+  <data name="settings_content_hidden" xml:space="preserve"><value>HIDDEN</value></data>
+  <data name="settings_quick_reply" xml:space="preserve"><value>Quick reply</value></data>
+  <data name="settings_lyrics" xml:space="preserve"><value>Song lyrics</value></data>
+  <data name="settings_win_order" xml:space="preserve"><value>Window order</value></data>
+  <data name="settings_home_cards" xml:space="preserve"><value>Home cards</value></data>
+  <data name="settings_home_cards_d" xml:space="preserve"><value>What shows when you open the notch.</value></data>
+  <data name="settings_pomo" xml:space="preserve"><value>Focus session</value></data>
+  <data name="settings_break" xml:space="preserve"><value>Break</value></data>
+  <data name="settings_long_break" xml:space="preserve"><value>Long break</value></data>
+  <data name="settings_clip_limit" xml:space="preserve"><value>Clipboard history</value></data>
+  <data name="settings_clip_exclude" xml:space="preserve"><value>Never save from</value></data>
+  <data name="settings_shelf_path" xml:space="preserve"><value>Shelf folder</value></data>
+  <data name="settings_shelf_clear" xml:space="preserve"><value>Clear on restart</value></data>
+  <data name="settings_shelf_actions" xml:space="preserve"><value>Quick actions</value></data>
+  <data name="settings_sounds" xml:space="preserve"><value>Sounds</value></data>
+  <data name="settings_volume" xml:space="preserve"><value>Volume</value></data>
+  <data name="settings_h_windows_os" xml:space="preserve"><value>WINDOWS</value></data>
+  <data name="settings_osd" xml:space="preserve"><value>Replace volume &amp; brightness</value></data>
+  <data name="settings_osd_d" xml:space="preserve"><value>Use the notch instead of the Windows indicator.</value></data>
+  <data name="settings_battery" xml:space="preserve"><value>Battery alerts</value></data>
+  <data name="settings_battery_d" xml:space="preserve"><value>When plugging in or running low.</value></data>
+  <data name="settings_wifi" xml:space="preserve"><value>Wi-Fi alerts</value></data>
+  <data name="settings_wifi_d" xml:space="preserve"><value>When the connection drops or comes back.</value></data>
+  <data name="settings_buds" xml:space="preserve"><value>Headphone alerts</value></data>
+  <data name="settings_low_power" xml:space="preserve"><value>Battery saver</value></data>
+  <data name="settings_reset" xml:space="preserve"><value>RESET</value></data>
+  <data name="settings_close" xml:space="preserve"><value>CLOSE</value></data>
+  <data name="settings_on" xml:space="preserve"><value>ON</value></data>
+  <data name="settings_off" xml:space="preserve"><value>OFF</value></data>
+  <data name="time_min" xml:space="preserve"><value>{n} MIN</value></data>
+  <data name="time_sec" xml:space="preserve"><value>{n} S</value></data>
+  <data name="time_ms" xml:space="preserve"><value>{n} MS</value></data>
+  <data name="time_h24" xml:space="preserve"><value>24 H</value></data>
+  <data name="time_h12" xml:space="preserve"><value>12 H</value></data>
+</root>

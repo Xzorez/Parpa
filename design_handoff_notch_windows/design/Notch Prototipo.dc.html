@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif&family=Doto:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#e8e6e1;font-family:Geist,"Segoe UI Variable",system-ui,sans-serif;color:#1c1b19;-webkit-font-smoothing:antialiased}
+a{color:#1c1b19}a:hover{color:#5a564f}
+</style>
+</helmet>
+<section style="padding:56px 64px 24px;display:flex;flex-direction:column;gap:24px">
+  <div style="display:flex;flex-direction:column;gap:6px;max-width:800px">
+    <div style="font:500 12px 'Geist Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6b675f">Prototipo integrado</div>
+    <p style="margin:0;font-size:15px;line-height:1.5;color:#4a4740;text-wrap:pretty">Notch + ajustes conectados. La nueva burbuja <strong>Ajustes</strong> tiene los rápidos; «TODOS LOS AJUSTES» abre la ventana completa encima. Todo se aplica al momento y se guarda en este navegador (también se sincroniza con <a href="Ajustes Notch.dc.html">Ajustes Notch</a> si lo abres en otra pestaña).</p>
+  </div>
+  <div id="8a" style="width:960px;display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 12px 'Geist Mono',monospace;background:#1c1b19;color:#fff;padding:3px 7px;border-radius:4px">8a</span><span style="font-weight:600;font-size:17px">Punto · Prototipo</span><span style="font-size:13px;color:#6b675f">Notch con ajustes reales</span></div>
+    <div style="background:#0b0b0c;padding:14px 14px 18px;border-radius:18px">
+      <div style="position:relative;height:440px;border-radius:4px;overflow:hidden;background-color:#d9d7d2;background-image:radial-gradient(circle,#b9b6af 1px,transparent 1.4px);background-size:14px 14px">
+        <div style="position:absolute;left:16px;bottom:50px;font:11px 'Geist Mono',monospace;color:#6b675f;letter-spacing:.06em">FONDO DE ESCRITORIO</div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:36px;background:rgba(20,20,22,.9)"></div>
+        <div style="position:absolute;left:28px;top:56px;display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ deskFiles }}" as="df" hint-placeholder-count="3">
+            <div draggable="true" onDragStart="{{ df.drag }}" style="width:72px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:grab;user-select:none">
+              <span style="font:8px 'Geist Mono',monospace;letter-spacing:.1em;color:#6b675f">{{ df.tag }}</span>
+              <div style="width:{{ df.w }};height:{{ df.hgt }};border-radius:6px;background-color:{{ df.bg }};background-image:radial-gradient(circle,#c9c6bf 1px,transparent 1.3px);background-size:5px 5px;box-shadow:0 1px 3px rgba(0,0,0,.15)"></div>
+              <span style="font:10px 'Geist Mono',monospace;color:#1c1b19;background:rgba(242,242,240,.85);padding:1px 5px;border-radius:3px">{{ df.n }}</span>
+            </div>
+          </sc-for>
+          <span style="font:9px 'Geist Mono',monospace;letter-spacing:.06em;color:#6b675f;width:90px">ARRÁSTRALOS AL NOTCH ↗</span>
+        </div>
+        <div data-notch="1" onMouseEnter="{{ nEnter }}" onMouseLeave="{{ nLeave }}" onWheel="{{ nWheel }}" onDragOver="{{ nDragOver }}" onDragLeave="{{ nDragLeave }}" onDrop="{{ nDrop }}" style="position:absolute;top:0;left:{{ nLeft }};transform:translateX(-50%) scale({{ nScale }});transform-origin:50% 0;width:{{ nW }};height:{{ nH }};transition:{{ nTrans }};filter:{{ nFilter }};opacity:{{ nOp }}">
+          <div style="position:absolute;top:0;left:-14px;width:16px;height:14px;background:radial-gradient(circle 14px at 0 100%,transparent 13.5px,var(--n0,#0b0b0c) 14px)"></div>
+          <div style="position:absolute;top:0;right:-14px;width:16px;height:14px;background:radial-gradient(circle 14px at 100% 100%,transparent 13.5px,var(--n0,#0b0b0c) 14px)"></div>
+          <div style="position:absolute;inset:0;background:var(--n0,#0b0b0c);color:var(--n11,#f2f2f0);border-radius:0 0 {{ nR }} {{ nR }};overflow:hidden;cursor:default">
+
+            <sc-if value="{{ showDrop }}" hint-placeholder-val="{{ false }}">
+              <div style="width:420px;height:84px;box-sizing:border-box;padding:10px 14px 14px;display:flex">
+                <div style="flex:1;border-radius:16px;background-image:radial-gradient(circle,var(--n7,#5a5a60) 1px,transparent 1.4px);background-size:7px 7px;display:flex;align-items:center;justify-content:center;gap:10px;pointer-events:none">
+                  <div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ dropG }}" as="d" hint-placeholder-count="49"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                  <span style="font:500 10px 'Geist Mono',monospace;letter-spacing:.12em;background:var(--n0,#0b0b0c);padding:3px 6px">{{ dropLabel }}</span>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ showMinimal }}" hint-placeholder-val="{{ false }}">
+              <div style="height:24px;display:flex;align-items:center;justify-content:center;gap:8px"><sc-if value="{{ minGlyphOn }}"><div style="display:grid;grid-template-columns:repeat(7,1.5px);gap:1px"><sc-for list="{{ minGlyph }}" as="d" hint-placeholder-count="49"><div style="width:1.5px;height:1.5px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div></sc-if><sc-if value="{{ minMic }}"><div style="width:4px;height:4px;border-radius:50%;background:{{ accent }}"></div></sc-if></div>
+            </sc-if>
+            <sc-if value="{{ showIdle }}" hint-placeholder-val="{{ true }}">
+              <div style="height:34px;display:flex;align-items:center;justify-content:center;gap:10px">
+                <sc-if value="{{ idleMascot }}">
+                  <div style="display:grid;grid-template-columns:repeat(13,3px);gap:1.5px">
+                    <sc-for list="{{ pxFlat }}" as="d" hint-placeholder-count="65"><div style="width:3px;height:3px;border-radius:50%;background:{{ d.c }}"></div></sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ idleClock }}"><span style="font:700 16px Doto,monospace">{{ clockTxt }}</span></sc-if>
+                <sc-if value="{{ dndOn }}"><div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ lunaG }}" as="d" hint-placeholder-count="49"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div></sc-if>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ showCompact }}" hint-placeholder-val="{{ false }}">
+              <div style="height:34px;display:flex;align-items:center;gap:10px;padding:0 14px 2px 12px;white-space:nowrap">
+                <div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px">
+                  <sc-for list="{{ cur.g }}" as="d" hint-placeholder-count="49"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for>
+                </div>
+                <span style="flex:1;font:500 11px 'Geist Mono',monospace;letter-spacing:.06em;overflow:hidden;text-overflow:ellipsis">{{ cur.label }} <span style="color:var(--n8,#6a6a70)">{{ cur.sub }}</span></span>
+                <sc-if value="{{ cur.isText }}"><span style="font:11px 'Geist Mono',monospace;color:var(--n9,#8d8d92)">{{ cur.text }}</span></sc-if>
+                <sc-if value="{{ cur.isDoto }}"><span style="font:700 16px Doto,monospace;letter-spacing:.02em">{{ cur.text }}</span></sc-if>
+                <sc-if value="{{ cur.isLive }}"><div style="width:6px;height:6px;border-radius:50%;background:{{ accent }};opacity:{{ blink }}"></div></sc-if>
+                <sc-if value="{{ cur.isBar }}">
+                  <div style="display:flex;gap:2px;align-items:center"><sc-for list="{{ dlBar }}" as="d" hint-placeholder-count="12"><div style="width:3px;height:3px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                </sc-if>
+                <sc-if value="{{ dndOn }}"><div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ lunaG }}" as="d" hint-placeholder-count="49"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div></sc-if>
+                <sc-if value="{{ cur.isEq }}">
+                  <div style="display:grid;grid-template-columns:repeat(5,2px);gap:1.5px"><sc-for list="{{ eq }}" as="d" hint-placeholder-count="20"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ showOsd }}" hint-placeholder-val="{{ false }}">
+              <div style="height:40px;display:flex;align-items:center;gap:12px;padding:0 16px 2px;white-space:nowrap">
+                <div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ osd.g }}" as="d" hint-placeholder-count="49"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                <div style="display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font:500 10px 'Geist Mono',monospace;letter-spacing:.1em">{{ osd.l }}</span><span style="font:9px 'Geist Mono',monospace;letter-spacing:.06em;color:var(--n8,#6a6a70)">{{ osd.sub }}</span></div>
+                <div style="flex:1;display:flex;gap:3px;align-items:center;justify-content:flex-end"><sc-for list="{{ osd.bar }}" as="d" hint-placeholder-count="16"><div style="width:4px;height:{{ d.h }};border-radius:2px;background:{{ d.c }};transition:height .12s"></div></sc-for></div>
+                <span style="font:700 15px Doto,monospace;min-width:40px;text-align:right">{{ osd.v }}</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ showPeek }}" hint-placeholder-val="{{ false }}">
+              <div style="width:420px;box-sizing:border-box;padding:10px 16px 12px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ peek.gl }}" as="d" hint-placeholder-count="49"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                  <span style="flex:1;font:500 10px 'Geist Mono',monospace;letter-spacing:.1em;color:var(--n9,#8d8d92)">{{ peek.head }}</span>
+                  <span style="font:10px 'Geist Mono',monospace;color:var(--n8,#6a6a70)">{{ peek.when }}</span>
+                </div>
+                <sc-if value="{{ notReplying }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <span style="flex:1;font-size:13px;line-height:1.35;text-wrap:pretty;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ peek.body }}</span>
+                    <div style="display:flex;gap:6px;flex-shrink:0">
+                      <span onClick="{{ peek.do2 }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:999px;border:1px solid var(--n4,#2a2a2e);color:{{ peek.a2c }};cursor:pointer;user-select:none" style-hover="background:var(--n12,#1d1d20)">{{ peek.a2 }}</span>
+                      <span onClick="{{ peek.do1 }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:999px;background:{{ peek.a1bg }};color:var(--n0,#0b0b0c);cursor:pointer;user-select:none" style-hover="opacity:.85">{{ peek.a1 }}</span>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ replying }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <input autoFocus placeholder="Escribe una respuesta…" style="flex:1;min-width:0;background:var(--n1,#151517);border:1px solid var(--n4,#2a2a2e);border-radius:999px;padding:7px 12px;color:var(--n11,#f2f2f0);font:13px Geist,sans-serif;outline:none">
+                    <span onClick="{{ peek.cancel }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:999px;border:1px solid var(--n4,#2a2a2e);color:var(--n9,#8d8d92);cursor:pointer;user-select:none">×</span>
+                    <span onClick="{{ peek.send }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:999px;background:var(--n11,#f2f2f0);color:var(--n0,#0b0b0c);cursor:pointer;user-select:none">ENVIAR</span>
+                  </div>
+                </sc-if>
+                <div style="display:flex;gap:2px"><sc-for list="{{ peek.bar }}" as="d" hint-placeholder-count="30"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ showOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="width:580px;box-sizing:border-box;padding:12px 18px 18px;display:flex;flex-direction:column;gap:12px">
+                <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:28px">
+                  <div style="display:flex;align-items:center;gap:8px;min-width:0">
+                    <sc-if value="{{ notLaunch }}"><div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ pg.g }}" as="d" hint-placeholder-count="49"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div></sc-if>
+                    <span style="font:500 10px 'Geist Mono',monospace;letter-spacing:.1em">{{ hdrLabel }}</span>
+                  </div>
+                  <div onClick="{{ openLauncher }}" title="Menú" style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;background:{{ menuBg }}" style-hover="background:var(--n13,#26262a)">
+                    <div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ menuG }}" as="d" hint-placeholder-count="49"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                  </div>
+                  <span style="justify-self:end;font:700 20px Doto,monospace">{{ clockTxt }}</span>
+                </div>
+
+                <sc-if value="{{ launch }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:relative;height:192px">
+                    <div onClick="{{ mHome }}" onMouseEnter="{{ mOver }}" onMouseLeave="{{ bOut }}" style="position:absolute;left:50%;top:56px;width:108px;height:62px;margin-left:-54px;margin-top:-31px;border-radius:31px;background:{{ mBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;transform:scale({{ mScale }});transition:transform .25s cubic-bezier(.3,1.6,.5,1),background .2s">
+                      <div style="display:grid;grid-template-columns:repeat(13,4px);gap:1.5px"><sc-for list="{{ mPx }}" as="d" hint-placeholder-count="65"><div style="width:4px;height:4px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                    </div>
+                    <div style="position:absolute;left:50%;top:93px;transform:translateX(-50%);font:500 9px 'Geist Mono',monospace;letter-spacing:.14em;color:var(--n9,#8d8d92);opacity:{{ mLblO }};transition:opacity .2s;white-space:nowrap">INICIO</div>
+                    <sc-for list="{{ bubbles }}" as="bb" hint-placeholder-count="4">
+                      <div onClick="{{ bb.go }}" onMouseEnter="{{ bb.over }}" onMouseLeave="{{ bb.out }}" style="position:absolute;left:{{ bb.x }};top:{{ bb.y }};width:54px;height:54px;margin-left:-27px;margin-top:-27px;border-radius:50%;background:{{ bb.bg }};box-shadow:inset 0 0 0 1.5px {{ bb.ring }};display:flex;align-items:center;justify-content:center;cursor:pointer;transform:{{ bb.tf }};opacity:{{ bb.o }};transition:left .35s cubic-bezier(.3,1.4,.5,1),top .35s cubic-bezier(.3,1.4,.5,1),transform .22s cubic-bezier(.3,1.6,.5,1),opacity .25s,background .2s">
+                        <div style="display:grid;grid-template-columns:repeat(7,3px);gap:1.5px"><sc-for list="{{ bb.g }}" as="d"><div style="width:3px;height:3px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                        <sc-if value="{{ bb.hasBadge }}">
+                          <div style="position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:{{ bb.badgeBg }};color:{{ bb.badgeFg }};border:2px solid var(--n0,#0b0b0c);display:flex;align-items:center;justify-content:center;font:900 11px Doto,monospace">{{ bb.badge }}</div>
+                        </sc-if>
+                        <div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:7px;font:500 9px 'Geist Mono',monospace;letter-spacing:.14em;color:var(--n11,#f2f2f0);white-space:nowrap;opacity:{{ bb.lo }};transition:opacity .2s">{{ bb.label }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ tabHome }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:grid;grid-template-columns:{{ homeCols }};gap:8px">
+                    <sc-if value="{{ cardMusic }}">
+                    <div style="background:var(--n1,#151517);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0">
+                      <div style="display:flex;gap:10px;align-items:center">
+                        <div style="width:48px;height:48px;flex-shrink:0;border-radius:8px;background-color:var(--n2,#1e1e21);background-image:radial-gradient(circle,var(--n6,#3a3a3f) 1px,transparent 1.3px);background-size:5px 5px"></div>
+                        <div style="display:flex;flex-direction:column;gap:3px;min-width:0"><span style="font-weight:600;font-size:14px">Luz de neón</span><span style="font:10px 'Geist Mono',monospace;letter-spacing:.06em;color:var(--n9,#8d8d92)">SPOTIFY</span></div>
+                      </div>
+                      <sc-if value="{{ lyricsOn }}"><span style="font-size:12px;color:var(--n10,#c9c9cc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">♪ {{ lyric }}</span></sc-if>
+                      <div style="display:flex;gap:3px;overflow:hidden"><sc-for list="{{ musicBar }}" as="d" hint-placeholder-count="26"><div style="width:4px;height:4px;flex-shrink:0;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                      <div style="display:flex;justify-content:space-between;font:10px 'Geist Mono',monospace;color:var(--n9,#8d8d92)"><span>1:24</span><span style="color:var(--n11,#f2f2f0);letter-spacing:.3em">◀◀ ▮▮ ▶▶</span><span>3:41</span></div>
+                    </div>
+                    </sc-if>
+                    <sc-if value="{{ cardFocus }}">
+                    <div style="background:var(--n1,#151517);border-radius:14px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;gap:8px">
+                      <div style="display:flex;justify-content:space-between;font:10px 'Geist Mono',monospace;letter-spacing:.08em;color:var(--n9,#8d8d92)"><span>FOCO</span><div style="width:6px;height:6px;border-radius:50%;background:{{ accent }}"></div></div>
+                      <span style="font:900 34px/1 Doto,monospace">{{ pomo }}</span>
+                      <div style="display:flex;flex-wrap:wrap;gap:2px;max-width:100px"><sc-for list="{{ pomoDots }}" as="d" hint-placeholder-count="25"><div style="width:4px;height:4px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                    </div>
+                    </sc-if>
+                    <sc-if value="{{ cardSys }}">
+                    <div style="background:var(--n1,#151517);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px">
+                      <span style="font:10px 'Geist Mono',monospace;letter-spacing:.08em;color:var(--n9,#8d8d92)">SISTEMA</span>
+                      <sc-for list="{{ sys }}" as="s" hint-placeholder-count="3">
+                        <div style="display:flex;align-items:center;gap:8px">
+                          <span style="font:10px 'Geist Mono',monospace;width:28px;color:var(--n9,#8d8d92)">{{ s.k }}</span>
+                          <div style="display:flex;gap:2px;flex:1"><sc-for list="{{ s.dots }}" as="d"><div style="width:3px;height:3px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                          <span style="font:700 13px Doto,monospace">{{ s.v }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                    </sc-if>
+                    <sc-if value="{{ cardTask }}">
+                    <div style="background:var(--n1,#151517);border-radius:14px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;gap:6px">
+                      <div style="display:flex;justify-content:space-between;font:10px 'Geist Mono',monospace;letter-spacing:.08em;color:var(--n9,#8d8d92)"><span>PRÓXIMA TAREA</span><span style="color:{{ accent }}">{{ nextTask.m }}</span></div>
+                      <span style="font-size:13px;line-height:1.35">{{ nextTask.t }}</span>
+                      <span onClick="{{ nextTask.done }}" style="align-self:flex-start;font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:5px 9px;border-radius:999px;border:1px solid var(--n4,#2a2a2e);cursor:pointer">HECHO</span>
+                    </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ tabQuick }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+                      <sc-for list="{{ tiles }}" as="tl" hint-placeholder-count="6">
+                        <div onClick="{{ tl.tog }}" style="height:62px;border-radius:14px;padding:10px 12px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;background:{{ tl.bg }};color:{{ tl.fg }};transition:background .2s,color .2s">
+                          <div style="display:flex;justify-content:space-between;align-items:center"><div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ tl.g }}" as="d"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div><span style="font:9px 'Geist Mono',monospace;letter-spacing:.08em;opacity:.7">{{ tl.st }}</span></div>
+                          <span style="font-size:12px;font-weight:500">{{ tl.l }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
+                      <div style="background:var(--n1,#151517);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:12px">
+                        <span style="font:10px 'Geist Mono',monospace;letter-spacing:.08em;color:var(--n9,#8d8d92)">SONIDOS</span>
+                        <div style="flex:1;display:flex;gap:3px;align-items:center;cursor:pointer"><sc-for list="{{ qVol }}" as="d"><div onClick="{{ d.set }}" style="width:5px;height:{{ d.h }};border-radius:3px;background:{{ d.c }}"></div></sc-for></div>
+                        <span style="font:700 13px Doto,monospace">{{ qVolV }}</span>
+                      </div>
+                      <div onClick="{{ openFull }}" style="background:var(--n11,#f2f2f0);color:var(--n0,#0b0b0c);border-radius:14px;padding:0 14px;display:flex;align-items:center;font:500 10px 'Geist Mono',monospace;letter-spacing:.1em;cursor:pointer">TODOS LOS AJUSTES ›</div>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ tabClip }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column">
+                    <sc-for list="{{ clips }}" as="c" hint-placeholder-count="4">
+                      <div style="display:flex;gap:14px;align-items:center;padding:9px 4px;border-top:1px solid var(--n2,#1e1e21);font-size:12px">
+                        <span style="font:700 14px Doto,monospace;color:var(--n7,#5a5a60)">{{ c.n }}</span>
+                        <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.t }}</span>
+                        <span style="font:10px 'Geist Mono',monospace;color:var(--n9,#8d8d92)">{{ c.m }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ tabTodo }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 4px 6px"><span style="font:10px 'Geist Mono',monospace;letter-spacing:.08em;color:var(--n9,#8d8d92)">HOY</span><span style="font:700 16px Doto,monospace">{{ todoCount }}</span></div>
+                    <sc-for list="{{ taskRows }}" as="k" hint-placeholder-count="5">
+                      <div onClick="{{ k.tog }}" style="display:flex;gap:12px;align-items:center;padding:7px 4px;border-top:1px solid var(--n2,#1e1e21);font-size:12px;cursor:pointer">
+                        <div style="width:10px;height:10px;border-radius:50%;border:1.5px solid var(--n11,#f2f2f0);box-sizing:border-box;background:{{ k.box }}"></div>
+                        <span style="flex:1;color:{{ k.fg }};text-decoration:{{ k.deco }}">{{ k.t }}</span>
+                        <span style="font:10px 'Geist Mono',monospace;color:{{ k.mc }}">{{ k.m }}</span>
+                      </div>
+                    </sc-for>
+                    <div style="padding:8px 4px 0;border-top:1px solid var(--n2,#1e1e21);font:500 10px 'Geist Mono',monospace;letter-spacing:.08em;color:var(--n9,#8d8d92)">+ NUEVA TAREA</div>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ tabNotes }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;height:152px">
+                    <div style="background:var(--n1,#151517);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+                      <textarea value="{{ draft }}" onChange="{{ setDraft }}" onKeyDown="{{ noteKey }}" placeholder="Escribe una nota rápida…" style="flex:1;resize:none;background:transparent;border:none;outline:none;color:var(--n11,#f2f2f0);font:13px/1.45 Geist,sans-serif;padding:0"></textarea>
+                      <div style="display:flex;justify-content:space-between;align-items:center">
+                        <span style="font:9px 'Geist Mono',monospace;letter-spacing:.08em;color:var(--n7,#5a5a60)">CTRL + ENTER</span>
+                        <span onClick="{{ saveNote }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:999px;background:var(--n11,#f2f2f0);color:var(--n0,#0b0b0c);cursor:pointer;user-select:none">GUARDAR</span>
+                      </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;overflow:hidden">
+                      <sc-if value="{{ noteList }}" hint-placeholder-val="{{ true }}">
+                      <div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 4px 4px"><span style="font:10px 'Geist Mono',monospace;letter-spacing:.08em;color:var(--n9,#8d8d92)">GUARDADAS</span><span style="font:700 14px Doto,monospace">{{ noteCount }}</span></div>
+                      <sc-for list="{{ noteRows }}" as="nt" hint-placeholder-count="3">
+                        <div onClick="{{ nt.open }}" style="display:flex;gap:10px;align-items:center;padding:7px 4px;border-top:1px solid var(--n2,#1e1e21);font-size:12px;cursor:pointer;border-radius:4px" style-hover="background:var(--n1,#151517)">
+                          <span style="font:700 12px Doto,monospace;color:var(--n7,#5a5a60)">{{ nt.n }}</span>
+                          <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ nt.t }}</span>
+                          <span style="font:9px 'Geist Mono',monospace;color:var(--n8,#6a6a70)">{{ nt.m }}</span>
+                          <span onClick="{{ nt.del }}" style="font:11px 'Geist Mono',monospace;color:var(--n7,#5a5a60);cursor:pointer" style-hover="color:var(--n11,#f2f2f0)">×</span>
+                        </div>
+                      </sc-for>
+                      </sc-if>
+                      <sc-if value="{{ noteView }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;flex-direction:column;gap:8px;height:100%;background:var(--n1,#151517);border-radius:14px;padding:10px 12px;box-sizing:border-box">
+                          <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:10px 'Geist Mono',monospace;letter-spacing:.08em;color:var(--n9,#8d8d92)">NOTA {{ nOpen.n }}</span><span style="font:9px 'Geist Mono',monospace;color:var(--n8,#6a6a70)">{{ nOpen.m }}</span></div>
+                          <div style="flex:1;overflow:auto;font-size:13px;line-height:1.45;white-space:pre-wrap;text-wrap:pretty">{{ nOpen.t }}</div>
+                          <div style="display:flex;gap:6px">
+                            <span onClick="{{ noteBack }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:999px;border:1px solid var(--n4,#2a2a2e);color:var(--n10,#c9c9cc);cursor:pointer;user-select:none">‹ ATRÁS</span>
+                            <span style="flex:1"></span>
+                            <span onClick="{{ nOpen.copy }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:999px;border:1px solid var(--n4,#2a2a2e);color:var(--n10,#c9c9cc);cursor:pointer;user-select:none">{{ nCopyLabel }}</span>
+                            <span onClick="{{ nOpen.del }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:999px;border:1px solid var(--n4,#2a2a2e);color:{{ accent }};cursor:pointer;user-select:none">BORRAR</span>
+                          </div>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ tabShelf }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:grid;grid-template-columns:1fr 1.15fr;gap:8px;height:168px">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:78px;gap:6px;overflow:auto">
+                      <sc-for list="{{ files }}" as="fl" hint-placeholder-count="2">
+                        <div onClick="{{ fl.pick }}" style="background:var(--n1,#151517);border-radius:12px;padding:10px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;box-shadow:inset 0 0 0 1.5px {{ fl.ring }}">
+                          <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="width:22px;height:22px;border-radius:5px;background-color:var(--n2,#1e1e21);background-image:radial-gradient(circle,#4a4a50 1px,transparent 1.3px);background-size:4px 4px"></div><span style="font:9px 'Geist Mono',monospace;letter-spacing:.08em;color:var(--n8,#6a6a70)">{{ fl.k }}</span></div>
+                          <div style="display:flex;flex-direction:column;gap:1px;min-width:0"><span style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fl.n }}</span><span style="font:9px 'Geist Mono',monospace;color:var(--n9,#8d8d92)">{{ fl.s }}</span></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <sc-if value="{{ fSelNone }}" hint-placeholder-val="{{ true }}">
+                      <div style="border-radius:14px;background-image:radial-gradient(circle,var(--n6,#3a3a3f) 1px,transparent 1.3px);background-size:7px 7px;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;text-align:center">
+                        <span style="font:500 10px 'Geist Mono',monospace;letter-spacing:.1em;color:var(--n10,#c9c9cc)">SUELTA ARCHIVOS EN EL NOTCH</span>
+                        <span style="font:9px 'Geist Mono',monospace;letter-spacing:.06em;color:var(--n8,#6a6a70)">O TOCA UNO PARA VER ACCIONES</span>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ fSelSome }}" hint-placeholder-val="{{ false }}">
+                      <div style="background:var(--n1,#151517);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-width:0">
+                        <div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fSel.n }}</span><span style="font:9px 'Geist Mono',monospace;color:var(--n8,#6a6a70);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fSel.p }}</span></div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+                          <sc-for list="{{ fActs }}" as="fa" hint-placeholder-count="4">
+                            <div onClick="{{ fa.go }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:8px 8px;border-radius:8px;background:var(--n12,#1d1d20);cursor:pointer;user-select:none;color:{{ fa.c }}" style-hover="background:var(--n13,#26262a)">{{ fa.l }}</div>
+                          </sc-for>
+                        </div>
+                        <span style="font:500 9px 'Geist Mono',monospace;letter-spacing:.1em;color:oklch(0.78 0.14 150);height:12px">{{ toast }}</span>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+      <span style="font:500 10px 'Geist Mono',monospace;letter-spacing:.08em;color:#6b675f;margin-right:2px">ACTIVIDAD</span>
+      <sc-for list="{{ actBtns }}" as="b" hint-placeholder-count="6">
+        <button onClick="{{ b.pick }}" style="border:1px solid #1c1b19;font:500 11px 'Geist Mono',monospace;letter-spacing:.06em;padding:7px 11px;border-radius:999px;cursor:pointer;background:{{ b.bg }};color:{{ b.fg }}">{{ b.label }}</button>
+      </sc-for>
+      <span style="width:12px"></span>
+      <span style="font:500 10px 'Geist Mono',monospace;letter-spacing:.08em;color:#6b675f;margin-right:2px">AVISOS</span>
+      <sc-for list="{{ peekBtns }}" as="b" hint-placeholder-count="4">
+        <button onClick="{{ b.pick }}" style="border:1px dashed #1c1b19;font:500 11px 'Geist Mono',monospace;letter-spacing:.06em;padding:7px 11px;border-radius:999px;cursor:pointer;background:{{ b.bg }};color:{{ b.fg }}">{{ b.label }}</button>
+      </sc-for>
+      <span style="flex:1"></span>
+      <button onClick="{{ toggleSound }}" style="border:1px solid #1c1b19;font:500 11px 'Geist Mono',monospace;letter-spacing:.06em;padding:7px 11px;border-radius:999px;cursor:pointer;background:{{ soundBg }};color:{{ soundFg }}">{{ soundLabel }}</button>
+      <button onClick="{{ toggleDemo }}" style="border:1px solid #1c1b19;font:500 11px 'Geist Mono',monospace;letter-spacing:.06em;padding:7px 11px;border-radius:999px;cursor:pointer;background:{{ demoBg }};color:{{ demoFg }}">▶ DEMO</button>
+      <button onClick="{{ togglePin }}" style="border:1px solid #1c1b19;font:500 11px 'Geist Mono',monospace;letter-spacing:.06em;padding:7px 11px;border-radius:999px;cursor:pointer;background:{{ pinBg }};color:{{ pinFg }}">FIJAR ABIERTO</button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+      <span style="font:500 10px 'Geist Mono',monospace;letter-spacing:.08em;color:#6b675f;margin-right:2px">SISTEMA</span>
+      <sc-for list="{{ sysBtns }}" as="b" hint-placeholder-count="7">
+        <button onClick="{{ b.pick }}" style="border:1px dashed #1c1b19;font:500 11px 'Geist Mono',monospace;letter-spacing:.06em;padding:7px 11px;border-radius:999px;cursor:pointer;background:transparent;color:#1c1b19">{{ b.label }}</button>
+      </sc-for>
+      <span style="font:10px 'Geist Mono',monospace;color:#6b675f;margin-left:6px">{{ sysToast }}</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;padding:14px 0 6px;border-top:1px solid #cfccc5">
+      <span style="font:500 11px 'Geist Mono',monospace;letter-spacing:.08em;color:#6b675f">APERTURA POR CONTEXTO</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px 28px;font:11px/1.5 'Geist Mono',monospace;color:#3a3832">
+        <span>ARRASTRAS UN ARCHIVO → BANDEJA</span>
+        <span>ARRASTRAS TEXTO → NUEVA NOTA</span>
+        <span>ARRASTRAS UN ENLACE → PORTAPAPELES</span>
+        <span>COPIAS ALGO (CTRL+C) → AVISO + PORTAPAPELES</span>
+        <span>PASAS EL RATÓN → SIEMPRE INICIO</span>
+        <span>BOTÓN DE PUNTOS → MENÚ</span>
+        <span>AJUSTES → SE APLICAN AL MOMENTO</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;padding-top:8px">
+      <span style="font:500 11px 'Geist Mono',monospace;letter-spacing:.08em;color:#6b675f">ICONOS · MATRIZ 7×7</span>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <sc-for list="{{ sheet }}" as="s" hint-placeholder-count="10">
+          <div style="width:84px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0 10px;background:#0b0b0c;border-radius:12px">
+            <div style="display:grid;grid-template-columns:repeat(7,5px);gap:2px"><sc-for list="{{ s.g }}" as="d"><div style="width:5px;height:5px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+            <span style="font:9px 'Geist Mono',monospace;letter-spacing:.08em;color:#8d8d92">{{ s.n }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  <sc-if value="{{ settingsOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeFullBg }}" style="position:fixed;inset:0;background:rgba(20,20,22,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:50">
+      <div onClick="{{ stop }}" style="display:flex;flex-shrink:0;transform:scale({{ modalScale }});transform-origin:50% 50%">
+        <dc-import name="Ajustes Notch" embed="{{ true }}" on-close="{{ closeFull }}" hint-size="1000px,680px"></dc-import>
+      </div>
+    </div>
+  </sc-if>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script >
+class Component extends DCLogic {
+  state = { open: {}, mode: 'auto', t: 0 };
+  KEY = 'punto.settings.v1';
+  ACC = ['oklch(0.63 0.22 27)', 'oklch(0.63 0.22 70)', 'oklch(0.63 0.22 150)', 'oklch(0.63 0.22 255)'];
+  DEF = { startup: true, keys: ['WIN', 'ALT', 'N'], wheel: true, closeOn: 'mouse', closeDelay: 0.4, noFocus: true, hoverSens: 6, openTime: 250, hideIdle: false, dnd: false, dndFrom: '23:00',
+    monitor: 1, pos: 'center', offset: 0, size: 100, minimal: false, hideFull: true, theme: 'dark', accent: 0, mascot: true, mood: 'curiosa', anim: 'full', clock: true, h24: true,
+    apps: { WhatsApp: true, Discord: true, Claude: true, Spotify: true, Teams: false }, content: 'full', notifDur: 4.5, quickReply: true, lyrics: true, micAlways: true,
+    homeCards: { MÚSICA: true, FOCO: true, SISTEMA: true, 'PRÓXIMA TAREA': false }, pomo: 25, brk: 5, longBrk: 15, clipLimit: 50,
+    actions: { 'IMÁGENES · COMPRIMIR': true, 'IMÁGENES · A PNG': true, 'PDF · UNIR': false, 'CARPETAS · ZIP': true, 'TODOS · COPIAR RUTA': true }, lang: 'auto', sounds: true, vol: 60, osd: true, battery: true, wifi: true, buds: true, lowPower: true };
+  DEFWINS = [['home', 'Inicio', true], ['clip', 'Portapapeles', true], ['shelf', 'Bandeja', true], ['todo', 'Tareas', true], ['notes', 'Notas', true], ['quick', 'Ajustes rápidos', true]];
+  C() { return { ...this.DEF, ...(this.state.cfg || {}) }; }
+  readCfg() { try { const raw = localStorage.getItem(this.KEY); if (!raw || raw === this._raw) return; this._raw = raw; const d = JSON.parse(raw); this.setState({ cfg: d.s || {}, cwins: d.wins || null, cprio: d.prio || null }); } catch (e) {} }
+  setCfg(patch) {
+    const cfg = { ...this.C(), ...patch };
+    this.setState({ cfg });
+    try { const prev = JSON.parse(localStorage.getItem(this.KEY) || '{}'); const raw = JSON.stringify({ ...prev, s: cfg, wins: prev.wins || this.state.cwins || this.DEFWINS }); this._raw = raw; localStorage.setItem(this.KEY, raw); } catch (e) {}
+  }
+  allowPeek(k) {
+    const c = this.C();
+    if (k === 'copiado') return true;
+    if (c.dnd && k !== 'entrante') return false;
+    const app = { mensaje: 'WhatsApp', claude: 'Claude', entrante: 'Discord' }[k];
+    return !app || c.apps[app] !== false;
+  }
+  osdOn(t) { return !!this.state.osd && t < (this.state.osdUntil || 0) && !this.state.hov && !this.state.pin && !this.state.dragOver && !(this.state.peek && t < (this.state.peekUntil || 0)); }
+  dur() { return Math.round(this.C().notifDur * 10); }
+  NOTES = [{ t: 'Idea: modo minimal para portátiles con marco grueso. Al cerrarse, el notch se queda en una línea fina de puntos y solo crece con avisos o al pasar el ratón.', m: '23:18' }, { t: 'Contraseña wifi del estudio en el cajón de la izquierda, debajo del cuaderno azul.', m: '21:02' }, { t: 'Llamar al técnico el jueves por la mañana: revisar el ventilador de la torre y pedir presupuesto del SSD.', m: 'AYER' }];
+  FILES = [{ n: 'playa.jpg', s: '2,4 MB', k: 'IMG', p: 'C:\\Usuarios\\tú\\Imágenes\\playa.jpg' }, { n: 'Proyecto', s: 'CARPETA', k: 'DIR', p: 'C:\\Usuarios\\tú\\Documentos\\Proyecto' }];
+  DESK = [{ n: 'informe.pdf', s: '840 KB', k: 'PDF', kind: 'file' }, { n: 'Texto', kind: 'text', txt: 'Comprar entradas para el viernes antes de las 14:00' }, { n: 'Enlace', kind: 'link', txt: 'https://github.com/tu-usuario/notch' }];
+  CLIPS = [{ t: 'npm run dev --host', m: '23:40' }, { t: 'https://claude.ai/chat/…', m: '23:31' }, { t: 'Nos vemos a las 9 en la puerta', m: '23:12' }, { t: 'Captura de pantalla 2026-10-27', m: '22:58' }];
+  DROP = { file: ['bandeja', 'SUELTA PARA AÑADIR A LA BANDEJA'], text: ['notas', 'SUELTA PARA CREAR UNA NOTA'], link: ['copias', 'SUELTA PARA GUARDAR EL ENLACE'] };
+  launcherVals(tabsDef, tab, t, pend) {
+    const L = !!this.state.launch, hv = this.state.bhov, t0 = this.state.lt0 || 0, CF = this.C();
+    const items = tabsDef.filter(x => x[0] !== 'home');
+    const pos = {}, n = items.length, RX = 192, RY = 80;
+    items.forEach(([k], i) => {
+      const ang = (n === 1 ? 270 : 180 + i * 180 / (n - 1)) * Math.PI / 180;
+      const x = Math.round(Math.cos(ang) * RX), y = Math.round(-Math.sin(ang) * RY);
+      pos[k] = [x, y, Math.max(-2, Math.min(2, Math.round(x / 95))), y > 40 ? 1 : 0];
+    });
+    const counts = { clip: (this.state.clips || this.CLIPS).length, shelf: (this.state.files || this.FILES).length, todo: pend, notes: (this.state.notes || this.NOTES).length, quick: 0 };
+    const RED = this.ACC[CF.accent] || this.ACC[0];
+    const bubbles = items.map(([k, label, g], i) => {
+      const [dx, dy] = pos[k], el = (t - t0) - 1 - i * 0.7, k01 = Math.max(0, Math.min(1, el / 2.5));
+      const bob = Math.sin(t / 9 + i * 1.7) * 2.5 * k01;
+      const isH = hv === k, dim = hv && !isH;
+      return { label, x: 'calc(50% + ' + (dx * k01).toFixed(1) + 'px)', y: (56 + dy * k01 + bob).toFixed(1) + 'px',
+        tf: 'translateY(' + (isH ? -4 : 0) + 'px) scale(' + ((isH ? 1.14 : 1) * (0.3 + 0.7 * k01)).toFixed(3) + ')', o: (dim ? 0.45 : 1) * k01,
+        bg: isH ? 'var(--n15,#1f1f23)' : 'var(--n1,#151517)', ring: isH ? 'var(--n11,#f2f2f0)' : 'transparent', lo: isH ? 1 : 0,
+        hasBadge: counts[k] > 0, badge: String(counts[k]), badgeBg: k === 'todo' ? RED : 'var(--n11,#f2f2f0)', badgeFg: k === 'todo' ? '#fff' : 'var(--n0,#0b0b0c)',
+        g: this.glyph(g, isH ? 'var(--n11,#f2f2f0)' : 'var(--n10,#c9c9cc)', 'transparent'),
+        go: () => { this.snd('page'); this.setState({ tab: k, launch: false, bhov: null }); },
+        over: () => { this.snd('tick'); this.setState({ bhov: k }); }, out: () => this.setState({ bhov: null }) };
+    });
+    // mascota que mira hacia la burbuja
+    const gr = Array.from({ length: 5 }, () => Array(13).fill(0));
+    const on = (r, c) => { if (r >= 0 && r < 5 && c >= 0 && c < 13) gr[r][c] = 1; };
+    if (!CF.mascot) { for (let r = 0; r < 5; r++) for (let c = 4; c <= 8; c++) if (!((r === 0 || r === 4) && (c === 4 || c === 8))) on(r, c); }
+    else if (hv === 'home') { [2, 8].forEach(x => { on(2, x); on(1, x + 1); on(2, x + 2); }); }
+    else {
+      const p = hv ? pos[hv] : null, o = p ? p[2] : 0, rs = p ? p[3] : 0, blink = !hv && CF.anim !== 'reduced' && (t % 38 < 2);
+      [3, 8].forEach(x => { for (let r = 1; r <= 3; r++) if (!blink || r === 2) { on(r + rs, x + o); on(r + rs, x + 1 + o); } });
+    }
+    const cur = tabsDef.find(x => x[0] === tab) || tabsDef[0];
+    return {
+      launch: L, notLaunch: !L, bubbles,
+      mPx: gr.flat().map(v => ({ c: v ? 'var(--n11,#f2f2f0)' : 'var(--n12,#1d1d20)' })),
+      mBg: hv === 'home' ? 'var(--n15,#1f1f23)' : 'var(--n1,#151517)', mScale: hv === 'home' ? 1.06 : Math.min(1, 0.6 + (t - t0) * 0.2).toFixed(2), mLblO: hv === 'home' ? 1 : 0,
+      mOver: () => { this.snd('tick'); this.setState({ bhov: 'home' }); }, bOut: () => this.setState({ bhov: null }),
+      mHome: () => { this.snd('page'); this.setState({ tab: 'home', launch: false, bhov: null }); },
+      hdrLabel: L ? 'MENÚ' : cur[1],
+      menuBg: L ? 'var(--n12,#1d1d20)' : 'transparent',
+      menuG: this.glyph('menu', L ? 'var(--n11,#f2f2f0)' : 'var(--n9,#8d8d92)', 'transparent'),
+      openLauncher: () => { this.snd(L ? 'close' : 'open'); this.setState(s => ({ launch: !L, lt0: s.t || 0, bhov: null })); }
+    };
+  }
+  noteView() {
+    const all = this.state.notes || this.NOTES, i = this.state.nOpen;
+    const x = i != null ? all[i] : null;
+    return {
+      noteList: !x, noteView: !!x, nCopyLabel: this.state.nCopied ? 'COPIADA' : 'COPIAR',
+      noteBack: () => { this.snd('close'); this.setState({ nOpen: null }); },
+      nOpen: x ? { n: String(i + 1).padStart(2, '0'), t: x.t, m: x.m,
+        copy: () => { try { navigator.clipboard.writeText(x.t); } catch (e) {} this.snd('confirm'); this.setState({ nCopied: true }); },
+        del: () => { this.snd('decline'); this.setState({ notes: all.filter((_, j) => j !== i), nOpen: null }); } } : { n: '', t: '', m: '' }
+    };
+  }
+  shelfVals() {
+    const files = this.state.files || this.FILES, sel = this.state.fsel, t = this.state.t || 0;
+    const f = sel != null ? files[sel] : null;
+    const say = (msg, snd = 'confirm') => { this.snd(snd); this.setState(s => ({ toast: msg, toastUntil: (s.t || 0) + 25 })); };
+    const add = list => { this.snd('confirm'); this.setState(s => { const cur = s.files || this.FILES; return { files: [...cur, ...list], fsel: cur.length, tab: 'shelf', launch: false, hov: true, dragOver: false, toast: '', }; }); };
+    return {
+      files: [...((this.state.base || 'musica') === 'descarga' ? [{ n: 'setup.exe', s: 'DESCARGANDO ' + Math.floor((t * 0.4) % 100) + '%', k: '↓', ring: 'transparent', pick: () => {} }] : []), ...files.map((x, i) => ({ ...x, ring: i === sel ? 'var(--n11,#f2f2f0)' : 'transparent', pick: () => { this.snd('click'); this.setState({ fsel: i === sel ? null : i, toast: '' }); } }))],
+      fSelNone: !f, fSelSome: !!f, fSel: f || { n: '', p: '' },
+      toast: this.state.toast && t < (this.state.toastUntil || 0) ? this.state.toast : '',
+      fActs: f ? [
+        { l: 'COPIAR RUTA', c: 'var(--n11,#f2f2f0)', go: () => { try { navigator.clipboard.writeText(f.p); } catch (e) {} say('✓ RUTA COPIADA'); } },
+        { l: 'ABRIR CARPETA', c: 'var(--n11,#f2f2f0)', go: () => say('✓ ABRIENDO CARPETA…', 'open') },
+        { l: 'COMPRIMIR', c: 'var(--n11,#f2f2f0)', go: () => { const base = f.n.replace(/\.[^.]+$/, ''); this.setState(s => ({ files: [...(s.files || this.FILES), { n: base + '.zip', s: 'ZIP', k: 'ZIP', p: f.p.replace(/[^\\]+$/, base + '.zip') }] })); say('✓ ' + base.toUpperCase() + '.ZIP CREADO'); } },
+        { l: 'QUITAR', c: 'oklch(0.63 0.22 27)', go: () => { this.snd('decline'); this.setState(s => ({ files: (s.files || this.FILES).filter((_, j) => j !== sel), fsel: null })); } }
+      ].filter(x => { const ac = this.C().actions || {}; return (x.l !== 'COPIAR RUTA' || ac['TODOS · COPIAR RUTA'] !== false) && (x.l !== 'COMPRIMIR' || ac['CARPETAS · ZIP'] !== false || ac['IMÁGENES · COMPRIMIR'] !== false); }) : [],
+      dropG: this.glyph(this.DROP[this.state.dragKind || 'file'][0]), dropLabel: this.DROP[this.state.dragKind || 'file'][1],
+      deskFiles: this.DESK.map(d => ({ n: d.n, tag: { file: 'ARCHIVO', text: 'TEXTO', link: 'ENLACE' }[d.kind], bg: d.kind === 'file' ? 'var(--n11,#f2f2f0)' : '#1c1b19', w: d.kind === 'file' ? '40px' : '48px', hgt: d.kind === 'file' ? '48px' : '32px', drag: e => {
+        if (d.kind === 'file') e.dataTransfer.setData('application/x-notch-file', JSON.stringify(d));
+        else if (d.kind === 'link') { e.dataTransfer.setData('text/uri-list', d.txt); e.dataTransfer.setData('text/plain', d.txt); }
+        else e.dataTransfer.setData('text/plain', d.txt);
+        e.dataTransfer.effectAllowed = 'copy'; } })),
+      nDragOver: e => { e.preventDefault(); const ty = Array.from(e.dataTransfer.types || []); const kind = ty.includes('Files') || ty.includes('application/x-notch-file') ? 'file' : ty.includes('text/uri-list') ? 'link' : 'text'; if (!this.state.dragOver || this.state.dragKind !== kind) { if (!this.state.dragOver) this.snd('open'); this.setState({ dragOver: true, dragKind: kind }); } },
+      nDragLeave: e => { if (e.currentTarget.contains(e.relatedTarget)) return; this.setState({ dragOver: false }); },
+      nDrop: e => {
+        e.preventDefault();
+        const out = [];
+        const fl = e.dataTransfer.files;
+        if (fl && fl.length) for (const x of fl) { const kb = x.size / 1024; out.push({ n: x.name, s: kb > 1024 ? (kb / 1024).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(kb)) + ' KB', k: (x.name.split('.').pop() || 'ARCH').toUpperCase().slice(0, 4), p: 'C:\\Usuarios\\tú\\Descargas\\' + x.name }); }
+        else if (e.dataTransfer.getData('application/x-notch-file')) { try { const d = JSON.parse(e.dataTransfer.getData('application/x-notch-file')); out.push({ n: d.n, s: d.s, k: d.k, p: 'C:\\Usuarios\\tú\\Escritorio\\' + d.n }); } catch (err) {} }
+        if (out.length) return add(out);
+        const url = e.dataTransfer.getData('text/uri-list'), txt = (e.dataTransfer.getData('text/plain') || '').trim();
+        if (url || /^https?:\/\//.test(txt)) { this.snd('confirm'); this.setState(s => ({ clips: [{ t: url || txt, m: 'AHORA' }, ...(s.clips || this.CLIPS)], tab: 'clip', launch: false, hov: true, dragOver: false })); return; }
+        if (txt) { this.snd('confirm'); this.setState(s => ({ notes: [{ t: txt, m: 'AHORA' }, ...(s.notes || this.NOTES)], nOpen: 0, tab: 'notes', launch: false, hov: true, dragOver: false })); return; }
+        this.setState({ dragOver: false });
+      }
+    };
+  }
+  DEMO = [{ base: 'musica' }, { peek: 'mensaje' }, { peek: 'claude' }, { base: 'descarga' }, { peek: 'entrante' }, { base: 'llamada' }, { base: 'foco' }, { peek: 'tarea' }, { base: 'micro' }];
+  componentDidMount() {
+    this.onCopy = () => { const txt = String(window.getSelection() || '').trim(); if (!txt) return; this.setState(s => ({ clips: [{ t: txt, m: 'AHORA' }, ...(s.clips || this.CLIPS)], copyText: txt, peek: 'copiado', peekUntil: (s.t || 0) + this.dur(), peekId: (s.peekId || 0) + 1, replying: false })); };
+    document.addEventListener('copy', this.onCopy);
+    this.readCfg();
+    this.onKey = e => {
+      const tg = e.target; if (tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA')) return;
+      if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
+      const want = this.C().keys.filter(k => k !== 'WIN');
+      const got = []; if (e.ctrlKey) got.push('CTRL'); if (e.altKey) got.push('ALT'); if (e.shiftKey) got.push('SHIFT'); got.push(e.key.toUpperCase());
+      if (want.length && want.join('+') === got.join('+')) { e.preventDefault(); this.snd(this.state.pin ? 'close' : 'open'); this.setState(s => ({ pin: !s.pin, tab: 'home', launch: false })); }
+    };
+    this.onDown = e => { if (this.C().closeOn === 'click' && this.state.hov && !(e.target.closest && e.target.closest('[data-notch]'))) { this.snd('close'); this.setState({ hov: false }); } };
+    this.onFs = () => this.setState({ fs: !!document.fullscreenElement });
+    this.onRs = () => this.forceUpdate(); window.addEventListener('resize', this.onRs);
+    window.addEventListener('keydown', this.onKey); document.addEventListener('mousedown', this.onDown); document.addEventListener('fullscreenchange', this.onFs);
+    this.iv = setInterval(() => { this.readCfg(); this.setState(s => {
+    const t = (s.t || 0) + 1, u = { t };
+    if (s.peek && (s.hov || s.replying) && s.peekUntil > s.t) u.peekUntil = s.peekUntil + 1;
+    if (s.demo && !s.hov && !s.replying && t % 60 === 0) { const ev = this.DEMO[(t / 60) % this.DEMO.length]; if (ev.base) { u.base = ev.base; u.peek = null; } else if (this.allowPeek(ev.peek)) { u.peek = ev.peek; u.peekUntil = t + this.dur(); u.peekId = (s.peekId || 0) + 1; u.replying = false; } }
+    return u;
+  }); }, 100); }
+  G = {
+    musica: ['..XXXXX', '..XXXXX', '..X...X', '..X...X', 'XXX.XXX', 'XXX.XXX', '.......'],
+    llamada: ['.XXXXX.', 'XXXXXXX', 'X.....X', '..XXX..', '.XX.XX.', 'XXXXXXX', 'XXXXXXX'],
+    general: ['X..X..X', '.XXXXX.', '.XX.XX.', 'XX...XX', '.XX.XX.', '.XXXXX.', 'X..X..X'],
+    brillo: ['X..X..X', '.......', '..XXX..', 'X.XXX.X', '..XXX..', '.......', 'X..X..X'],
+    bateria: ['.......', '.......', 'XXXXXX.', 'XXX..XX', 'XXX..XX', 'XXXXXX.', '.......'],
+    wifi: ['.......', '.XXXXX.', 'X.....X', '..XXX..', '.X...X.', '...X...', '.......'],
+    cascos: ['.XXXXX.', 'X.....X', 'X.....X', 'XX...XX', 'XX...XX', 'XX...XX', '.......'],
+    luna: ['..XXX..', '.XX....', 'XX.....', 'XX.....', 'XX.....', '.XX....', '..XXX..'],
+    sonido: ['...X...', '..XX..X', 'XXXX.X.', 'XXXX.X.', 'XXXX.X.', '..XX..X', '...X...'],
+    cara: ['.......', 'XX...XX', 'XX...XX', '.......', '.X...X.', '..XXX..', '.......'],
+    linea: ['.......', '.......', '.......', 'XXXXXXX', '.......', '.......', '.......'],
+    juego: ['.......', '.XXXXX.', 'XX.X.XX', 'X.....X', 'XX.X.XX', '.XXXXX.', '.......'],
+    ojo: ['.......', '..XXX..', '.X...X.', 'X..X..X', '.X...X.', '..XXX..', '.......'],
+    menu: ['X..X..X', '.......', '.......', 'X..X..X', '.......', '.......', 'X..X..X'],
+    notas: ['XXXXXXX', 'XXXXXXX', 'X.....X', 'X.XXX.X', 'X....XX', 'X...XX.', 'XXXXX..'],
+    tareas: ['XX.XXXX', 'XX.....', '.......', 'XX.XXXX', 'XX.....', '.......', 'XX.XXX.'],
+    micro: ['..XXX..', '..XXX..', 'X.XXX.X', 'X.XXX.X', '.X...X.', '..XXX..', '..XXX..'],
+    descarga: ['...X...', '...X...', '.X.X.X.', '..XXX..', '...X...', 'X.....X', 'XXXXXXX'],
+    mensaje: ['.XXXXX.', 'XXXXXXX', 'X.X.X.X', 'XXXXXXX', '.XXXXX.', '.XX....', '.X.....'],
+    claude: ['...X...', '.X.X.X.', '..XXX..', 'XXXXXXX', '..XXX..', '.X.X.X.', '...X...'],
+    foco: ['..X.X..', '...X...', '.XXXXX.', 'XXXXXXX', 'XXXXXXX', 'XXXXXXX', '.XXXXX.'],
+    inicio: ['..XXX..', '.XXXXX.', 'XXXXXXX', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..'],
+    copias: ['XXXXX..', 'X...X..', 'X.XXXXX', 'X.X...X', 'XXX...X', '..X...X', '..XXXXX'],
+    bandeja: ['XXX....', 'XXXXXXX', 'X.....X', 'X.....X', 'X.....X', 'XXXXXXX', '.......'],
+    sistema: ['......X', '....X.X', '....X.X', '..X.X.X', '..X.X.X', 'X.X.X.X', 'XXXXXXX']
+  };
+  V = [
+    { name: 'LLAMADA', items: [
+      ['Auricular', ['XXX....', 'XXX....', '.X.....', '.XX....', '..XX...', '...XXXX', '....XXX']],
+      ['Auricular + ondas', ['XX..X..', 'XX...X.', '.X.X..X', '.XX.X.X', '..XX...', '...XXXX', '....XXX']],
+      ['Cascos con micro', ['.XXXXX.', 'X.....X', 'X.....X', 'XX...XX', 'XX...XX', 'XX...X.', '....X..']],
+      ['Teléfono de mesa', ['.XXXXX.', 'XXXXXXX', 'X.....X', '..XXX..', '.XX.XX.', 'XXXXXXX', 'XXXXXXX'], true]] },
+    { name: 'INICIO', items: [
+      ['Casa', ['...X...', '..XXX..', '.XXXXX.', 'XXXXXXX', '.X...X.', '.X.X.X.', '.XXXXX.']],
+      ['Casa contorno', ['...X...', '..X.X..', '.X...X.', 'XX...XX', '.X...X.', '.X.X.X.', '.XXXXX.']],
+      ['Mosaico', ['XXX.XXX', 'XXX.XXX', 'XXX.XXX', '.......', 'XXX.XXX', 'XXX.XXX', 'XXX.XXX']],
+      ['Punto', ['..XXX..', '.XXXXX.', 'XXXXXXX', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..'], true]] },
+    { name: 'PORTAPAPELES', items: [
+      ['Tablilla', ['..XXX..', 'XXX.XXX', 'X.....X', 'X.XXX.X', 'X.....X', 'X.XXX.X', 'XXXXXXX']],
+      ['Tablilla sólida', ['..XXX..', 'XXXXXXX', 'XXXXXXX', 'X.....X', 'XXXXXXX', 'X...XXX', 'XXXXXXX']],
+      ['Dos hojas', ['XXXXX..', 'X...X..', 'X.XXXXX', 'X.X...X', 'XXX...X', '..X...X', '..XXXXX'], true],
+      ['Hoja doblada', ['XXXXX..', 'X...XX.', 'X....XX', 'X.XXX.X', 'X.....X', 'X.XXX.X', 'XXXXXXX']]] }
+  ];
+  variants() {
+    let n = 0;
+    return this.V.map(gp => ({ name: gp.name, items: gp.items.map(([label, rows, cur]) => {
+      const cells = rows.join('').split('').map(ch => ({ c: ch === 'X' ? 'var(--n11,#f2f2f0)' : 'var(--n12,#1d1d20)' }));
+      return { id: '5' + 'abcdefghijkl'[n++], label, cells, tag: cur ? 'ACTUAL' : '' };
+    }) }));
+  }
+  glyph(n, on = 'var(--n11,#f2f2f0)', off = 'var(--n12,#1d1d20)') { return this.G[n].join('').split('').map(ch => ({ c: ch === 'X' ? on : off })); }
+  dots(n, filled, on = 'var(--n11,#f2f2f0)', off = 'var(--n4,#2a2a2e)') { return Array.from({ length: n }, (_, i) => ({ c: i < filled ? on : off })); }
+  punto(ms) {
+    const t = this.state.t || 0, act = this.state.base || 'musica', tab = this.state.tab || 'home';
+    const peekK = this.state.peek && t < (this.state.peekUntil || 0) ? this.state.peek : null;
+    const CF = this.C(), RED = this.ACC[CF.accent] || this.ACC[0], DUR = this.dur();
+    const drag = !!this.state.dragOver;
+    const open = !drag && (!!this.state.pin || (!!this.state.hov && !peekK));
+    const mm = s => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+    const pomoS = Math.max(0, CF.pomo * 60 - 336 - Math.floor(t / 10));
+    const pct = Math.floor((t * 0.4) % 100);
+    const A = {
+      idle: { label: 'REPOSO', w: 120 },
+      musica: { label: 'LUZ DE NEÓN', sub: 'RUTA NOCTURNA', g: 'musica', r: 'eq', w: 290, b: 'MÚSICA' },
+      llamada: { label: 'DISCORD · GENERAL', g: 'llamada', r: 'doto', text: mm(724 + Math.floor(t / 10)), w: 250 },
+      mensaje: { label: 'ANA · ¿VIENES?', g: 'mensaje', r: 'text', text: 'WHATSAPP', w: 250 },
+      micro: { label: 'MICRO · CÁMARA', g: 'micro', gc: RED, r: 'live', w: 190 },
+      descarga: { label: 'SETUP.EXE', g: 'descarga', r: 'bar', w: 220 },
+      foco: { label: 'FOCO', g: 'foco', r: 'doto', text: mm(pomoS), w: 160 },
+      claude: { label: 'CLAUDE', g: 'claude', r: 'text', text: 'RESPUESTA LISTA', w: 230 },
+      tarea: { label: 'RESPONDER A ANA', g: 'tareas', r: 'doto', text: '21:00', w: 240, b: 'TAREA' }
+    };
+    const P = {
+      mensaje: { g: 'mensaje', head: CF.content === 'hidden' ? 'WHATSAPP' : 'WHATSAPP · ANA', when: 'AHORA', body: CF.content === 'full' ? '¿Vienes esta noche? Llevo la cámara y salimos a las 21:30.' : CF.content === 'sender' ? 'Nuevo mensaje de Ana' : 'Tienes un mensaje nuevo', a1: CF.quickReply ? 'RESPONDER' : 'ABRIR', a2: 'SILENCIAR', b: 'WHATSAPP', do1: CF.quickReply ? 'reply' : 'confirm', do2: 'dismiss' },
+      claude: { g: 'claude', head: 'CLAUDE', when: 'AHORA', body: CF.content === 'full' ? 'Tu script está listo: 3 archivos modificados.' : 'Claude ha respondido', a1: 'ABRIR', a2: 'MÁS TARDE', b: 'CLAUDE', do1: 'confirm', do2: 'dismiss' },
+      entrante: { g: 'llamada', head: 'DISCORD · LLAMADA ENTRANTE', when: '', body: 'Marcos te está llamando', a1: 'ACEPTAR', a2: 'RECHAZAR', red: true, b: 'LLAMADA ENTRANTE', do1: 'accept', do2: 'decline' },
+      tarea: { g: 'tareas', head: 'RECORDATORIO · 21:00', when: '', body: 'Responder a Ana', a1: 'HECHO', a2: '+10 MIN', b: 'TAREA', do1: 'done', do2: 'dismiss' },
+      copiado: { g: 'copias', head: 'PORTAPAPELES · COPIADO', when: '', body: this.state.copyText || 'npm run dev --host', a1: 'VER', a2: 'OK', b: 'COPIADO', do1: 'viewclip', do2: 'dismiss' }
+    };
+    const pk = peekK ? P[peekK] : null;
+    const firePeek = k => () => { if (!this.allowPeek(k)) { this.snd('decline'); this.setState({ toast: CF.dnd ? '☾ NO MOLESTAR ACTIVO' : '✕ AVISOS DE ESTA APP DESACTIVADOS', toastUntil: t + 25 }); return; } this.setState(s => ({ peek: k, peekUntil: (s.t || 0) + DUR, peekId: (s.peekId || 0) + 1, replying: false, demo: false })); };
+    const end = (snd, extra = {}) => { this.snd(snd); this.setState({ peek: null, replying: false, ...extra }); };
+    const doAct = what => () => {
+      if (what === 'reply') { this.snd('click'); this.setState({ replying: true }); }
+      else if (what === 'send') end('send');
+      else if (what === 'accept') end('confirm', { base: 'llamada' });
+      else if (what === 'decline') end('decline');
+      else if (what === 'viewclip') end('page', { tab: 'clip', launch: false, hov: true });
+      else if (what === 'done') { const ts = this.state.tasks; end('confirm', ts ? { tasks: ts.map(x => x.t === 'Responder a Ana' ? { ...x, d: true } : x) } : { tasksDoneAna: true }); }
+      else end(what === 'confirm' ? 'confirm' : 'close');
+    };
+    const tasks = this.state.tasks || [
+      { t: 'Revisar el informe', m: '10:00', d: true }, { t: 'Responder a Ana', m: '21:00', d: !!this.state.tasksDoneAna, due: true },
+      { t: 'Subir build a Discord', m: '22:30', d: false }, { t: 'Comprar café', m: '', d: true }, { t: 'Leer respuesta de Claude', m: '', d: false }];
+    const togTask = i => () => this.snd('tick') || this.setState({ tasks: tasks.map((x, j) => j === i ? { ...x, d: !x.d } : x) });
+    const a = A[act] || A.musica;
+    const cur = { sub: a.sub || '', label: a.label, text: a.text || '', g: a.g ? this.glyph(a.g, a.gc) : [], isText: a.r === 'text', isDoto: a.r === 'doto', isLive: a.r === 'live', isBar: a.r === 'bar', isEq: a.r === 'eq' };
+    const eqH = [0, 1, 2, 3, 4].map(i => 1 + Math.floor(3 * Math.abs(Math.sin(t / 3 + i * 1.3))));
+    const eq = [];
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 5; c++) eq.push({ c: 4 - r <= eqH[c] ? 'var(--n11,#f2f2f0)' : 'var(--n12,#1d1d20)' });
+    const META = { home: ['INICIO', 'inicio'], clip: ['PORTAPAPELES', 'copias'], shelf: ['BANDEJA', 'bandeja'], todo: ['TAREAS', 'tareas'], notes: ['NOTAS', 'notas'], quick: ['AJUSTES', 'general'] };
+    const wins = (this.state.cwins || this.DEFWINS).filter(w => META[w[0]] && (w[2] || w[0] === 'home'));
+    if (!wins.find(w => w[0] === 'home')) wins.unshift(['home', 'Inicio', true]);
+    const tabsDef = [['home', ...META.home], ...wins.filter(w => w[0] !== 'home').map(w => [w[0], ...META[w[0]]])];
+    const hc = CF.homeCards || {};
+    const cards = [hc['MÚSICA'] !== false && '1.5fr', hc.FOCO !== false && '1fr', hc.SISTEMA !== false && '1fr', !!hc['PRÓXIMA TAREA'] && '1fr'].filter(Boolean);
+    const minimal = CF.minimal && !open && !pk && !drag;
+    const closedIdle = !open && !pk && !drag && act === 'idle';
+    const light = CF.theme === 'light' || (CF.theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches);
+    const now = new Date(), hh = now.getHours(), mi = String(now.getMinutes()).padStart(2, '0');
+    const clockTxt = CF.clock ? (CF.h24 ? String(hh).padStart(2, '0') + ':' + mi : ((hh % 12) || 12) + ':' + mi) : '';
+    const LYR = ['bajo la luz de neón', 'cruzamos la ciudad', 'sin mirar atrás', 'hasta que salga el sol'];
+    const sysV = [23 + Math.round(6 * Math.sin(t / 7)), 61, 34 + Math.round(10 * Math.sin(t / 5))];
+    return {
+      ...(() => {
+        const o = this.state.osd && t < (this.state.osdUntil || 0) ? this.state.osd : null;
+        const lvl = { vol: this.state.sv ?? 60, bri: this.state.sb ?? 70, charge: 70, wifiOff: 0, wifiOn: 100, buds: 80 };
+        const D = { vol: ['sonido', 'VOLUMEN', 'ALTAVOCES'], bri: ['brillo', 'BRILLO', 'PANTALLA 1'], charge: ['bateria', 'CARGANDO', 'CARGADOR CONECTADO'], wifiOff: ['wifi', 'SIN CONEXIÓN', 'WI-FI · CASA_5G'], wifiOn: ['wifi', 'CONECTADO', 'WI-FI · CASA_5G'], buds: ['cascos', 'AURICULARES', 'CONECTADOS'] };
+        const fire = (k, patch = {}) => { const need = { vol: 'osd', bri: 'osd', charge: 'battery', wifiOff: 'wifi', wifiOn: 'wifi', buds: 'buds' }[k]; if (!CF[need]) { this.snd('decline'); this.setState({ sysMsg: 'DESACTIVADO EN AJUSTES', sysUntil: t + 20 }); return; } this.snd(k === 'wifiOff' ? 'decline' : k === 'vol' || k === 'bri' ? 'tick' : 'notify'); this.setState({ osd: k, osdUntil: t + 18, ...patch }); };
+        const adj = (key, d, k) => () => { const v = Math.max(0, Math.min(100, (this.state[key] ?? (key === 'sv' ? 60 : 70)) + d)); fire(k, { [key]: v }); };
+        const v = o ? lvl[o] : 0, d = o ? D[o] : ['sonido', '', ''];
+        return {
+          showOsd: !!o && !drag && !open && !pk,
+          osd: { g: this.glyph(d[0], o === 'wifiOff' ? RED : 'var(--n11,#f2f2f0)', 'transparent'), l: d[1], sub: d[2], v: o === 'wifiOff' ? '—' : o === 'wifiOn' ? 'OK' : v + '%',
+            bar: Array.from({ length: 16 }, (_, i) => { const f = (i + 0.5) / 16 <= v / 100; return { c: f ? (o === 'charge' ? 'oklch(0.78 0.14 150)' : 'var(--n11,#f2f2f0)') : 'var(--n4,#2a2a2e)', h: f ? (4 + Math.round(i / 16 * 10)) + 'px' : '4px' }; }) },
+          osdOpen: !!o && !drag && !open && !pk,
+          sysBtns: [['VOL −', adj('sv', -10, 'vol')], ['VOL +', adj('sv', 10, 'vol')], ['BRILLO −', adj('sb', -10, 'bri')], ['BRILLO +', adj('sb', 10, 'bri')], ['CARGADOR', () => fire('charge')], ['WI-FI', () => fire(this.state.wifiLost ? 'wifiOn' : 'wifiOff', { wifiLost: !this.state.wifiLost })], ['AURICULARES', () => fire('buds')]].map(([label, pick]) => ({ label, pick })),
+          sysToast: this.state.sysMsg && t < (this.state.sysUntil || 0) ? this.state.sysMsg : ''
+        };
+      })(),
+      dndOn: !!CF.dnd, lunaG: this.glyph('luna', 'var(--n9,#8d8d92)', 'transparent'),
+      cur, eq, showDrop: drag, showMinimal: minimal && !this.osdOn(t), minMic: minimal && act === 'micro' && CF.micAlways, minGlyphOn: minimal && !!a.g, minGlyph: a.g ? this.glyph(a.g, 'var(--n9,#8d8d92)', 'transparent') : [], showIdle: !minimal && closedIdle && !this.osdOn(t), showCompact: !minimal && !drag && !open && !pk && act !== 'idle' && !this.osdOn(t), showOpen: open, showPeek: !drag && !open && !!pk,
+      idleMascot: CF.mascot, idleClock: !CF.mascot, clockTxt, accent: RED,
+      nLeft: 'calc(' + ({ left: 22, center: 50, right: 78 }[CF.pos] || 50) + '% + ' + (CF.offset || 0) + 'px)', nScale: (CF.size / 100).toFixed(2),
+      nTrans: CF.anim === 'reduced' ? 'all .15s ease' : 'all .45s cubic-bezier(.3,1.2,.5,1)', nFilter: light ? 'drop-shadow(0 1px 0 rgba(0,0,0,.06)) drop-shadow(0 8px 18px rgba(0,0,0,.14))' : 'none',
+      nOp: (CF.hideFull && this.state.fs) || (CF.hideIdle && closedIdle && !minimal) ? 0 : 1,
+      homeCols: cards.join(' ') || '1fr', cardMusic: hc['MÚSICA'] !== false, cardFocus: hc.FOCO !== false, cardSys: hc.SISTEMA !== false, cardTask: !!hc['PRÓXIMA TAREA'],
+      lyricsOn: CF.lyrics, lyric: LYR[Math.floor(t / 30) % LYR.length],
+      nextTask: (() => { const nt = tasks.find(x => !x.d) || { t: 'Nada pendiente', m: '' }; const i = tasks.indexOf(nt); return { t: nt.t, m: nt.m, done: i >= 0 ? togTask(i) : () => {} }; })(),
+      tabQuick: !this.state.launch && tab === 'quick',
+      tiles: [['dnd', 'No molestar', 'luna'], ['sounds', 'Sonidos', 'sonido'], ['mascot', 'Mascota', 'cara'], ['minimal', 'Modo minimal', 'linea'], ['hideFull', 'Ocultar en juegos', 'juego'], ['noFocus', 'Sin quitar foco', 'ojo']].map(([k, l, g]) => { const on = !!CF[k]; return { l, st: on ? 'ACTIVADO' : 'NO', g: this.glyph(g, on ? 'var(--n0,#0b0b0c)' : 'var(--n11,#f2f2f0)', 'transparent'), bg: on ? 'var(--n11,#f2f2f0)' : 'var(--n1,#151517)', fg: on ? 'var(--n0,#0b0b0c)' : 'var(--n11,#f2f2f0)', tog: () => { if (k === 'sounds' && on) this.snd('close'); this.setCfg({ [k]: !on }); if (!(k === 'sounds' && on)) setTimeout(() => this.snd(on ? 'close' : 'confirm'), 0); } }; }),
+      qVol: Array.from({ length: 14 }, (_, i) => { const f = (i + 0.5) / 14 <= CF.vol / 100 + 0.001; return { c: f ? 'var(--n11,#f2f2f0)' : 'var(--n4,#2a2a2e)', h: f ? (5 + Math.round(i / 14 * 9)) + 'px' : '5px', set: () => { this.setCfg({ vol: Math.round((i + 1) / 14 * 100 / 5) * 5 }); setTimeout(() => this.snd('tick'), 0); } }; }),
+      qVolV: CF.vol + '%',
+      settingsOpen: !!this.state.full, modalScale: Math.min(1, (window.innerWidth - 40) / 1000, (window.innerHeight - 40) / 680).toFixed(3),
+      openFull: () => { this.snd('open'); this.setState({ full: true, pin: false, hov: false }); },
+      closeFull: () => { this.readCfg(); this.setState({ full: false }); }, closeFullBg: () => { this.snd('close'); this.readCfg(); this.setState({ full: false }); }, stop: e => e.stopPropagation(),
+      nWheel: e => { if (!CF.wheel) return; const nw = Date.now(); if (nw - (this._wt || 0) < 350) return; this._wt = nw; if (!open) { this.snd('open'); this.setState({ hov: true, tab: 'home', launch: false }); return; } const order = tabsDef.map(x => x[0]); const i = Math.max(0, order.indexOf(tab)); this.setState({ launch: false, tab: order[(i + (e.deltaY > 0 ? 1 : -1) + order.length) % order.length] }); },
+      peek: pk ? { ...pk, do1: doAct(pk.do1), do2: doAct(pk.do2), send: doAct('send'), cancel: () => { this.snd('close'); this.setState({ replying: false }); }, gl: this.glyph(pk.g, pk.red ? RED : 'var(--n11,#f2f2f0)'), a1bg: pk.red ? 'oklch(0.72 0.17 150)' : 'var(--n11,#f2f2f0)', a2c: pk.red ? RED : 'var(--n9,#8d8d92)', bar: this.dots(30, Math.ceil(((this.state.peekUntil || 0) - t) / DUR * 30), 'var(--n7,#5a5a60)', 'var(--n12,#1d1d20)') } : { head: '', when: '', body: '', a1: '', a2: '', gl: [], bar: [] },
+      pxFlat: ms.px.flatMap(r => r.cells),
+      nW: drag ? '420px' : open ? '580px' : pk ? '420px' : this.osdOn(t) ? '340px' : minimal ? Math.max(96, Math.round(a.w * 0.6)) + 'px' : a.w + 'px', nH: drag ? '84px' : open ? this.state.launch ? '264px' : ({ home: CF.lyrics && hc['MÚSICA'] !== false ? '196px' : '176px', clip: '214px', shelf: '236px', todo: '280px', notes: '222px', quick: '246px' }[tab] || '176px') : pk ? '112px' : this.osdOn(t) ? '40px' : minimal ? '24px' : '34px', nR: drag ? '26px' : open ? '30px' : pk ? '26px' : minimal ? '12px' : '16px',
+      replying: !!this.state.replying && !!pk, notReplying: !(this.state.replying && pk),
+      nEnter: () => {
+        clearTimeout(this._ct);
+        if (this.state.hov) return;
+        const go = () => { if (!this.state.peek || t >= (this.state.peekUntil || 0)) { if (!this.state.pin) this.snd('open'); this.setState({ launch: false, tab: 'home' }); } this.setState({ hov: true }); };
+        const delay = CF.minimal ? 0 : Math.max(0, CF.openTime - CF.hoverSens * 15);
+        if (peekK || delay === 0) go(); else { clearTimeout(this._ot); this._ot = setTimeout(go, delay); }
+      },
+      nLeave: () => {
+        clearTimeout(this._ot);
+        if (CF.closeOn === 'click') return;
+        const close = () => { if (!this.state.pin && !this.state.replying && this.state.hov && !(this.state.peek && this.state.t < (this.state.peekUntil || 0))) this.snd('close'); this.setState({ hov: false }); };
+        clearTimeout(this._ct); this._ct = setTimeout(close, CF.closeDelay * 1000);
+      },
+      blink: t % 10 < 5 ? 1 : 0.25,
+      dlBar: this.dots(12, Math.round(pct / 100 * 12)),
+      musicBar: this.dots(26, 11),
+      pomo: mm(pomoS), pomoDots: this.dots(Math.min(CF.pomo, 30), Math.ceil(pomoS / 60), RED),
+      sys: [['CPU', sysV[0]], ['RAM', sysV[1]], ['RED', sysV[2]]].map(([k, v]) => ({ k, v: v + '%', dots: this.dots(12, Math.round(v / 100 * 12)) })),
+      tabs: tabsDef.map(([k, l, g]) => ({ label: l, g: this.glyph(g, tab === k ? 'var(--n11,#f2f2f0)' : 'var(--n8,#6a6a70)', 'var(--n16,#161618)'), bg: tab === k ? 'var(--n12,#1d1d20)' : 'transparent', fg: tab === k ? 'var(--n11,#f2f2f0)' : 'var(--n9,#8d8d92)', pick: () => this.setState({ tab: k }) })),
+      ...(() => {
+        const order = tabsDef.map(x => x[0]), i = Math.max(0, order.indexOf(tab)), n = order.length;
+        const go = j => () => this.setState({ tab: order[(j + n) % n] });
+        return {
+          pg: { label: tabsDef[i][1], g: this.glyph(tabsDef[i][2]) },
+          goHome: go(0), notHome: i !== 0, homeBg: i === 0 ? 'var(--n12,#1d1d20)' : 'transparent',
+          homeG: this.glyph('inicio', i === 0 ? 'var(--n11,#f2f2f0)' : 'var(--n9,#8d8d92)', 'transparent'),
+          pgPrev: go(i - 1), pgNext: go(i + 1),
+          pgWheel: e => { const now = Date.now(); if (now - (this._wt || 0) < 350) return; this._wt = now; go(i + (e.deltaY > 0 ? 1 : -1))(); },
+          pgDots: order.map((k, j) => ({ w: j === i ? '14px' : '4px', c: j === i ? 'var(--n11,#f2f2f0)' : 'var(--n6,#3a3a3f)', go: go(j) }))
+        };
+      })(),
+      ...this.shelfVals(),
+      tabNotes: !this.state.launch && tab === 'notes',
+      ...this.launcherVals(tabsDef, tab, t, tasks.filter(x => !x.d).length), draft: this.state.draft || '',
+      setDraft: e => this.setState({ draft: e.target.value }),
+      saveNote: () => { const d = (this.state.draft || '').trim(); if (!d) return; this.snd('confirm'); const now = new Date(); this.setState(s => ({ draft: '', notes: [{ t: d, m: String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') }, ...(s.notes || this.NOTES)] })); },
+      noteKey: e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); const d = (this.state.draft || '').trim(); if (d) { this.snd('confirm'); this.setState(s => ({ draft: '', notes: [{ t: d, m: 'AHORA' }, ...(s.notes || this.NOTES)] })); } } },
+      ...this.noteView(),
+      noteRows: (this.state.notes || this.NOTES).slice(0, 4).map((x, i, arr) => ({ n: String(i + 1).padStart(2, '0'), t: x.t, m: x.m, open: () => { this.snd('click'); this.setState({ nOpen: i, nCopied: false }); }, del: e => { e.stopPropagation(); this.snd('decline'); const all = this.state.notes || this.NOTES; this.setState({ notes: all.filter((_, j) => j !== i) }); } })),
+      noteCount: String((this.state.notes || this.NOTES).length).padStart(2, '0'),
+      tabTodo: !this.state.launch && tab === 'todo', todoCount: tasks.filter(x => x.d).length + '/' + tasks.length,
+      taskRows: tasks.map((x, i) => ({ t: x.t, m: x.m, tog: togTask(i), box: x.d ? 'var(--n11,#f2f2f0)' : 'transparent', fg: x.d ? 'var(--n7,#5a5a60)' : 'var(--n11,#f2f2f0)', deco: x.d ? 'line-through' : 'none', mc: x.due && !x.d ? RED : 'var(--n9,#8d8d92)' })),
+      tabHome: !this.state.launch && tab === 'home', tabClip: !this.state.launch && tab === 'clip', tabShelf: !this.state.launch && tab === 'shelf',
+      clips: (this.state.clips || this.CLIPS).slice(0, 4).map((c, i) => ({ n: String(i + 1).padStart(2, '0'), t: c.t, m: c.m })),
+      actBtns: ['idle', 'musica', 'llamada', 'micro', 'descarga', 'foco'].map(k => ({ label: A[k].b || { llamada: 'EN LLAMADA', descarga: 'DESCARGA', micro: 'MICRO' }[k] || A[k].label, bg: act === k ? '#1c1b19' : 'transparent', fg: act === k ? '#fff' : '#1c1b19', pick: () => { this.snd('click'); this.setState({ base: k, peek: null, demo: false }); } })),
+      peekBtns: Object.keys(P).map(k => ({ label: P[k].b, bg: peekK === k ? '#1c1b19' : 'transparent', fg: peekK === k ? '#fff' : '#1c1b19', pick: firePeek(k) })),
+      toggleDemo: () => { this.snd('click'); this.setState(s => ({ demo: !s.demo })); },
+      toggleSound: () => { this.setCfg({ sounds: !CF.sounds }); setTimeout(() => this.snd('click'), 0); }, soundLabel: CF.sounds ? 'SONIDO ON' : 'SONIDO OFF', soundBg: CF.sounds ? '#1c1b19' : 'transparent', soundFg: CF.sounds ? '#fff' : '#1c1b19', demoBg: this.state.demo ? 'oklch(0.63 0.22 27)' : 'transparent', demoFg: this.state.demo ? '#fff' : '#1c1b19',
+      togglePin: () => { this.snd(this.state.pin ? 'close' : 'open'); this.setState(s => ({ pin: !s.pin })); }, pinBg: this.state.pin ? '#1c1b19' : 'transparent', pinFg: this.state.pin ? '#fff' : '#1c1b19',
+      sheet: Object.keys(this.G).map(n => ({ n: n.toUpperCase(), g: this.glyph(n, n === 'micro' ? RED : 'var(--n11,#f2f2f0)') }))
+    };
+  }
+  componentWillUnmount() { clearInterval(this.iv); document.removeEventListener('copy', this.onCopy); window.removeEventListener('keydown', this.onKey); window.removeEventListener('resize', this.onRs); document.removeEventListener('mousedown', this.onDown); document.removeEventListener('fullscreenchange', this.onFs); clearTimeout(this._ot); clearTimeout(this._ct); }
+  LIGHT = { n0: '#f6f5f2', n1: '#ebe9e4', n2: '#dedbd4', n3: '#e4e1db', n4: '#cfccc4', n5: '#c9c6be', n6: '#b9b6ae', n7: '#9a968e', n8: '#86827a', n9: '#6b675f', n10: '#3a3833', n11: '#1c1b19', n12: '#e1ded8', n13: '#d4d1c9', n14: '#a8a49c', n15: '#dcd9d2', n16: '#eae8e3', n17: '#78746c' };
+  applyTheme() {
+    const th = this.C().theme, light = th === 'light' || (th === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches);
+    if (this._light === light) return; const el = document.querySelector('[data-notch]'); if (!el) return; this._light = light;
+    Object.keys(this.LIGHT).forEach(k => light ? el.style.setProperty('--' + k, this.LIGHT[k]) : el.style.removeProperty('--' + k));
+  }
+  componentDidUpdate() {
+    this.applyTheme();
+    const s = this.state, ps = this._ps || {};
+    if (s.peekId && s.peekId !== ps.peekId) this.snd(s.peek === 'entrante' ? 'ring' : 'notify');
+    if (this._ps && s.tab !== ps.tab) this.snd('page');
+    this._ps = { peekId: s.peekId, tab: s.tab };
+  }
+  snd(type) {
+    const cf = this.C(); if (!cf.sounds) return; const VOL = cf.vol / 100;
+    try {
+      const ac = this.ac || (this.ac = new (window.AudioContext || window.webkitAudioContext)());
+      if (ac.state === 'suspended') ac.resume();
+      const T = {
+        click: [['square', 1800, 1800, 0, .025, .03]],
+        tick: [['sine', 1300, 900, 0, .05, .08]],
+        page: [['sine', 660, 660, 0, .05, .06], ['sine', 990, 990, .05, .06, .06]],
+        open: [['sine', 380, 760, 0, .12, .05]],
+        close: [['sine', 760, 380, 0, .1, .04]],
+        notify: [['triangle', 880, 880, 0, .12, .08], ['triangle', 1320, 1320, .09, .16, .08]],
+        ring: [['triangle', 740, 740, 0, .1, .08], ['triangle', 990, 990, .12, .1, .08], ['triangle', 740, 740, .24, .1, .08], ['triangle', 990, 990, .36, .1, .08]],
+        confirm: [['sine', 660, 660, 0, .07, .08], ['sine', 990, 990, .07, .12, .08]],
+        send: [['sine', 500, 1400, 0, .14, .07]],
+        decline: [['sine', 440, 220, 0, .18, .08]]
+      }[type] || [];
+      const now = ac.currentTime;
+      T.forEach(([w, f0, f1, at, dur, vol]) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = w; o.frequency.setValueAtTime(f0, now + at); o.frequency.exponentialRampToValueAtTime(f1, now + at + dur);
+        g.gain.setValueAtTime(0, now + at); g.gain.linearRampToValueAtTime(vol * VOL, now + at + .005); g.gain.exponentialRampToValueAtTime(.0001, now + at + dur);
+        o.connect(g).connect(ac.destination); o.start(now + at); o.stop(now + at + dur + .02);
+      });
+    } catch (e) {}
+  }
+  curMode() {
+    const md = this.state.mode ?? 'auto';
+    if (md !== 'auto') return md;
+    const c = (this.state.t || 0) % 150;
+    return c < 60 ? 'awake' : c < 120 ? 'sleep' : 'hello';
+  }
+  mascots() {
+    const t = this.state.t || 0, m = this.curMode();
+    // Píxel: matriz 13x5
+    const g = Array.from({ length: 5 }, () => Array(13).fill(0));
+    const on = (r, c) => { if (r >= 0 && r < 5 && c >= 0 && c < 13) g[r][c] = 1; };
+    if (m === 'awake') {
+      const lc = t % 80, o = lc >= 40 && lc < 55 ? 1 : lc >= 62 && lc < 72 ? -1 : 0;
+      const blink = t % 45 < 2;
+      [3, 8].forEach(x => { for (let r = 1; r <= 3; r++) if (!blink || r === 2) { on(r, x + o); on(r, x + 1 + o); } });
+    } else if (m === 'sleep') {
+      [3, 4, 8, 9].forEach(x => on(3, x));
+      const z = Math.floor((t % 25) / 5); on(3 - z, 11 + (z % 2));
+    } else {
+      const b = t % 6 < 3 ? 0 : -1;
+      [2, 8].forEach(x => { on(2 + b, x); on(1 + b, x + 1); on(2 + b, x + 2); });
+    }
+    const onC = m === 'sleep' ? 'var(--n17,#7d7d83)' : 'var(--n11,#f2f2f0)';
+    const px = g.map(row => ({ cells: row.map(v => ({ c: v ? onC : 'var(--n3,#1b1b1f)' })) }));
+    // Brasa
+    let br;
+    if (m === 'awake') { const s = Math.sin(t / 30 * 2 * Math.PI); br = { size: (9 + s * 1.2) + 'px', col: 'oklch(0.8 0.16 60)', glow: '0 0 ' + (10 + s * 5) + 'px oklch(0.8 0.16 60 / .8)', ringS: 'scale(0)', ringO: 0 }; }
+    else if (m === 'sleep') { const s = Math.sin(t / 60 * 2 * Math.PI); br = { size: '6px', col: 'oklch(0.55 0.08 250)', glow: '0 0 ' + (3 + s * 3) + 'px oklch(0.55 0.08 250 / .7)', ringS: 'scale(0)', ringO: 0 }; }
+    else { const p = (t % 15) / 15; br = { size: '11px', col: 'oklch(0.88 0.14 75)', glow: '0 0 16px oklch(0.88 0.14 75)', ringS: 'scale(' + (1 + p * 3) + ')', ringO: 1 - p }; }
+    // Antenas
+    let an;
+    if (m === 'awake') an = { l: (12 * Math.sin(t / 12)) + 'deg', r: (-12 * Math.sin(t / 12 + 1)) + 'deg', tip: 'oklch(0.78 0.14 150)' };
+    else if (m === 'sleep') an = { l: (28 + Math.sin(t / 25) * 2) + 'deg', r: (-28 - Math.sin(t / 25) * 2) + 'deg', tip: 'var(--n6,#3a3a3e)' };
+    else an = { l: (26 * Math.sin(t * 1.3)) + 'deg', r: (26 * Math.sin(t * 1.3 + 2)) + 'deg', tip: 'oklch(0.88 0.14 75)' };
+    // Pulso
+    const bars = Array.from({ length: 22 }, (_, i) => {
+      let h, c;
+      if (m === 'awake') { const pos = (t % 40) * 0.8 - 4, d = i - pos; h = 2 + 11 * Math.exp(-d * d / 1.2) - (Math.abs(d - 1.6) < .6 ? 0 : 0); c = 'oklch(0.78 0.14 150)'; }
+      else if (m === 'sleep') { h = 2 + 1.2 * (1 + Math.sin(i / 3 + t / 10)); c = 'var(--n14,#4a4a50)'; }
+      else { h = 2 + 11 * Math.abs(Math.sin(i / 2 + t / 2)); c = 'var(--n11,#f2f2f0)'; }
+      return { h: h.toFixed(1) + 'px', c };
+    });
+    return { px, br, an, bars, m };
+  }
+  sizes = {
+    a: { cw: '170px', ch: '36px', ow: '460px', oh: '170px', cr: '18px', or: '28px' },
+    b: { cw: '180px', ch: '34px', ow: '440px', oh: '200px', cr: '17px', or: '12px' },
+    c: { cw: '210px', ch: '34px', ow: '440px', oh: '196px' },
+    d: { ch: '30px', oh: '150px' },
+    e: { cw: '48px', ch: '48px', ow: '280px', oh: '232px', cr: '24px', or: '22px' },
+    g: { cw: '180px', ch: '32px', ow: '500px', oh: '178px', cr: '14px', or: '30px' },
+    f: { cw: '170px', ch: '34px', ow: '420px', oh: '172px' }
+  };
+  item(k) {
+    const s = this.sizes[k];
+    const open = !!(this.props.expandAll ?? false) || !!this.state.open[k];
+    return {
+      open, closed: !open,
+      w: open ? s.ow : s.cw, h: open ? s.oh : s.ch,
+      r: open ? s.or : s.cr, r2: open ? '12px' : '17px',
+      enter: () => this.setState(st => ({ open: { ...st.open, [k]: true } })),
+      leave: () => this.setState(st => ({ open: { ...st.open, [k]: false } }))
+    };
+  }
+  renderVals() {
+    const g = 'oklch(0.75 0.15 150)', o = 'oklch(0.75 0.15 55)', bl = 'oklch(0.65 0.15 255)', n = '#9a978f';
+    const acts = [
+      { label: 'Luz de neón', meta: '1:24', dot: g },
+      { label: 'Discord #general', meta: '12:04', dot: g },
+      { label: 'Ana: ¿vienes?', meta: 'WhatsApp', dot: g },
+      { label: 'Micro · Cámara', meta: 'activos', dot: o },
+      { label: 'setup.exe', meta: '64%', dot: bl },
+      { label: 'Claude', meta: 'respuesta lista', dot: o },
+      { label: 'Pomodoro', meta: '18:24', dot: n }
+    ];
+    const ms = this.mascots();
+    const labels = { awake: 'Despierto', sleep: 'Dormido', hello: 'Saludo', auto: 'Auto' };
+    const p = this.punto(ms);
+    const v = { acts, ...ms, ...p, iconGroups: this.variants(), modeNow: labels[ms.m],
+      modeBtns: ['auto', 'awake', 'sleep', 'hello'].map(k => ({ label: labels[k], bg: this.state.mode === k ? '#1c1b19' : 'transparent', fg: this.state.mode === k ? '#fff' : '#1c1b19', pick: () => this.setState({ mode: k, t: 0 }) })) };
+    ['a', 'b', 'c', 'd', 'e', 'f', 'g'].forEach(k => (v[k] = this.item(k)));
+    return v;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Doto:wght@700;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#e8e6e1;font-family:Geist,"Segoe UI Variable",system-ui,sans-serif;color:#1c1b19;-webkit-font-smoothing:antialiased}
+a{color:#1c1b19;text-decoration:none}a:hover{color:#5a564f}
+</style>
+</helmet>
+<div style="display:flex;flex-direction:column;min-height:100vh">
+
+  <header style="max-width:1120px;width:100%;margin:0 auto;padding:22px 24px;box-sizing:border-box;display:flex;align-items:center;gap:16px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:30px;height:30px;border-radius:7px;background:#0b0b0c;display:flex;align-items:center;justify-content:center;gap:4px"><div style="width:4px;height:7px;border-radius:1px;background:#f2f2f0"></div><div style="width:4px;height:7px;border-radius:1px;background:#f2f2f0"></div></div>
+      <span style="font:900 22px Doto,monospace;letter-spacing:.02em">PARPA</span>
+    </div>
+    <span style="flex:1"></span>
+    <nav style="display:flex;gap:20px;align-items:center;font:500 13px 'Geist Mono',monospace;letter-spacing:.04em">
+      <a href="#funciones">Funciones</a>
+      <a href="#privacidad">Privacidad</a>
+      <a href="#" style="padding:8px 14px;border-radius:999px;border:1px solid #1c1b19">GitHub ↗</a>
+    </nav>
+  </header>
+
+  <section style="max-width:1120px;width:100%;margin:0 auto;padding:40px 24px 72px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:40px;text-align:center">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:18px;max-width:760px">
+      <span style="font:500 12px 'Geist Mono',monospace;letter-spacing:.14em;color:#6b675f">GRATIS · CÓDIGO ABIERTO · WINDOWS 10 Y 11</span>
+      <h1 style="margin:0;font:600 clamp(40px,6.4vw,76px)/1 Geist,sans-serif;letter-spacing:-.035em;text-wrap:balance">Tu Windows, con un notch que parpadea.</h1>
+      <p style="margin:0;font-size:clamp(16px,1.6vw,19px);line-height:1.5;color:#4a4740;max-width:600px;text-wrap:pretty">Música, avisos, archivos y notas en una isla arriba de la pantalla. Se abre cuando pasas el ratón y se esconde cuando no la necesitas.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:6px">
+        <a href="#descargar" style="font:500 15px Geist,sans-serif;padding:14px 22px;border-radius:999px;background:#0b0b0c;color:#f2f2f0" style-hover="background:#2a2a2e;color:#f2f2f0">Descargar para Windows</a>
+        <a href="#" style="font:500 15px Geist,sans-serif;padding:14px 22px;border-radius:999px;border:1px solid #1c1b19">Ver el código</a>
+      </div>
+    </div>
+
+    <div style="width:100%;max-width:960px;background:#0b0b0c;border-radius:22px;padding:14px;box-sizing:border-box;box-shadow:0 30px 80px rgba(0,0,0,.22)">
+      <div style="position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background-color:#d9d7d2;background-image:radial-gradient(circle,#b9b6af 1px,transparent 1.4px);background-size:14px 14px">
+        <div style="position:absolute;top:0;left:50%;transform:translateX(-50%) scale({{ demoScale }});transform-origin:50% 0;width:{{ dW }};height:{{ dH }};transition:all .45s cubic-bezier(.3,1.2,.5,1)">
+          <div style="position:absolute;top:0;left:-14px;width:16px;height:14px;background:radial-gradient(circle 14px at 0 100%,transparent 13.5px,#0b0b0c 14px)"></div>
+          <div style="position:absolute;top:0;right:-14px;width:16px;height:14px;background:radial-gradient(circle 14px at 100% 100%,transparent 13.5px,#0b0b0c 14px)"></div>
+          <div style="position:absolute;inset:0;background:#0b0b0c;color:#f2f2f0;border-radius:0 0 {{ dR }} {{ dR }};overflow:hidden;text-align:left">
+            <sc-if value="{{ sIdle }}" hint-placeholder-val="{{ true }}">
+              <div style="height:34px;display:flex;align-items:center;justify-content:center"><div style="display:grid;grid-template-columns:repeat(13,3px);gap:1.5px"><sc-for list="{{ mascot }}" as="d" hint-placeholder-count="65"><div style="width:3px;height:3px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div></div>
+            </sc-if>
+            <sc-if value="{{ sMusic }}" hint-placeholder-val="{{ false }}">
+              <div style="height:34px;display:flex;align-items:center;gap:10px;padding:0 14px 2px 12px;white-space:nowrap">
+                <div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ gMusic }}" as="d"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                <span style="flex:1;font:500 10px 'Geist Mono',monospace;letter-spacing:.1em">LUZ DE NEÓN</span>
+                <div style="display:flex;gap:2px;align-items:flex-end;height:12px"><sc-for list="{{ eq }}" as="b"><div style="width:3px;border-radius:1px;background:#f2f2f0;height:{{ b.h }};transition:height .15s"></div></sc-for></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ sPeek }}" hint-placeholder-val="{{ false }}">
+              <div style="width:420px;padding:10px 16px 12px;box-sizing:border-box;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;gap:10px"><div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ gMsg }}" as="d"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div><span style="flex:1;font:500 10px 'Geist Mono',monospace;letter-spacing:.1em;color:#8d8d92">WHATSAPP · ANA</span><span style="font:9px 'Geist Mono',monospace;color:#5a5a60">AHORA</span></div>
+                <span style="font-size:13px;line-height:1.35">¿Vienes a la cena del viernes? Reservé a las 21:00.</span>
+                <div style="display:flex;gap:6px;justify-content:flex-end"><span style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:999px;border:1px solid #2a2a2e;color:#8d8d92">MÁS TARDE</span><span style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:999px;background:#f2f2f0;color:#0b0b0c">RESPONDER</span></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ sOsd }}" hint-placeholder-val="{{ false }}">
+              <div style="height:40px;display:flex;align-items:center;gap:12px;padding:0 16px 2px;white-space:nowrap">
+                <div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ gVol }}" as="d"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                <div style="display:flex;flex-direction:column;gap:1px"><span style="font:500 10px 'Geist Mono',monospace;letter-spacing:.1em">VOLUMEN</span><span style="font:9px 'Geist Mono',monospace;color:#8d8d92">ALTAVOCES</span></div>
+                <div style="flex:1;display:flex;gap:3px;align-items:flex-end;justify-content:flex-end"><sc-for list="{{ volBars }}" as="b"><div style="width:4px;border-radius:2px;height:{{ b.h }};background:{{ b.c }}"></div></sc-for></div>
+                <span style="font:700 15px Doto,monospace;min-width:40px;text-align:right">70%</span>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:7%;min-height:28px;background:rgba(240,238,234,.92);border-top:1px solid #cfccc5;display:flex;align-items:center;justify-content:center;gap:6px"><div style="width:18px;height:18px;border-radius:5px;background:#1c1b19"></div><div style="width:18px;height:18px;border-radius:5px;background:#cfccc4"></div><div style="width:18px;height:18px;border-radius:5px;background:#cfccc4"></div><div style="width:18px;height:18px;border-radius:5px;background:#cfccc4"></div></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center">
+      <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4"><div onClick="{{ d.go }}" title="{{ d.l }}" style="height:6px;width:{{ d.w }};border-radius:3px;background:{{ d.c }};cursor:pointer;transition:width .3s"></div></sc-for>
+    </div>
+  </section>
+
+  <section id="funciones" style="background:#0b0b0c;color:#f2f2f0">
+    <div style="max-width:1120px;margin:0 auto;padding:80px 24px;box-sizing:border-box;display:flex;flex-direction:column;gap:40px">
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:640px">
+        <span style="font:500 12px 'Geist Mono',monospace;letter-spacing:.14em;color:#8d8d92">QUÉ HACE</span>
+        <h2 style="margin:0;font:600 clamp(30px,4vw,44px)/1.05 Geist,sans-serif;letter-spacing:-.03em;text-wrap:balance">Todo lo que miras a menudo, en un solo sitio.</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px">
+        <sc-for list="{{ features }}" as="f" hint-placeholder-count="6">
+          <div style="background:#151517;border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:14px">
+            <div style="width:44px;height:44px;border-radius:50%;background:#1e1e21;display:flex;align-items:center;justify-content:center"><div style="display:grid;grid-template-columns:repeat(7,3px);gap:1.5px"><sc-for list="{{ f.g }}" as="d"><div style="width:3px;height:3px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div></div>
+            <span style="font:600 18px Geist,sans-serif;letter-spacing:-.01em">{{ f.t }}</span>
+            <span style="font-size:14px;line-height:1.5;color:#a9a9ae;text-wrap:pretty">{{ f.d }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacidad" style="max-width:1120px;width:100%;margin:0 auto;padding:80px 24px;box-sizing:border-box;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:40px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <span style="font:500 12px 'Geist Mono',monospace;letter-spacing:.14em;color:#6b675f">PRIVACIDAD</span>
+      <h2 style="margin:0;font:600 clamp(30px,4vw,44px)/1.05 Geist,sans-serif;letter-spacing:-.03em;text-wrap:balance">Todo se queda en tu PC.</h2>
+      <p style="margin:0;font-size:16px;line-height:1.55;color:#4a4740;text-wrap:pretty">Parpa lee tus avisos y tu portapapeles para enseñártelos arriba. Por eso no tiene cuentas, no envía nada a ningún servidor y su código está a la vista de cualquiera.</p>
+    </div>
+    <div style="display:flex;flex-direction:column">
+      <sc-for list="{{ privacy }}" as="p" hint-placeholder-count="4">
+        <div style="display:flex;gap:16px;align-items:baseline;padding:16px 0;border-top:1px solid #cfccc5">
+          <span style="font:700 18px Doto,monospace;color:#9a968e">{{ p.n }}</span>
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 16px Geist,sans-serif">{{ p.t }}</span><span style="font-size:14px;line-height:1.5;color:#4a4740">{{ p.d }}</span></div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="descargar" style="max-width:1120px;width:100%;margin:0 auto;padding:0 24px 80px;box-sizing:border-box">
+    <div style="background:#f4f2ee;border-radius:24px;padding:clamp(28px,5vw,56px);display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center">
+      <div style="width:84px;height:84px;border-radius:22%;background:#0b0b0c;display:flex;align-items:center;justify-content:center">
+        <div style="width:56%;display:grid;grid-template-columns:repeat(7,1fr);gap:6%"><sc-for list="{{ eyes }}" as="d"><div style="aspect-ratio:1;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+      </div>
+      <h2 style="margin:0;font:600 clamp(28px,3.6vw,40px)/1.05 Geist,sans-serif;letter-spacing:-.03em">Instálalo en un minuto</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+        <a href="#" style="font:500 15px Geist,sans-serif;padding:14px 22px;border-radius:999px;background:#0b0b0c;color:#f2f2f0" style-hover="background:#2a2a2e;color:#f2f2f0">Descargar instalador (.exe)</a>
+        <a href="#" style="font:500 15px Geist,sans-serif;padding:14px 22px;border-radius:999px;border:1px solid #1c1b19">Todas las versiones</a>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center">
+        <span style="font:13px Geist,sans-serif;color:#6b675f">o desde la terminal:</span>
+        <div onClick="{{ copyCmd }}" style="display:flex;align-items:center;gap:12px;background:#0b0b0c;color:#f2f2f0;border-radius:10px;padding:10px 14px;cursor:pointer;font:500 14px 'Geist Mono',monospace">
+          <span>winget install Parpa</span><span style="font:500 10px 'Geist Mono',monospace;letter-spacing:.08em;color:{{ copyC }}">{{ copyL }}</span>
+        </div>
+      </div>
+      <span style="font:12px 'Geist Mono',monospace;letter-spacing:.06em;color:#6b675f">WINDOWS 10 (2004+) Y 11 · 64 BITS · ESPAÑOL E INGLÉS</span>
+    </div>
+  </section>
+
+  <footer style="border-top:1px solid #cfccc5">
+    <div style="max-width:1120px;margin:0 auto;padding:28px 24px;box-sizing:border-box;display:flex;flex-wrap:wrap;gap:16px;align-items:center;font:13px Geist,sans-serif;color:#4a4740">
+      <span style="font:900 16px Doto,monospace;color:#1c1b19">PARPA</span>
+      <span>Código abierto con licencia MIT.</span>
+      <span style="flex:1"></span>
+      <a href="#">GitHub</a><a href="#">Contribuir</a><a href="#">Reportar un fallo</a>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;autoplay&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Demo&quot;}}">
+class Component extends DCLogic {
+  state = { i: 0, t: 0 };
+  G = {
+    musica: ['..XXXXX', '..XXXXX', '..X...X', '..X...X', 'XXX.XXX', 'XXX.XXX', '.......'],
+    mensaje: ['.XXXXX.', 'XXXXXXX', 'X.X.X.X', 'XXXXXXX', '.XXXXX.', '.XX....', '.X.....'],
+    sonido: ['...X...', '..XX..X', 'XXXX.X.', 'XXXX.X.', 'XXXX.X.', '..XX..X', '...X...'],
+    bandeja: ['XXX....', 'XXXXXXX', 'X.....X', 'X.....X', 'X.....X', 'XXXXXXX', '.......'],
+    notas: ['XXXXXXX', 'XXXXXXX', 'X.....X', 'X.XXX.X', 'X....XX', 'X...XX.', 'XXXXX..'],
+    copias: ['XXXXX..', 'X...X..', 'X.XXXXX', 'X.X...X', 'XXX...X', '..X...X', '..XXXXX'],
+    tareas: ['XX.XXXX', 'XX.....', '.......', 'XX.XXXX', 'XX.....', '.......', 'XX.XXX.']
+  };
+  S = [{ k: 'idle', w: 120, h: 34, r: 16, l: 'Reposo' }, { k: 'music', w: 290, h: 34, r: 16, l: 'Música' }, { k: 'peek', w: 420, h: 112, r: 26, l: 'Aviso' }, { k: 'osd', w: 340, h: 40, r: 16, l: 'Volumen' }];
+  g(n, on = '#f2f2f0') { return this.G[n].join('').split('').map(ch => ({ c: ch === 'X' ? on : 'transparent' })); }
+  componentDidMount() {
+    this.iv = setInterval(() => this.setState(s => {
+      const t = s.t + 1, auto = (this.props.autoplay ?? true);
+      return { t, i: auto && t % 13 === 0 ? (s.i + 1) % this.S.length : s.i };
+    }), 200);
+    this.onRs = () => this.forceUpdate(); window.addEventListener('resize', this.onRs);
+  }
+  componentWillUnmount() { clearInterval(this.iv); window.removeEventListener('resize', this.onRs); }
+  renderVals() {
+    const { i, t } = this.state, s = this.S[i];
+    const blink = t % 18 === 0, look = Math.sin(t / 6) > 0.6 ? 1 : 0;
+    const mascot = [];
+    for (let r = 0; r < 5; r++) for (let c = 0; c < 13; c++) {
+      let on = false;
+      [3, 8].forEach(x => { if ((c === x + look || c === x + 1 + look) && r >= 1 && r <= 3 && (!blink || r === 2)) on = true; });
+      mascot.push({ c: on ? '#f2f2f0' : '#1b1b1e' });
+    }
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const frame = Math.min(960, vw - 48) - 28;
+    return {
+      demoScale: Math.max(0.7, Math.min(1.9, frame / 520)).toFixed(2),
+      dW: s.w + 'px', dH: s.h + 'px', dR: s.r + 'px',
+      sIdle: s.k === 'idle', sMusic: s.k === 'music', sPeek: s.k === 'peek', sOsd: s.k === 'osd',
+      mascot, gMusic: this.g('musica'), gMsg: this.g('mensaje'), gVol: this.g('sonido'),
+      eq: [0, 1, 2, 3, 4].map(k => ({ h: (3 + 9 * Math.abs(Math.sin(t * (0.9 + k * 0.37) + k))).toFixed(1) + 'px' })),
+      volBars: Array.from({ length: 16 }, (_, k) => ({ h: (4 + k * 0.75) + 'px', c: k < 11 ? '#f2f2f0' : '#2a2a2e' })),
+      dots: this.S.map((x, k) => ({ l: x.l, w: k === i ? '22px' : '6px', c: k === i ? '#1c1b19' : '#b9b6ae', go: () => this.setState({ i: k, t: 1 }) })),
+      features: [
+        { g: this.g('musica'), t: 'Lo que suena', d: 'Canción, carátula y controles de Spotify o cualquier reproductor, sin cambiar de ventana.' },
+        { g: this.g('mensaje'), t: 'Avisos con respuesta', d: 'WhatsApp, Discord o llamadas arriba, con botones. Responde sin salir de lo que haces.' },
+        { g: this.g('bandeja'), t: 'Bandeja de archivos', d: 'Arrastra archivos al notch y suéltalos luego donde quieras. Comprime, convierte o copia la ruta.' },
+        { g: this.g('sonido'), t: 'Volumen y batería', d: 'Indicadores limpios de volumen, brillo, batería, Wi-Fi y auriculares en lugar de los de Windows.' },
+        { g: this.g('copias'), t: 'Portapapeles', d: 'Lo último que copiaste siempre a mano. Las contraseñas no se guardan.' },
+        { g: this.g('tareas'), t: 'Tareas, notas y foco', d: 'Apunta algo rápido, marca tareas y arranca un pomodoro desde arriba.' }
+      ],
+      privacy: [
+        { n: '01', t: 'Sin cuenta', d: 'Instalar y usar. No hay registro ni correo.' },
+        { n: '02', t: 'Sin servidores', d: 'Avisos, portapapeles y notas se guardan solo en tu PC.' },
+        { n: '03', t: 'Sin rastreo', d: 'Ni anuncios ni estadísticas. Solo se conecta si activas las letras de canciones.' },
+        { n: '04', t: 'Código abierto', d: 'Cualquiera puede revisar lo que hace. Licencia MIT.' }
+      ],
+      eyes: ['XX...XX', 'XX...XX', 'XX...XX'].join('').split('').map(ch => ({ c: ch === 'X' ? '#f2f2f0' : 'transparent' })),
+      copyCmd: () => { try { navigator.clipboard.writeText('winget install Parpa'); } catch (e) {} this.setState({ copied: Date.now() }); setTimeout(() => this.forceUpdate(), 1600); },
+      copyL: this.state.copied && Date.now() - this.state.copied < 1500 ? 'COPIADO' : 'COPIAR',
+      copyC: this.state.copied && Date.now() - this.state.copied < 1500 ? 'oklch(0.78 0.14 150)' : '#8d8d92'
+    };
+  }
+}
+</script>
+</body>
+</html>

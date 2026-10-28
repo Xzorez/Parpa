@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Doto:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#e8e6e1;font-family:Geist,"Segoe UI Variable",system-ui,sans-serif;color:#1c1b19;-webkit-font-smoothing:antialiased}
+a{color:#1c1b19}a:hover{color:#5a564f}
+input::placeholder{color:#5a5a60}
+</style>
+</helmet>
+<section style="padding:{{ secPad }};display:flex;flex-direction:column;gap:28px">
+  <sc-if value="{{ notEmbed }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;flex-direction:column;gap:6px;max-width:820px">
+    <div style="font:500 12px 'Geist Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6b675f">Ajustes · Lenguaje de puntos</div>
+    <h1 style="margin:0;font:600 30px/1.1 Geist,sans-serif;letter-spacing:-.02em">Ajustes del notch</h1>
+    <p style="margin:0;font-size:15px;line-height:1.5;color:#4a4740;text-wrap:pretty">Ventana completa (<a href="#7a">7a</a>) y ajustes rápidos dentro del notch (<a href="#7b">7b</a>). Comparten el mismo estado: si cambias algo en uno, se refleja en el otro. Todo es interactivo; el buscador filtra entre todas las secciones. Se guardan en este navegador y los usa el <a href="Notch Prototipo.dc.html">prototipo</a>.</p>
+  </div>
+  </sc-if>
+  <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+
+    <div id="7a" style="display:flex;flex-direction:column;gap:12px">
+      <sc-if value="{{ notEmbed }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 12px 'Geist Mono',monospace;background:#1c1b19;color:#fff;padding:3px 7px;border-radius:4px">7a</span><span style="font-weight:600;font-size:17px">Ventana de ajustes</span></div></sc-if>
+      <div style="width:1000px;height:680px;background:#111113;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.25);color:#f2f2f0">
+        <div style="height:40px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 0 0 16px;background:#0b0b0c">
+          <div style="display:grid;grid-template-columns:repeat(13,2px);gap:1px"><sc-for list="{{ logo }}" as="d" hint-placeholder-count="65"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+          <span style="font:500 12px Geist,sans-serif">Ajustes</span>
+          <span style="flex:1"></span>
+          <div style="display:flex;height:40px;font:12px 'Geist Mono',monospace;color:#8d8d92">
+            <span style="width:46px;display:flex;align-items:center;justify-content:center">—</span>
+            <span style="width:46px;display:flex;align-items:center;justify-content:center">▢</span>
+            <span onClick="{{ closeWin }}" style="width:46px;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:oklch(0.55 0.2 27);color:#fff">✕</span>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;min-height:0">
+          <div style="width:230px;flex-shrink:0;background:#0b0b0c;padding:8px 12px 16px;display:flex;flex-direction:column;gap:4px;box-sizing:border-box">
+            <input value="{{ q }}" onChange="{{ setQ }}" placeholder="Buscar ajuste" style="background:#151517;border:1px solid #1e1e21;border-radius:8px;padding:8px 10px;color:#f2f2f0;font:12px Geist,sans-serif;outline:none;margin-bottom:10px">
+            <sc-for list="{{ nav }}" as="n" hint-placeholder-count="6">
+              <div onClick="{{ n.go }}" style="display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:8px;cursor:pointer;background:{{ n.bg }}" style-hover="background:#151517">
+                <div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ n.g }}" as="d"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                <span style="font-size:13px;color:{{ n.fg }}">{{ n.l }}</span>
+              </div>
+            </sc-for>
+            <span style="flex:1"></span>
+            <div style="display:flex;flex-direction:column;gap:2px;padding:0 10px"><span style="font:700 16px Doto,monospace">PUNTO</span><span style="font:9px 'Geist Mono',monospace;letter-spacing:.08em;color:#5a5a60">VERSIÓN 1.0.0</span></div>
+          </div>
+          <div style="flex:1;overflow:auto;padding:22px 32px 32px;display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <span style="font:600 22px Geist,sans-serif;letter-spacing:-.01em">{{ secTitle }}</span>
+              <span style="font:10px 'Geist Mono',monospace;letter-spacing:.08em;color:oklch(0.78 0.14 150)">{{ toast }}</span>
+            </div>
+
+            <sc-if value="{{ showMonitors }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#0b0b0c;border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:14px;flex-shrink:0">
+                <div style="display:flex;align-items:flex-end;justify-content:center;gap:16px;height:110px">
+                  <sc-for list="{{ monitors }}" as="m" hint-placeholder-count="3">
+                    <div onClick="{{ m.pick }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+                      <div style="position:relative;width:{{ m.w }};height:{{ m.h }};border-radius:5px;background-color:#1b1b1e;background-image:radial-gradient(circle,#2c2c31 1px,transparent 1.3px);background-size:6px 6px;box-shadow:inset 0 0 0 2px {{ m.ring }}">
+                        <div style="position:absolute;top:2px;left:{{ m.nx }};width:26px;height:6px;margin-left:-13px;border-radius:0 0 4px 4px;background:#f2f2f0;opacity:{{ m.no }};transition:left .3s"></div>
+                        <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 22px Doto,monospace;color:{{ m.fc }}">{{ m.id }}</span>
+                      </div>
+                      <span style="font:9px 'Geist Mono',monospace;letter-spacing:.08em;color:#8d8d92">{{ m.name }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <span style="text-align:center;font:10px 'Geist Mono',monospace;letter-spacing:.06em;color:#5a5a60">TOCA UN MONITOR PARA MOVER EL NOTCH</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ showPreview }}" hint-placeholder-val="{{ false }}">
+              <div style="background-color:{{ pv.wall }};background-image:radial-gradient(circle,{{ pv.wallDot }} 1px,transparent 1.4px);background-size:12px 12px;border-radius:14px;height:120px;flex-shrink:0;position:relative;overflow:hidden">
+                <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:{{ pv.w }};height:{{ pv.h }};background:{{ pv.bg }};border-radius:0 0 16px 16px;display:flex;align-items:center;justify-content:center;gap:12px;transition:all .3s">
+                  <sc-if value="{{ pv.mascot }}"><div style="display:grid;grid-template-columns:repeat(13,3px);gap:1.5px"><sc-for list="{{ pv.px }}" as="d" hint-placeholder-count="65"><div style="width:3px;height:3px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div></sc-if>
+                  <sc-if value="{{ pv.clock }}"><span style="font:700 16px Doto,monospace;color:{{ pv.fg }}">{{ pv.time }}</span></sc-if>
+                  <div style="width:6px;height:6px;border-radius:50%;background:{{ pv.accent }}"></div>
+                </div>
+                <span style="position:absolute;left:14px;bottom:10px;font:9px 'Geist Mono',monospace;letter-spacing:.1em;color:{{ pv.cap }}">VISTA PREVIA</span>
+              </div>
+            </sc-if>
+
+            <div style="display:flex;flex-direction:column;flex-shrink:0">
+              <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+                <sc-if value="{{ r.isHead }}">
+                  <div style="padding:18px 0 8px;font:500 10px 'Geist Mono',monospace;letter-spacing:.12em;color:#8d8d92">{{ r.label }}</div>
+                </sc-if>
+                <sc-if value="{{ r.isRow }}">
+                  <div style="display:flex;align-items:center;gap:20px;padding:12px 0;border-top:1px solid #1e1e21;opacity:{{ r.o }}">
+                    <div style="flex:1;display:flex;flex-direction:column;gap:3px;min-width:0">
+                      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px">{{ r.label }}</span><span style="font:9px 'Geist Mono',monospace;letter-spacing:.08em;color:#5a5a60">{{ r.where }}</span></div>
+                      <span style="font-size:12px;color:#8d8d92;text-wrap:pretty">{{ r.desc }}</span>
+                    </div>
+                    <sc-if value="{{ r.isToggle }}">
+                      <div onClick="{{ r.toggle }}" style="width:40px;height:22px;border-radius:11px;background:{{ r.track }};position:relative;cursor:pointer;flex-shrink:0;transition:background .2s">
+                        <div style="position:absolute;top:4px;left:{{ r.knob }};width:14px;height:14px;border-radius:50%;background:{{ r.knobC }};transition:left .2s cubic-bezier(.3,1.4,.5,1)"></div>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ r.isSeg }}">
+                      <div style="display:flex;gap:2px;padding:3px;background:#0b0b0c;border-radius:8px;flex-shrink:0">
+                        <sc-for list="{{ r.segs }}" as="sg"><div onClick="{{ sg.pick }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:5px;cursor:pointer;background:{{ sg.bg }};color:{{ sg.fg }}">{{ sg.l }}</div></sc-for>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ r.isSlider }}">
+                      <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
+                        <div style="display:flex;gap:3px;align-items:center;cursor:pointer"><sc-for list="{{ r.dots }}" as="d"><div onClick="{{ d.set }}" style="width:6px;height:{{ d.h }};border-radius:3px;background:{{ d.c }};transition:height .15s"></div></sc-for></div>
+                        <span style="font:700 15px Doto,monospace;width:58px;text-align:right">{{ r.val }}</span>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ r.isKeys }}">
+                      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                        <sc-for list="{{ r.keys }}" as="k"><span style="font:500 10px 'Geist Mono',monospace;padding:5px 8px;border-radius:5px;background:#1d1d20;box-shadow:inset 0 -2px 0 #2a2a2e">{{ k }}</span></sc-for>
+                        <span onClick="{{ r.btnDo }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:999px;border:1px solid #2a2a2e;cursor:pointer;color:{{ r.btnC }}">{{ r.btn }}</span>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ r.isBtn }}">
+                      <span onClick="{{ r.btnDo }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:7px 12px;border-radius:999px;background:#f2f2f0;color:#0b0b0c;cursor:pointer;flex-shrink:0;user-select:none">{{ r.btn }}</span>
+                    </sc-if>
+                    <sc-if value="{{ r.isChips }}">
+                      <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:360px">
+                        <sc-for list="{{ r.chips }}" as="c"><span onClick="{{ c.tog }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:999px;cursor:pointer;border:1px solid #2a2a2e;background:{{ c.bg }};color:{{ c.fg }}">{{ c.l }}</span></sc-for>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ r.isOrder }}">
+                      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                        <span style="font:700 14px Doto,monospace;color:#5a5a60;width:22px">{{ r.idx }}</span>
+                        <span onClick="{{ r.up }}" style="width:26px;height:26px;border-radius:50%;border:1px solid #2a2a2e;display:flex;align-items:center;justify-content:center;cursor:pointer;font:11px 'Geist Mono',monospace;color:#c9c9cc">↑</span>
+                        <span onClick="{{ r.down }}" style="width:26px;height:26px;border-radius:50%;border:1px solid #2a2a2e;display:flex;align-items:center;justify-content:center;cursor:pointer;font:11px 'Geist Mono',monospace;color:#c9c9cc">↓</span>
+                        <sc-if value="{{ r.hasToggle }}">
+                          <div onClick="{{ r.toggle }}" style="width:40px;height:22px;border-radius:11px;background:{{ r.track }};position:relative;cursor:pointer;margin-left:6px;transition:background .2s"><div style="position:absolute;top:4px;left:{{ r.knob }};width:14px;height:14px;border-radius:50%;background:{{ r.knobC }};transition:left .2s cubic-bezier(.3,1.4,.5,1)"></div></div>
+                        </sc-if>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ r.isStepper }}">
+                      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+                        <span onClick="{{ r.minus }}" style="width:26px;height:26px;border-radius:50%;border:1px solid #2a2a2e;display:flex;align-items:center;justify-content:center;cursor:pointer;font:13px 'Geist Mono',monospace">−</span>
+                        <span style="font:700 18px Doto,monospace;min-width:92px;text-align:center;white-space:nowrap">{{ r.val }}</span>
+                        <span onClick="{{ r.plus }}" style="width:26px;height:26px;border-radius:50%;border:1px solid #2a2a2e;display:flex;align-items:center;justify-content:center;cursor:pointer;font:13px 'Geist Mono',monospace">+</span>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ r.isPath }}">
+                      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+                        <span style="font:11px 'Geist Mono',monospace;color:#c9c9cc;padding:6px 10px;background:#0b0b0c;border-radius:6px">{{ r.path }}</span>
+                        <span onClick="{{ r.btnDo }}" style="font:500 10px 'Geist Mono',monospace;letter-spacing:.06em;padding:6px 10px;border-radius:999px;border:1px solid #2a2a2e;cursor:pointer">CAMBIAR</span>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ r.isSwatch }}">
+                      <div style="display:flex;gap:8px;flex-shrink:0">
+                        <sc-for list="{{ r.sw }}" as="w"><div onClick="{{ w.pick }}" style="width:22px;height:22px;border-radius:50%;background:{{ w.c }};cursor:pointer;box-shadow:0 0 0 2px #111113,0 0 0 {{ w.ring }} #f2f2f0"></div></sc-for>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </sc-for>
+              <sc-if value="{{ noResults }}"><div style="padding:30px 0;font:11px 'Geist Mono',monospace;letter-spacing:.08em;color:#5a5a60">SIN RESULTADOS</div></sc-if>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <sc-if value="{{ notEmbed }}" hint-placeholder-val="{{ true }}">
+    <div id="7b" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 12px 'Geist Mono',monospace;background:#1c1b19;color:#fff;padding:3px 7px;border-radius:4px">7b</span><span style="font-weight:600;font-size:17px">Ajustes rápidos en el notch</span><span style="font-size:13px;color:#6b675f">Nueva burbuja en el menú</span></div>
+      <div style="background:#0b0b0c;padding:12px 12px 0;border-radius:16px 16px 0 0;width:660px;box-sizing:border-box">
+        <div style="position:relative;height:330px;border-radius:3px 3px 0 0;overflow:hidden;background-color:#d9d7d2;background-image:radial-gradient(circle,#b9b6af 1px,transparent 1.4px);background-size:14px 14px">
+          <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:580px">
+            <div style="position:absolute;top:0;left:-14px;width:16px;height:14px;background:radial-gradient(circle 14px at 0 100%,transparent 13.5px,#0b0b0c 14px)"></div>
+            <div style="position:absolute;top:0;right:-14px;width:16px;height:14px;background:radial-gradient(circle 14px at 100% 100%,transparent 13.5px,#0b0b0c 14px)"></div>
+            <div style="background:#0b0b0c;color:#f2f2f0;border-radius:0 0 30px 30px;padding:12px 18px 18px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:28px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ gearG }}" as="d" hint-placeholder-count="49"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                  <span style="font:500 10px 'Geist Mono',monospace;letter-spacing:.1em">AJUSTES</span>
+                </div>
+                <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center">
+                  <div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ menuG }}" as="d" hint-placeholder-count="49"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div>
+                </div>
+                <span style="justify-self:end;font:700 20px Doto,monospace">{{ clock }}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+                <sc-for list="{{ tiles }}" as="tl" hint-placeholder-count="6">
+                  <div onClick="{{ tl.tog }}" style="height:64px;border-radius:14px;padding:10px 12px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;background:{{ tl.bg }};color:{{ tl.fg }};transition:background .2s,color .2s">
+                    <div style="display:flex;justify-content:space-between;align-items:center"><div style="display:grid;grid-template-columns:repeat(7,2px);gap:1px"><sc-for list="{{ tl.g }}" as="d"><div style="width:2px;height:2px;border-radius:50%;background:{{ d.c }}"></div></sc-for></div><span style="font:9px 'Geist Mono',monospace;letter-spacing:.08em;opacity:.7">{{ tl.st }}</span></div>
+                    <span style="font-size:12px;font-weight:500">{{ tl.l }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
+                <div style="background:#151517;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:12px">
+                  <span style="font:10px 'Geist Mono',monospace;letter-spacing:.08em;color:#8d8d92">SONIDOS</span>
+                  <div style="flex:1;display:flex;gap:3px;align-items:center;cursor:pointer"><sc-for list="{{ qVol }}" as="d"><div onClick="{{ d.set }}" style="width:5px;height:{{ d.h }};border-radius:3px;background:{{ d.c }}"></div></sc-for></div>
+                  <span style="font:700 13px Doto,monospace">{{ qVolV }}</span>
+                </div>
+                <div style="background:#151517;border-radius:14px;padding:6px;display:flex;align-items:center;gap:2px">
+                  <span style="font:10px 'Geist Mono',monospace;letter-spacing:.08em;color:#8d8d92;padding:0 6px">MONITOR</span>
+                  <sc-for list="{{ qMon }}" as="m"><span onClick="{{ m.pick }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:900 14px Doto,monospace;cursor:pointer;background:{{ m.bg }};color:{{ m.fg }}">{{ m.id }}</span></sc-for>
+                </div>
+              </div>
+              <div onClick="{{ openFull }}" style="display:flex;justify-content:center;font:500 10px 'Geist Mono',monospace;letter-spacing:.12em;color:#8d8d92;cursor:pointer;padding-top:2px" style-hover="color:#f2f2f0">TODOS LOS AJUSTES ›</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </sc-if>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    t: 0, sec: 'general', q: '', toast: '', toastUntil: 0, rec: false, upd: 'idle',
+    s: { startup: true, keys: ['WIN', 'ALT', 'N'], wheel: true, closeOn: 'mouse', closeDelay: 0.4, noFocus: true, hoverSens: 6, openTime: 250, hideIdle: false, dnd: false, dndFrom: '23:00',
+      monitor: 1, pos: 'center', offset: 0, size: 100, minimal: false, hideFull: true,
+      theme: 'dark', accent: 0, mascot: true, mood: 'curiosa', anim: 'full', clock: true, h24: true,
+      apps: { WhatsApp: true, Discord: true, Claude: true, Spotify: true, Teams: false }, content: 'full', notifDur: 4.5, quickReply: true, lyrics: true, micAlways: true,
+      homeCards: { MÚSICA: true, FOCO: true, SISTEMA: true, 'PRÓXIMA TAREA': false }, pomo: 25, brk: 5, longBrk: 15, clipLimit: 50,
+      clipExclude: { '1Password': true, Bitwarden: true, KeePassXC: false }, shelfPath: 'C:\\Usuarios\\tú\\Parpa', shelfClear: false,
+      actions: { 'IMÁGENES · COMPRIMIR': true, 'IMÁGENES · A PNG': true, 'PDF · UNIR': false, 'CARPETAS · ZIP': true, 'TODOS · COPIAR RUTA': true },
+      lang: 'auto', sounds: true, vol: 60, osd: true, battery: true, wifi: true, buds: true, lowPower: true },
+    wins: [['home', 'Inicio', true], ['clip', 'Portapapeles', true], ['shelf', 'Bandeja', true], ['todo', 'Tareas', true], ['notes', 'Notas', true], ['quick', 'Ajustes rápidos', true]],
+    prio: ['Llamada', 'Micro / cámara', 'Foco', 'Descarga', 'Música']
+  };
+  G = {
+    general: ['X..X..X', '.XXXXX.', '.XX.XX.', 'XX...XX', '.XX.XX.', '.XXXXX.', 'X..X..X'],
+    pantalla: ['XXXXXXX', 'X.....X', 'X.....X', 'X.....X', 'XXXXXXX', '...X...', '.XXXXX.'],
+    apariencia: ['..XXX..', '.X.XXX.', 'X..XXXX', 'X..XXXX', 'X..XXXX', '.X.XXX.', '..XXX..'],
+    avisos: ['...X...', '..XXX..', '.XXXXX.', '.XXXXX.', '.XXXXX.', 'XXXXXXX', '...X...'],
+    ventanas: ['XXX.XXX', 'XXX.XXX', 'XXX.XXX', '.......', 'XXX.XXX', 'XXX.XXX', 'XXX.XXX'],
+    sistema: ['......X', '....X.X', '....X.X', '..X.X.X', '..X.X.X', 'X.X.X.X', 'XXXXXXX'],
+    menu: ['X..X..X', '.......', '.......', 'X..X..X', '.......', '.......', 'X..X..X'],
+    luna: ['..XXX..', '.XX....', 'XX.....', 'XX.....', 'XX.....', '.XX....', '..XXX..'],
+    sonido: ['...X...', '..XX..X', 'XXXX.X.', 'XXXX.X.', 'XXXX.X.', '..XX..X', '...X...'],
+    cara: ['.......', 'XX...XX', 'XX...XX', '.......', '.X...X.', '..XXX..', '.......'],
+    linea: ['.......', '.......', '.......', 'XXXXXXX', '.......', '.......', '.......'],
+    juego: ['.......', '.XXXXX.', 'XX.X.XX', 'X.....X', 'XX.X.XX', '.XXXXX.', '.......'],
+    foco: ['...X...', '..XXX..', '.X...X.', 'XX.X.XX', '.X...X.', '..XXX..', '...X...']
+  };
+  ACC = ['oklch(0.63 0.22 27)', 'oklch(0.63 0.22 70)', 'oklch(0.63 0.22 150)', 'oklch(0.63 0.22 255)'];
+  SECS = [['general', 'General'], ['pantalla', 'Pantalla'], ['apariencia', 'Apariencia'], ['avisos', 'Avisos'], ['ventanas', 'Ventanas'], ['sistema', 'Sistema']];
+  MONS = [{ id: 1, name: 'DELL 27" · 2560×1440', w: 170, h: 96 }, { id: 2, name: 'PORTÁTIL · 1920×1200', w: 120, h: 75 }, { id: 3, name: 'LG 24" · 1920×1080', w: 140, h: 79 }];
+  KEY = 'punto.settings.v1';
+  load() { try { const raw = localStorage.getItem(this.KEY); if (!raw) return; this._last = raw; const d = JSON.parse(raw); this.setState(st => ({ s: { ...st.s, ...(d.s || {}) }, wins: d.wins || st.wins, prio: d.prio || st.prio })); } catch (e) {} }
+  save() { try { const raw = JSON.stringify({ s: this.state.s, wins: this.state.wins, prio: this.state.prio }); if (raw !== this._last) { this._last = raw; localStorage.setItem(this.KEY, raw); } } catch (e) {} }
+  componentDidUpdate() { if (this._loaded) this.save(); }
+  componentDidMount() {
+    this.load(); this._loaded = true;
+    this.iv = setInterval(() => { try { const raw = localStorage.getItem(this.KEY); if (raw && raw !== this._last) this.load(); } catch (e) {} this.setState(s => ({ t: s.t + 1 })); }, 100);
+    this.onKey = e => {
+      if (!this.state.rec) return;
+      e.preventDefault();
+      if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
+      const k = []; if (e.ctrlKey) k.push('CTRL'); if (e.metaKey) k.push('WIN'); if (e.altKey) k.push('ALT'); if (e.shiftKey) k.push('SHIFT');
+      k.push(e.key.length === 1 ? e.key.toUpperCase() : e.key.toUpperCase());
+      this.snd('confirm'); this.setState(st => ({ rec: false, s: { ...st.s, keys: k } }));
+    };
+    window.addEventListener('keydown', this.onKey);
+  }
+  componentWillUnmount() { clearInterval(this.iv); window.removeEventListener('keydown', this.onKey); }
+  snd(type) {
+    const s = this.state.s; if (!s.sounds) return;
+    try {
+      const ac = this.ac || (this.ac = new (window.AudioContext || window.webkitAudioContext)());
+      if (ac.state === 'suspended') ac.resume();
+      const v = s.vol / 100;
+      const T = { click: [['square', 1800, 1800, 0, .025, .03]], tick: [['sine', 1300, 900, 0, .05, .07]], on: [['sine', 700, 1100, 0, .07, .07]], off: [['sine', 900, 500, 0, .07, .06]], page: [['sine', 660, 660, 0, .05, .06], ['sine', 990, 990, .05, .06, .06]], confirm: [['sine', 660, 660, 0, .07, .08], ['sine', 990, 990, .07, .12, .08]] }[type] || [];
+      const now = ac.currentTime;
+      T.forEach(([w, f0, f1, at, dur, vol]) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = w; o.frequency.setValueAtTime(f0, now + at); o.frequency.exponentialRampToValueAtTime(f1, now + at + dur);
+        g.gain.setValueAtTime(0, now + at); g.gain.linearRampToValueAtTime(vol * v, now + at + .005); g.gain.exponentialRampToValueAtTime(.0001, now + at + dur);
+        o.connect(g).connect(ac.destination); o.start(now + at); o.stop(now + at + dur + .02);
+      });
+    } catch (e) {}
+  }
+  glyph(n, on = '#f2f2f0', off = 'transparent') { return this.G[n].join('').split('').map(ch => ({ c: ch === 'X' ? on : off })); }
+  set(k, v) { this.setState(st => ({ s: { ...st.s, [k]: v } })); }
+  say(msg) { this.snd('confirm'); this.setState(st => ({ toast: msg, toastUntil: st.t + 25 })); }
+  // row builders
+  tg(k, label, desc, o = 1) {
+    const on = !!this.state.s[k];
+    return { isRow: true, isToggle: true, label, desc, o, track: on ? '#f2f2f0' : '#2a2a2e', knob: on ? '22px' : '4px', knobC: on ? '#0b0b0c' : '#8d8d92', toggle: () => { this.snd(on ? 'off' : 'on'); this.set(k, !on); } };
+  }
+  tgMap(k, key, label, desc) {
+    const m = this.state.s[k], on = !!m[key];
+    return { isRow: true, isToggle: true, label, desc, o: 1, track: on ? '#f2f2f0' : '#2a2a2e', knob: on ? '22px' : '4px', knobC: on ? '#0b0b0c' : '#8d8d92', toggle: () => { this.snd(on ? 'off' : 'on'); this.set(k, { ...m, [key]: !on }); } };
+  }
+  sg(k, label, desc, opts, o = 1) {
+    const v = this.state.s[k];
+    return { isRow: true, isSeg: true, label, desc, o, segs: opts.map(([val, l]) => ({ l, bg: v === val ? '#f2f2f0' : 'transparent', fg: v === val ? '#0b0b0c' : '#8d8d92', pick: () => { this.snd('click'); this.set(k, val); } })) };
+  }
+  sl(k, label, desc, min, max, step, fmt, o = 1) {
+    const v = this.state.s[k], n = 16, f = (v - min) / (max - min);
+    return { isRow: true, isSlider: true, label, desc, o, val: fmt(v), dots: Array.from({ length: n }, (_, i) => {
+      const filled = (i + 0.5) / n <= f + 0.001;
+      return { c: filled ? '#f2f2f0' : '#2a2a2e', h: filled ? (6 + Math.round(i / n * 10)) + 'px' : '6px', set: () => { this.snd('tick'); const raw = min + (i + 1) / n * (max - min); this.set(k, Math.round(raw / step) * step); } };
+    }) };
+  }
+  ch(k, label, desc) {
+    const m = this.state.s[k];
+    return { isRow: true, isChips: true, label, desc, o: 1, chips: Object.keys(m).map(c => ({ l: c, bg: m[c] ? '#f2f2f0' : 'transparent', fg: m[c] ? '#0b0b0c' : '#8d8d92', tog: () => { this.snd(m[c] ? 'off' : 'on'); this.set(k, { ...m, [c]: !m[c] }); } })) };
+  }
+  st(k, label, desc, step, min, max, unit) {
+    const v = this.state.s[k];
+    return { isRow: true, isStepper: true, label, desc, o: 1, val: v + unit, minus: () => { this.snd('tick'); this.set(k, Math.max(min, v - step)); }, plus: () => { this.snd('tick'); this.set(k, Math.min(max, v + step)); } };
+  }
+  head(label) { return { isHead: true, label }; }
+  btn(label, desc, b, fn) { return { isRow: true, isBtn: true, label, desc, o: 1, btn: b, btnDo: fn }; }
+  orderRows(key, withToggle) {
+    const arr = this.state[key];
+    const mv = (i, d) => () => { const j = i + d; if (j < 0 || j >= arr.length) return; this.snd('tick'); const a = arr.slice(); [a[i], a[j]] = [a[j], a[i]]; this.setState({ [key]: a }); };
+    return arr.map((x, i) => {
+      const label = withToggle ? x[1] : x, on = withToggle ? x[2] : true;
+      return { isRow: true, isOrder: true, label, desc: '', o: on ? 1 : 0.5, idx: String(i + 1).padStart(2, '0'), up: mv(i, -1), down: mv(i, 1), hasToggle: withToggle,
+        track: on ? '#f2f2f0' : '#2a2a2e', knob: on ? '22px' : '4px', knobC: on ? '#0b0b0c' : '#8d8d92',
+        toggle: () => { if (x[0] === 'home') return; this.snd(on ? 'off' : 'on'); this.setState({ [key]: arr.map((y, j) => j === i ? [y[0], y[1], !y[2]] : y) }); } };
+    });
+  }
+  sectionRows(sec) {
+    const s = this.state.s;
+    if (sec === 'general') return [
+      this.head('IDIOMA'),
+      this.sg('lang', 'Idioma', 'Por defecto sigue el idioma de Windows.', [['auto', 'SISTEMA'], ['es', 'ESPAÑOL'], ['en', 'ENGLISH']]),
+      this.head('INICIO'),
+      this.tg('startup', 'Iniciar con Windows', 'El notch aparece al iniciar sesión.'),
+      { isRow: true, isKeys: true, label: 'Atajo para abrir', desc: 'Abre el notch desde el teclado, sin usar el ratón.', o: 1, keys: this.state.rec ? ['…'] : s.keys, btn: this.state.rec ? 'PULSA UNA COMBINACIÓN' : 'CAMBIAR', btnC: this.state.rec ? 'oklch(0.63 0.22 27)' : '#f2f2f0', btnDo: () => { this.snd('click'); this.setState(st => ({ rec: !st.rec })); } },
+      this.tg('wheel', 'Abrir con la rueda del ratón', 'Gira la rueda sobre el notch para abrirlo o cambiar de ventana.'),
+      this.head('APERTURA Y CIERRE'),
+      this.tg('noFocus', 'Expandir sin quitar el foco', 'Puedes seguir escribiendo en tu app mientras el notch está abierto.'),
+      this.sl('hoverSens', 'Sensibilidad', 'Cuánto hay que acercar el ratón para que se abra.', 1, 10, 1, v => v + '/10'),
+      this.sl('openTime', 'Tiempo de apertura', 'Espera antes de abrirse al pasar el ratón.', 0, 800, 50, v => v + ' MS'),
+      this.sg('closeOn', 'Cerrar', 'Cuándo vuelve a su estado compacto.', [['mouse', 'AL QUITAR EL RATÓN'], ['click', 'AL HACER CLIC FUERA']]),
+      this.sl('closeDelay', 'Retraso antes de cerrarse', 'Margen para volver con el ratón sin que se cierre.', 0, 2, 0.1, v => v.toFixed(1) + ' S', s.closeOn === 'mouse' ? 1 : 0.4),
+      this.tg('hideIdle', 'Ocultar si no hay actividad', 'Sin música, avisos ni tareas, el notch desaparece.'),
+      this.head('NO MOLESTAR'),
+      this.tg('dnd', 'No molestar', 'Silencia avisos y sonidos. Las llamadas siguen entrando.'),
+      this.sg('dndFrom', 'Horario silencioso', 'Se activa solo cada noche hasta las 08:00.', [['22:00', '22:00'], ['23:00', '23:00'], ['00:00', '00:00']], s.dnd ? 1 : 0.4)
+    ];
+    if (sec === 'pantalla') return [
+      this.head('POSICIÓN'),
+      this.sg('pos', 'Posición en el borde', 'Dónde se ancla en la parte superior.', [['left', 'IZQUIERDA'], ['center', 'CENTRO'], ['right', 'DERECHA']]),
+      this.sl('offset', 'Desplazamiento fino', 'Muévelo a mano para esquivar la cámara o una barra.', -100, 100, 10, v => (v > 0 ? '+' : '') + v + ' PX'),
+      this.sl('size', 'Tamaño', 'Escala del notch; en monitores anchos crece solo.', 70, 140, 5, v => v + '%'),
+      this.head('VISIBILIDAD'),
+      this.tg('minimal', 'Modo minimal', 'Cerrado, el notch queda en una línea fina de puntos.'),
+      this.tg('hideFull', 'Ocultar en pantalla completa', 'Se aparta en juegos, vídeos y presentaciones.'),
+      this.tg('micAlways', 'Micro y cámara siempre visibles', 'El punto rojo se ve aunque el notch esté oculto.')
+    ];
+    if (sec === 'apariencia') return [
+      this.head('ESTILO'),
+      this.sg('theme', 'Tema', 'Automático sigue el modo de Windows.', [['dark', 'OSCURO'], ['light', 'CLARO'], ['auto', 'AUTO']]),
+      { isRow: true, isSwatch: true, label: 'Color de acento', desc: 'Para lo que está en vivo: micro, cámara, llamadas.', o: 1, sw: this.ACC.map((c, i) => ({ c, ring: s.accent === i ? '4px' : '0px', pick: () => { this.snd('click'); this.set('accent', i); } })) },
+      this.sg('anim', 'Animaciones', 'Reducidas evita rebotes y movimientos largos.', [['full', 'COMPLETAS'], ['reduced', 'REDUCIDAS']]),
+      this.head('MASCOTA'),
+      this.tg('mascot', 'Mascota', 'La cara de puntos que aparece en reposo.'),
+      this.sg('mood', 'Personalidad', 'Cómo se comporta cuando no pasa nada.', [['tranquila', 'TRANQUILA'], ['curiosa', 'CURIOSA'], ['dormilona', 'DORMILONA']], s.mascot ? 1 : 0.4),
+      this.head('RELOJ'),
+      this.tg('clock', 'Mostrar reloj', 'Hora en el notch compacto y expandido.'),
+      this.sg('h24', 'Formato', '', [[true, '24 H'], [false, '12 H']], s.clock ? 1 : 0.4)
+    ];
+    if (sec === 'avisos') return [
+      this.head('APPS QUE PUEDEN AVISAR'),
+      ...Object.keys(s.apps).map(a => this.tgMap('apps', a, a, '')),
+      this.head('CONTENIDO'),
+      this.sg('content', 'Privacidad', 'Qué se ve del mensaje cuando llega.', [['full', 'COMPLETO'], ['sender', 'SOLO REMITENTE'], ['hidden', 'OCULTO']]),
+      this.sl('notifDur', 'Duración de los avisos', 'Tiempo que el aviso se queda abierto.', 2, 10, 0.5, v => v.toFixed(1) + ' S'),
+      this.tg('quickReply', 'Respuesta rápida', 'Contesta desde el propio aviso.'),
+      this.tg('lyrics', 'Letras sincronizadas', 'Muestra la línea que suena junto a la canción.'),
+      this.head('PRIORIDAD EN EL COMPACTO'),
+      ...this.orderRows('prio', false)
+    ];
+    if (sec === 'ventanas') return [
+      this.head('VENTANAS DEL MENÚ'),
+      ...this.orderRows('wins', true),
+      this.head('INICIO'),
+      this.ch('homeCards', 'Tarjetas de Inicio', 'Qué aparece al abrir el notch.'),
+      this.head('FOCO'),
+      this.st('pomo', 'Sesión de foco', '', 5, 5, 90, ' MIN'),
+      this.st('brk', 'Descanso corto', '', 1, 1, 30, ' MIN'),
+      this.st('longBrk', 'Descanso largo', 'Cada cuatro sesiones.', 5, 5, 60, ' MIN'),
+      this.head('PORTAPAPELES'),
+      this.sg('clipLimit', 'Historial', 'Elementos que se guardan.', [[10, '10'], [25, '25'], [50, '50'], [100, '100']]),
+      this.ch('clipExclude', 'Excluir apps', 'Nunca guarda lo que copies desde aquí.'),
+      this.head('BANDEJA'),
+      { isRow: true, isPath: true, label: 'Carpeta de la bandeja', desc: 'Dónde se guardan los archivos que sueltas.', o: 1, path: s.shelfPath, btnDo: () => this.say('✓ CARPETA SELECCIONADA') },
+      this.tg('shelfClear', 'Vaciar al reiniciar', 'La bandeja empieza limpia cada día.'),
+      this.ch('actions', 'Acciones rápidas', 'Aparecen al soltar un archivo según su tipo.')
+    ];
+    if (sec === 'sistema') return [
+      this.head('SONIDO'),
+      this.tg('sounds', 'Sonidos', 'Clics, avisos y cambios de ventana.'),
+      this.sl('vol', 'Volumen', '', 0, 100, 5, v => v + '%', s.sounds ? 1 : 0.4),
+      this.head('WINDOWS'),
+      this.tg('osd', 'Sustituir volumen y brillo', 'Usa el notch en lugar del indicador de Windows.'),
+      this.tg('battery', 'Avisos de batería', 'Al enchufar el cargador o con batería baja.'),
+      this.tg('wifi', 'Avisos de Wi-Fi', 'Al perder o recuperar la conexión.'),
+      this.tg('buds', 'Avisos de auriculares', 'Al conectar con su nivel de batería.'),
+      this.tg('lowPower', 'Bajo consumo con batería', 'Menos animaciones y refresco cuando no está enchufado.'),
+      this.head('DATOS'),
+      this.btn('Exportar ajustes', 'Guarda un archivo con toda tu configuración.', 'EXPORTAR', () => this.say('✓ AJUSTES EXPORTADOS')),
+      this.btn('Importar ajustes', 'Carga una configuración guardada.', 'IMPORTAR', () => this.say('✓ AJUSTES IMPORTADOS')),
+      this.btn('Actualizaciones', this.state.upd === 'ok' ? 'Estás al día · versión 1.0.0' : 'Versión 1.0.0', this.state.upd === 'checking' ? 'BUSCANDO…' : 'BUSCAR', () => { this.snd('click'); this.setState({ upd: 'checking' }); setTimeout(() => { this.setState({ upd: 'ok' }); this.say('✓ ESTÁS AL DÍA'); }, 1400); })
+    ];
+    return [];
+  }
+  mascotPx(on, off, t, mood) {
+    const g = Array.from({ length: 5 }, () => Array(13).fill(0));
+    const reduced = this.state.s.anim === 'reduced';
+    const period = mood === 'dormilona' ? 120 : mood === 'tranquila' ? 90 : 60;
+    const c = reduced ? 0 : t % period;
+    const sleepy = mood === 'dormilona' && c > 60;
+    const o = mood === 'curiosa' && !reduced ? (c > 20 && c < 32 ? 1 : c > 40 && c < 50 ? -1 : 0) : 0;
+    const blink = !reduced && c % 40 < 2;
+    [3, 8].forEach(x => {
+      if (sleepy) { on && (g[3][x] = 1, g[3][x + 1] = 1); return; }
+      for (let r = 1; r <= 3; r++) if (!blink || r === 2) { g[r][x + o] = 1; g[r][x + 1 + o] = 1; }
+    });
+    return g.flat().map(v => ({ c: v ? on : off }));
+  }
+  renderVals() {
+    const S = this.state, s = S.s, t = S.t;
+    const q = S.q.trim().toLowerCase();
+    let rows;
+    if (q) {
+      rows = [];
+      this.SECS.forEach(([k, l]) => this.sectionRows(k).forEach(r => { if (r.isRow && (r.label + ' ' + r.desc).toLowerCase().includes(q)) rows.push({ ...r, where: l.toUpperCase() }); }));
+    } else rows = this.sectionRows(S.sec);
+    rows = rows.map(r => ({ where: '', isHead: false, isRow: false, isToggle: false, isSeg: false, isSlider: false, isKeys: false, isBtn: false, isChips: false, isOrder: false, isStepper: false, isPath: false, isSwatch: false, hasToggle: false, ...r }));
+    const now = new Date(), hh = now.getHours(), mi = String(now.getMinutes()).padStart(2, '0');
+    const time = s.h24 ? String(hh).padStart(2, '0') + ':' + mi : ((hh % 12) || 12) + ':' + mi;
+    const light = s.theme === 'light';
+    const acc = this.ACC[s.accent];
+    const nx = { left: 22, center: 50, right: 78 }[s.pos] + s.offset / 10;
+    const qVolN = 14, qf = s.vol / 100;
+    const tileDef = [['dnd', 'No molestar', 'luna'], ['sounds', 'Sonidos', 'sonido'], ['mascot', 'Mascota', 'cara'], ['minimal', 'Modo minimal', 'linea'], ['hideFull', 'Ocultar en juegos', 'juego'], ['noFocus', 'Sin quitar foco', 'foco']];
+    const embed = !!this.props.embed;
+    return {
+      embed, notEmbed: !embed, secPad: embed ? '0' : '56px 64px 80px',
+      closeWin: () => { this.snd('off'); this.props.onClose && this.props.onClose(); },
+      logo: this.mascotPx('#f2f2f0', '#1d1d20', t, 'curiosa'),
+      q: S.q, setQ: e => this.setState({ q: e.target.value }),
+      nav: this.SECS.map(([k, l]) => ({ l, g: this.glyph(k, S.sec === k && !q ? '#f2f2f0' : '#8d8d92'), bg: S.sec === k && !q ? '#1a1a1d' : 'transparent', fg: S.sec === k && !q ? '#f2f2f0' : '#c9c9cc', go: () => { this.snd('page'); this.setState({ sec: k, q: '' }); } })),
+      secTitle: q ? 'Resultados' : this.SECS.find(x => x[0] === S.sec)[1],
+      toast: S.toast && t < S.toastUntil ? S.toast : '',
+      rows, noResults: !!q && rows.length === 0,
+      showMonitors: !q && S.sec === 'pantalla', showPreview: !q && S.sec === 'apariencia',
+      monitors: this.MONS.map(m => ({ ...m, w: m.w + 'px', h: m.h + 'px', ring: s.monitor === m.id ? '#f2f2f0' : '#2a2a2e', fc: s.monitor === m.id ? '#f2f2f0' : '#3a3a3f', no: s.monitor === m.id ? 1 : 0, nx: nx + '%', pick: () => { this.snd('click'); this.set('monitor', m.id); } })),
+      pv: { wall: light ? '#f2f2f0' : '#d9d7d2', wallDot: light ? '#dcdad4' : '#b9b6af', bg: light ? '#ffffff' : '#0b0b0c', fg: light ? '#0b0b0c' : '#f2f2f0', cap: '#6b675f', accent: acc,
+        w: s.minimal ? '120px' : (Math.round(200 * s.size / 100)) + 'px', h: s.minimal ? '6px' : '36px',
+        mascot: s.mascot && !s.minimal, clock: s.clock && !s.minimal, time, px: this.mascotPx(light ? '#0b0b0c' : '#f2f2f0', light ? '#e8e8ea' : '#1d1d20', t, s.mood) },
+      gearG: this.glyph('general'), menuG: this.glyph('menu', '#8d8d92'), clock: s.clock ? time : '',
+      tiles: tileDef.map(([k, l, g]) => { const on = !!s[k]; return { l, st: on ? 'ACTIVADO' : 'NO', g: this.glyph(g, on ? '#0b0b0c' : '#f2f2f0'), bg: on ? '#f2f2f0' : '#151517', fg: on ? '#0b0b0c' : '#f2f2f0', tog: () => { this.snd(on ? 'off' : 'on'); this.set(k, !on); } }; }),
+      qVol: Array.from({ length: qVolN }, (_, i) => { const f = (i + 0.5) / qVolN <= qf + 0.001; return { c: f ? '#f2f2f0' : '#2a2a2e', h: f ? (5 + Math.round(i / qVolN * 9)) + 'px' : '5px', set: () => { this.snd('tick'); this.set('vol', Math.round((i + 1) / qVolN * 100 / 5) * 5); } }; }),
+      qVolV: s.vol + '%',
+      qMon: this.MONS.map(m => ({ id: m.id, bg: s.monitor === m.id ? '#f2f2f0' : 'transparent', fg: s.monitor === m.id ? '#0b0b0c' : '#8d8d92', pick: () => { this.snd('click'); this.set('monitor', m.id); } })),
+      openFull: () => { this.snd('page'); this.setState({ sec: 'general', q: '' }); this.say('✓ AJUSTES ABIERTOS'); }
+    };
+  }
+}
+</script>
+</body>
+</html>

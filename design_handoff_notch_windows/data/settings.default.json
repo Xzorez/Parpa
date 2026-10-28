@@ -1,0 +1,100 @@
+{
+  "s": {
+    "startup": true,
+    "keys": [
+      "WIN",
+      "ALT",
+      "N"
+    ],
+    "wheel": true,
+    "closeOn": "mouse",
+    "closeDelay": 0.4,
+    "noFocus": true,
+    "hoverSens": 6,
+    "openTime": 250,
+    "hideIdle": false,
+    "dnd": false,
+    "dndFrom": "23:00",
+    "monitor": 1,
+    "pos": "center",
+    "offset": 0,
+    "size": 100,
+    "minimal": false,
+    "hideFull": true,
+    "theme": "dark",
+    "accent": 0,
+    "mascot": true,
+    "mood": "curiosa",
+    "anim": "full",
+    "clock": true,
+    "h24": true,
+    "apps": {
+      "WhatsApp": true,
+      "Discord": true,
+      "Claude": true,
+      "Spotify": true,
+      "Teams": false
+    },
+    "content": "full",
+    "notifDur": 4.5,
+    "quickReply": true,
+    "lyrics": true,
+    "micAlways": true,
+    "homeCards": {
+      "MÚSICA": true,
+      "FOCO": true,
+      "SISTEMA": true,
+      "PRÓXIMA TAREA": false
+    },
+    "pomo": 25,
+    "brk": 5,
+    "longBrk": 15,
+    "clipLimit": 50,
+    "actions": {
+      "IMÁGENES · COMPRIMIR": true,
+      "IMÁGENES · A PNG": true,
+      "PDF · UNIR": false,
+      "CARPETAS · ZIP": true,
+      "TODOS · COPIAR RUTA": true
+    },
+    "sounds": true,
+    "vol": 60,
+    "osd": true,
+    "battery": true,
+    "wifi": true,
+    "buds": true,
+    "lowPower": true
+  },
+  "wins": [
+    [
+      "home",
+      "Inicio",
+      true
+    ],
+    [
+      "clip",
+      "Portapapeles",
+      true
+    ],
+    [
+      "shelf",
+      "Bandeja",
+      true
+    ],
+    [
+      "todo",
+      "Tareas",
+      true
+    ],
+    [
+      "notes",
+      "Notas",
+      true
+    ],
+    [
+      "quick",
+      "Ajustes rápidos",
+      true
+    ]
+  ]
+}

@@ -1,0 +1,22 @@
+<Window
+    x:Class="Parpa.AppWindows.NotchWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:Parpa.Controls">
+
+    <!-- Canvas: no recorta al raíz cuando la escala (ajuste "size") lo hace más grande que la ventana. -->
+    <Canvas>
+        <Grid
+            x:Name="Root"
+            Background="Transparent"
+            PointerEntered="Root_PointerEntered"
+            PointerExited="Root_PointerExited"
+            PointerPressed="Root_PointerPressed"
+            PointerWheelChanged="Root_PointerWheelChanged">
+            <Grid.RenderTransform>
+                <ScaleTransform x:Name="RootScale" />
+            </Grid.RenderTransform>
+            <c:NotchShape x:Name="Shape" />
+        </Grid>
+    </Canvas>
+</Window>
