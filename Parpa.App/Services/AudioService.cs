@@ -23,6 +23,9 @@ public sealed class AudioService : IMMNotificationClient, IDisposable
 
     public string DeviceName { get; private set; } = string.Empty;
 
+    /// <summary>Volumen actual en % (0 si está en silencio).</summary>
+    public int Volume => _last.Muted ? 0 : Math.Max(0, _last.Percent);
+
     /// <summary>Volumen en % y silencio, en el hilo de la UI.</summary>
     public event Action<int, bool>? VolumeChanged;
 

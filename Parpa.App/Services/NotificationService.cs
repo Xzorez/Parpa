@@ -105,6 +105,16 @@ public sealed class NotificationService : IDisposable
         _fallbackTimer.Start();
     }
 
+    /// <summary>Tras volver de Configuración: si ahora hay permiso, empieza a leer avisos.</summary>
+    /// <returns><c>true</c> si el acceso ha cambiado a permitido.</returns>
+    public async Task<bool> RetryAsync()
+    {
+        if (Access == UserNotificationListenerAccess.Allowed) return false;
+        if (_listener.GetAccessStatus() != UserNotificationListenerAccessStatus.Allowed) return false;
+        await StartAsync();
+        return Access == UserNotificationListenerAccess.Allowed;
+    }
+
     /// <summary>Llega por la cola de mensajes del hilo de la UI (gancho fuera de proceso).</summary>
     private void OnWinEvent(IntPtr hook, uint ev, IntPtr hwnd, int idObject, int idChild, uint thread, uint time)
     {

@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Microsoft.UI.Dispatching;
 using Parpa.Services;
 
@@ -5,9 +6,11 @@ namespace Parpa.ViewModels;
 
 /// <summary>
 /// Estados del notch. Prioridad (gana el primero): Arrastre &gt; Abierto &gt; Aviso &gt; Indicador &gt; Actividad &gt; Reposo.
-/// Implementados: Abierto, Aviso, Indicador, Actividad y Reposo; Arrastre llega en la fase 4.
 /// </summary>
-public enum NotchState { Idle, Activity, Osd, Peek, Open }
+public enum NotchState { Idle, Activity, Osd, Peek, Open, Drop }
+
+/// <summary>Qué se arrastra sobre el notch.</summary>
+public enum DropKind { File, Text, Link }
 
 /// <summary>Forma objetivo: ancho y alto del cuerpo (sin orejas) y radio de las esquinas inferiores.</summary>
 public readonly record struct NotchGeometry(double Width, double Height, double Radius);
@@ -21,43 +24,69 @@ public sealed record NotchPage(string Id, string TitleKey, string Glyph, string 
     public static readonly NotchPage Todo = new("todo", "windows_todo", "tareas", "tasks");
     public static readonly NotchPage Notes = new("notes", "windows_notes", "notas", "notes");
     public static readonly NotchPage Quick = new("quick", "windows_quick", "general", "quick");
+
+    /// <summary>Ventanas con vista propia. Ajustes rápidos llega en la fase 5 con la ventana de Ajustes.</summary>
+    public static readonly IReadOnlyList<NotchPage> Implemented = [Home, Clip, Shelf, Todo, Notes];
 }
 
-/// <summary>Actividad en vivo del notch compacto. <see cref="SizeToken"/> da el ancho (tokens.json › notch).</summary>
-public sealed record NotchActivity(string SizeToken, string Glyph, string Label, string Sub, bool IsPlaying);
+/// <summary>
+/// Actividad en vivo del notch compacto. <see cref="SizeToken"/> da el ancho (tokens.json › notch).
+/// A la derecha: ecualizador si <see cref="RightText"/> es null; si no, ese texto en Doto (temporizadores).
+/// </summary>
+public sealed record NotchActivity(string SizeToken, string Glyph, string Label, string Sub, bool IsPlaying, string? RightText = null);
 
 /// <summary>
 /// Indicador del sistema (340×40). <see cref="Level"/> 0–100 llena las 16 barras.
 /// <see cref="Alert"/> pinta el glifo en acento; <see cref="Success"/> pinta las barras en verde.
+/// <see cref="Banner"/>: error breve compacto (300×34) con punto rojo y enlace, durante <c>notifDur</c>.
 /// </summary>
-public sealed record NotchIndicator(string Glyph, string Label, string Sub, double Level, string Value, bool Alert = false, bool Success = false);
+public sealed record NotchIndicator(string Glyph, string Label, string Sub, double Level, string Value,
+    bool Alert = false, bool Success = false, bool Banner = false);
 
 /// <summary>
-/// Aviso (420×112) con dos acciones. Mayor <see cref="Priority"/> se muestra antes
-/// (y desplaza a uno de menor prioridad que ya se esté viendo).
+/// Aviso (420×112) con una o dos acciones. Mayor <see cref="Priority"/> se muestra antes
+/// (y desplaza a uno de menor prioridad que ya se esté viendo). Un aviso nuevo con la misma
+/// <see cref="Key"/> sustituye al anterior. <see cref="ErrorDot"/>: punto rojo en vez de glifo.
 /// </summary>
 public sealed record NotchPeek(
     string Glyph, string Head, string When, string Body,
     string PrimaryLabel, string SecondaryLabel,
     int Priority, bool IsCall,
-    Action? OnPrimary = null, Action? OnSecondary = null)
+    Action? OnPrimary = null, Action? OnSecondary = null,
+    string? Key = null, bool ErrorDot = false)
 {
+    public const int PriorityInfo = 0;
     public const int PriorityMessage = 1;
     public const int PriorityCall = 2;
 }
 
 public sealed class NotchViewModel
 {
+    public const string ActivityFocus = "focus";
+    public const string ActivityMusic = "music";
+
+    /// <summary>Orden de prioridad de las actividades (gana la primera presente).</summary>
+    private static readonly string[] ActivityOrder = [ActivityFocus, ActivityMusic];
+
+    /// <summary>Ancho del error breve compacto (design/Icono y Estados.dc.html #11f).</summary>
+    private const double BannerWidth = 300;
+
+    private static readonly TimeSpan WheelThrottle = TimeSpan.FromMilliseconds(350);
+
     private readonly ParpaSettings _s;
+    private readonly JsonArray _wins;
     private readonly DispatcherQueueTimer _openTimer;
     private readonly DispatcherQueueTimer _closeTimer;
     private readonly DispatcherQueueTimer _osdTimer;
     private readonly DispatcherQueueTimer _peekTimer;
     private readonly List<NotchPeek> _queue = new();
+    private readonly Dictionary<string, NotchActivity> _activities = new();
     private NotchPage _lastPage = NotchPage.Home;
     private bool _isOpen;
     private bool _pointerInside;
     private bool _suppressed;
+    private bool _holdOpen;
+    private DateTime _lastWheel;
     private TimeSpan _peekTotal;
     private TimeSpan _peekRemaining;
     private DateTime _peekDeadline;
@@ -67,11 +96,16 @@ public sealed class NotchViewModel
 
     public NotchPage Page { get; private set; } = NotchPage.Home;
 
+    /// <summary>Menú de burbujas abierto (dentro del estado Abierto).</summary>
+    public bool IsLauncher { get; private set; }
+
     public NotchActivity? Activity { get; private set; }
 
     public NotchIndicator? Indicator { get; private set; }
 
     public NotchPeek? Peek { get; private set; }
+
+    public DropKind? Drop { get; private set; }
 
     /// <summary>Fracción de tiempo que le queda al aviso visible (para la barra de puntos).</summary>
     public double PeekRemainingFraction
@@ -87,9 +121,10 @@ public sealed class NotchViewModel
     /// <summary>Se dispara cada vez que cambia el estado, la ventana abierta o el contenido visible.</summary>
     public event Action? Changed;
 
-    public NotchViewModel(ParpaSettings settings)
+    public NotchViewModel(ParpaSettings settings, JsonArray wins)
     {
         _s = settings;
+        _wins = wins;
         var dispatcher = DispatcherQueue.GetForCurrentThread();
         _openTimer = CreateTimer(dispatcher, () => Open(NotchPage.Home));
         _closeTimer = CreateTimer(dispatcher, Close);
@@ -109,8 +144,10 @@ public sealed class NotchViewModel
 
     public NotchGeometry Geometry => State switch
     {
-        NotchState.Open => OpenGeometry(Page),
+        NotchState.Drop => Size("drop", "notchPeek"),
+        NotchState.Open => IsLauncher ? Size("launcher", "notchOpen") : Size(Page.SizeToken, "notchOpen"),
         NotchState.Peek => Size("peek", "notchPeek"),
+        NotchState.Osd when Indicator!.Banner => new NotchGeometry(BannerWidth, Tokens.Current.NotchSize("idle").H, Tokens.Current.Radius("notchCompact")),
         NotchState.Osd => Size("osd", "notchCompact"),
         NotchState.Activity => Size(Activity!.SizeToken, "notchCompact"),
         _ => Size("idle", "notchCompact"),
@@ -119,37 +156,55 @@ public sealed class NotchViewModel
     /// <summary>Mayor forma posible (para dimensionar la ventana).</summary>
     public static NotchGeometry Largest => Size("tasks", "notchOpen");
 
-    public NotchGeometry OpenGeometry(NotchPage page)
-    {
-        // Inicio crece a 196 si la letra está activada y la tarjeta MÚSICA visible (como el prototipo).
-        var token = page == NotchPage.Home && _s.Lyrics && _s.HomeCards.GetValueOrDefault("MÚSICA", true)
-            ? "homeLyrics"
-            : page.SizeToken;
-        return Size(token, "notchOpen");
-    }
-
     private static NotchGeometry Size(string sizeToken, string radiusToken)
     {
         var (w, h) = Tokens.Current.NotchSize(sizeToken);
         return new NotchGeometry(w, h, Tokens.Current.Radius(radiusToken));
     }
 
+    /// <summary>
+    /// Ventanas visibles en el orden de Ajustes (<c>wins</c>: [id, nombre, visible]). Inicio siempre va primero.
+    /// </summary>
+    public IReadOnlyList<NotchPage> Pages
+    {
+        get
+        {
+            var pages = new List<NotchPage> { NotchPage.Home };
+            foreach (var entry in _wins.OfType<JsonArray>())
+            {
+                var id = entry[0]?.GetValue<string>();
+                var visible = entry.Count > 2 && entry[2]?.GetValue<bool>() == true;
+                if (visible && NotchPage.Implemented.FirstOrDefault(p => p.Id == id && p != NotchPage.Home) is { } page)
+                    pages.Add(page);
+            }
+            return pages;
+        }
+    }
+
     // ---- Contenido ----
 
-    /// <summary>Actividad en vivo (música…); <c>null</c> al terminar la sesión.</summary>
-    public void SetActivity(NotchActivity? activity)
+    /// <summary>Actividad en vivo de una fuente (música, foco…); <c>null</c> al terminar. Gana la de más prioridad.</summary>
+    public void SetActivity(string slot, NotchActivity? activity)
     {
-        if (Activity == activity) return;
-        Activity = activity;
+        if (activity is null) _activities.Remove(slot);
+        else _activities[slot] = activity;
+        var next = ActivityOrder.Select(s => _activities.GetValueOrDefault(s)).FirstOrDefault(a => a is not null);
+        if (next == Activity) return;
+        Activity = next;
         Update();
     }
 
-    /// <summary>Indicador del sistema durante <c>osdVisibleMs</c> (1,6 s). Se descarta si hay aviso visible o está abierto.</summary>
+    /// <summary>
+    /// Indicador del sistema durante <c>osdVisibleMs</c> (1,6 s); los errores breves duran <c>notifDur</c>.
+    /// Se descarta si hay aviso visible o el notch está abierto.
+    /// </summary>
     public void ShowIndicator(NotchIndicator indicator)
     {
-        if (_isOpen || Peek is not null || _suppressed) return;
+        if (_isOpen || Peek is not null || _suppressed || Drop is not null) return;
         Indicator = indicator;
-        _osdTimer.Interval = TimeSpan.FromMilliseconds(Tokens.Current.OsdVisibleMs);
+        _osdTimer.Interval = indicator.Banner
+            ? TimeSpan.FromSeconds(Math.Max(1, _s.NotifDur))
+            : TimeSpan.FromMilliseconds(Tokens.Current.OsdVisibleMs);
         _osdTimer.Start();
         Update();
     }
@@ -160,16 +215,21 @@ public sealed class NotchViewModel
     /// </summary>
     public void EnqueuePeek(NotchPeek peek)
     {
+        if (peek.Key is { } key)
+        {
+            _queue.RemoveAll(p => p.Key == key);
+            if (Peek?.Key == key) HidePeek();
+        }
         if (Peek is not null && peek.Priority > Peek.Priority)
         {
             _queue.Insert(0, Peek);
             HidePeek();
         }
         _queue.Add(peek);
-        TryShowNextPeek();
+        if (Peek is null) TryShowNextPeek(update: true);
     }
 
-    /// <summary>Botón principal del aviso (ABRIR).</summary>
+    /// <summary>Botón principal del aviso.</summary>
     public void PeekPrimary()
     {
         var action = Peek?.OnPrimary;
@@ -177,7 +237,7 @@ public sealed class NotchViewModel
         action?.Invoke();
     }
 
-    /// <summary>Botón secundario del aviso (MÁS TARDE / IGNORAR).</summary>
+    /// <summary>Botón secundario del aviso.</summary>
     public void PeekSecondary()
     {
         var action = Peek?.OnSecondary;
@@ -196,12 +256,16 @@ public sealed class NotchViewModel
             HidePeek();
             Update();
         }
-        else TryShowNextPeek();
+        else TryShowNextPeek(update: true);
     }
 
-    private void TryShowNextPeek()
+    private bool TryShowNextPeek(bool update)
     {
-        if (Peek is not null || _isOpen || _suppressed || _queue.Count == 0) return;
+        if (Peek is not null || _isOpen || _suppressed || Drop is not null || _queue.Count == 0)
+        {
+            if (update) Update();
+            return false;
+        }
         var next = _queue.OrderByDescending(p => p.Priority).First(); // estable: a igual prioridad, el más antiguo
         _queue.Remove(next);
         Peek = next;
@@ -213,6 +277,7 @@ public sealed class NotchViewModel
         _peekPaused = true;
         if (!_pointerInside) ResumePeek(); // con el ratón encima el tiempo no corre
         Update();
+        return true;
     }
 
     private void PausePeek()
@@ -242,18 +307,97 @@ public sealed class NotchViewModel
     {
         if (Peek is null) return;
         HidePeek();
-        Update();
-        TryShowNextPeek();
+        TryShowNextPeek(update: true);
     }
 
     private void Update()
     {
-        State = _isOpen ? NotchState.Open
+        State = Drop is not null ? NotchState.Drop
+            : _isOpen ? NotchState.Open
             : Peek is not null ? NotchState.Peek
             : Indicator is not null ? NotchState.Osd
             : Activity is not null ? NotchState.Activity
             : NotchState.Idle;
         Changed?.Invoke();
+    }
+
+    // ---- Ventanas ----
+
+    /// <summary>Botón central: abre o cierra el menú de burbujas.</summary>
+    public void ToggleLauncher()
+    {
+        if (!_isOpen) return;
+        IsLauncher = !IsLauncher;
+        Update();
+    }
+
+    /// <summary>Elige una ventana (burbuja, mascota, "VER" de un aviso…). Abre el notch si hace falta.</summary>
+    public void ShowPage(NotchPage page)
+    {
+        IsLauncher = false;
+        if (!_isOpen)
+        {
+            Open(page);
+            return;
+        }
+        Page = _lastPage = page;
+        Update();
+    }
+
+    /// <summary>Rueda sobre el notch: cerrado abre Inicio; abierto cambia de ventana (si <c>wheel</c>).</summary>
+    public void OnWheel(int delta)
+    {
+        if (!_s.Wheel || DateTime.UtcNow - _lastWheel < WheelThrottle) return;
+        _lastWheel = DateTime.UtcNow;
+        if (!_isOpen)
+        {
+            if (Peek is null) Open(NotchPage.Home);
+            return;
+        }
+        var pages = Pages;
+        var index = Math.Max(0, pages.ToList().IndexOf(Page));
+        ShowPage(pages[(index + (delta < 0 ? 1 : -1) + pages.Count) % pages.Count]);
+    }
+
+    /// <summary>
+    /// Mientras hay un campo de texto en uso (nota, nueva tarea) el notch no se cierra al salir el ratón.
+    /// </summary>
+    public void SetHoldOpen(bool hold)
+    {
+        _holdOpen = hold;
+        if (hold) _closeTimer.Stop();
+        else if (!_pointerInside) OnPointerExited();
+    }
+
+    // ---- Arrastrar ----
+
+    public void DragEntered(DropKind kind)
+    {
+        _openTimer.Stop();
+        _closeTimer.Stop();
+        if (Drop == kind) return;
+        Drop = kind;
+        if (Peek is not null)
+        {
+            _queue.Insert(0, Peek);
+            HidePeek();
+        }
+        _osdTimer.Stop();
+        Indicator = null;
+        Update();
+    }
+
+    /// <param name="openPage">Ventana a la que lleva lo soltado (o <c>null</c> si se canceló).</param>
+    public void DragEnded(NotchPage? openPage)
+    {
+        if (Drop is null) return;
+        Drop = null;
+        if (openPage is not null)
+        {
+            ShowPage(openPage);
+            return;
+        }
+        if (!TryShowNextPeek(update: false)) Update();
     }
 
     // ---- Entradas ----
@@ -268,7 +412,7 @@ public sealed class NotchViewModel
             PausePeek(); // hover pausa el aviso; no abre el notch encima de él
             return;
         }
-        if (_isOpen) return;
+        if (_isOpen || Drop is not null) return;
         _openTimer.Interval = TimeSpan.FromMilliseconds(Math.Max(0, _s.OpenTime));
         _openTimer.Start();
     }
@@ -279,7 +423,7 @@ public sealed class NotchViewModel
         _pointerInside = false;
         _openTimer.Stop();
         ResumePeek();
-        if (!_isOpen || _s.CloseOn != "mouse") return;
+        if (!_isOpen || _holdOpen || _s.CloseOn != "mouse") return;
         _closeTimer.Interval = TimeSpan.FromSeconds(Math.Max(0, _s.CloseDelay));
         _closeTimer.Start();
     }
@@ -303,19 +447,17 @@ public sealed class NotchViewModel
         if (_isOpen) Close();
     }
 
-    /// <summary>Rueda sobre el notch cerrado: abre Inicio (si <c>wheel</c>).</summary>
-    public void OnWheel()
-    {
-        if (!_isOpen && _s.Wheel) Open(NotchPage.Home);
-    }
+    /// <summary>Esc o el sistema piden cerrar.</summary>
+    public void RequestClose() => Close();
 
     private void Open(NotchPage page)
     {
         _openTimer.Stop();
         _closeTimer.Stop();
-        if (_isOpen && Page == page) return;
+        if (_isOpen && Page == page && !IsLauncher) return;
         _isOpen = true;
-        Page = _lastPage = page;
+        IsLauncher = false;
+        Page = _lastPage = Pages.Contains(page) ? page : NotchPage.Home;
         // Al abrir, el indicador visible se descarta y el aviso visible espera en la cola.
         _osdTimer.Stop();
         Indicator = null;
@@ -333,7 +475,8 @@ public sealed class NotchViewModel
         _closeTimer.Stop();
         if (!_isOpen) return;
         _isOpen = false;
-        Update();
-        TryShowNextPeek();
+        IsLauncher = false;
+        _holdOpen = false;
+        if (!TryShowNextPeek(update: false)) Update();
     }
 }

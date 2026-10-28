@@ -36,7 +36,7 @@
                     TextTrimming="CharacterEllipsis" />
             </StackPanel>
 
-            <!-- Botón de menú circular 28 px (el menú de burbujas llega en la fase 4). -->
+            <!-- Botón de menú circular 28 px: abre/cierra el menú de burbujas. -->
             <Border
                 x:Name="MenuButton"
                 Grid.Column="1"
@@ -45,8 +45,10 @@
                 Background="Transparent"
                 CornerRadius="14"
                 PointerEntered="MenuButton_PointerEntered"
-                PointerExited="MenuButton_PointerExited">
+                PointerExited="MenuButton_PointerExited"
+                Tapped="MenuButton_Tapped">
                 <c:DotMatrix
+                    x:Name="MenuGlyph"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Glyph="menu"
@@ -62,8 +64,16 @@
                 FontSize="20"
                 FontWeight="Bold"
                 Foreground="{StaticResource PrimaryBrush}" />
+            <TextBlock
+                x:Name="HeaderRight"
+                Grid.Column="2"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                FontFamily="{StaticResource FontMono}"
+                FontSize="10"
+                Visibility="Collapsed" />
         </Grid>
 
-        <ContentPresenter x:Name="Body" Grid.Row="1" />
+        <Grid x:Name="Body" Grid.Row="1" />
     </Grid>
 </UserControl>

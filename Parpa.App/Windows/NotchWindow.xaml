@@ -8,7 +8,13 @@
     <Canvas>
         <Grid
             x:Name="Root"
+            AllowDrop="True"
             Background="Transparent"
+            DragEnter="Root_DragEnter"
+            DragLeave="Root_DragLeave"
+            DragOver="Root_DragOver"
+            Drop="Root_Drop"
+            KeyDown="Root_KeyDown"
             PointerEntered="Root_PointerEntered"
             PointerExited="Root_PointerExited"
             PointerPressed="Root_PointerPressed"

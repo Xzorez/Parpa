@@ -22,6 +22,7 @@ public partial class App : Application
         SettingsService.Load();
         Loc.SetLanguage(SettingsService.Current.S.Lang);
         ApplyColorResources(Tokens.Current.Dark);
+        Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("ms-appx:///Styles.xaml") });
 
         _notch = new NotchWindow(SettingsService.Current.S);
         _notch.ShowWithoutActivation();

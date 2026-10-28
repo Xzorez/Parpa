@@ -1,0 +1,138 @@
+<UserControl
+    x:Class="Parpa.Views.NotesView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:Parpa.Controls">
+
+    <!-- Dos columnas, gap 8: nota nueva | guardadas (o la nota abierta). -->
+    <Grid ColumnSpacing="8">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid
+            Padding="12,10"
+            Background="{StaticResource CardBrush}"
+            CornerRadius="14"
+            RowSpacing="8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBox
+                x:Name="Draft"
+                AcceptsReturn="True"
+                KeyDown="Draft_KeyDown"
+                Style="{StaticResource BareTextBox}"
+                TextWrapping="Wrap" />
+            <Grid Grid.Row="1">
+                <TextBlock
+                    x:Name="SaveHint"
+                    VerticalAlignment="Center"
+                    CharacterSpacing="80"
+                    FontFamily="{StaticResource FontMono}"
+                    FontSize="9"
+                    Foreground="{StaticResource TertiaryBrush}" />
+                <c:PillButton
+                    x:Name="SaveButton"
+                    HorizontalAlignment="Right"
+                    Primary="True"
+                    Click="SaveButton_Click" />
+            </Grid>
+        </Grid>
+
+        <!-- Guardadas: "GUARDADAS" + contador; filas con índice, texto, hora y ×. -->
+        <Grid x:Name="ListPanel" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid Padding="4,0,4,4">
+                <TextBlock x:Name="SavedLabel" VerticalAlignment="Bottom" Style="{StaticResource CardLabel}" />
+                <TextBlock
+                    x:Name="SavedCount"
+                    HorizontalAlignment="Right"
+                    FontFamily="{StaticResource FontDisplay}"
+                    FontSize="14"
+                    FontWeight="Bold"
+                    Foreground="{StaticResource PrimaryBrush}" />
+            </Grid>
+            <ScrollViewer
+                Grid.Row="1"
+                HorizontalScrollMode="Disabled"
+                VerticalScrollBarVisibility="Hidden">
+                <StackPanel x:Name="Rows" />
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Nota abierta. -->
+        <Grid
+            x:Name="NotePanel"
+            Grid.Column="1"
+            Padding="12,10"
+            Background="{StaticResource CardBrush}"
+            CornerRadius="14"
+            RowSpacing="8"
+            Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid>
+                <TextBlock x:Name="NoteTitle" Style="{StaticResource CardLabel}" />
+                <TextBlock
+                    x:Name="NoteTime"
+                    HorizontalAlignment="Right"
+                    FontFamily="{StaticResource FontMono}"
+                    FontSize="9"
+                    Foreground="{StaticResource QuaternaryBrush}" />
+            </Grid>
+            <ScrollViewer Grid.Row="1" HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Hidden">
+                <TextBlock
+                    x:Name="NoteText"
+                    FontFamily="{StaticResource FontUi}"
+                    FontSize="13"
+                    Foreground="{StaticResource PrimaryBrush}"
+                    IsTextSelectionEnabled="True"
+                    LineHeight="18.85"
+                    TextWrapping="Wrap" />
+            </ScrollViewer>
+            <Grid Grid.Row="2" ColumnSpacing="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <c:PillButton x:Name="BackButton" Foreground="{StaticResource SoftBrush}" Click="BackButton_Click" />
+                <c:PillButton x:Name="CopyButton" Grid.Column="2" Foreground="{StaticResource SoftBrush}" Click="CopyButton_Click" />
+                <c:PillButton x:Name="DeleteButton" Grid.Column="3" Click="DeleteButton_Click" />
+            </Grid>
+        </Grid>
+
+        <!-- Sin notas. -->
+        <StackPanel
+            x:Name="EmptyPanel"
+            Grid.Column="1"
+            Padding="6,0"
+            VerticalAlignment="Center"
+            Spacing="6"
+            Visibility="Collapsed">
+            <TextBlock
+                x:Name="EmptyTitle"
+                FontFamily="{StaticResource FontUi}"
+                FontSize="13"
+                FontWeight="SemiBold"
+                Foreground="{StaticResource PrimaryBrush}" />
+            <TextBlock
+                x:Name="EmptyText"
+                FontFamily="{StaticResource FontUi}"
+                FontSize="12"
+                Foreground="{StaticResource SecondaryBrush}"
+                LineHeight="16.8"
+                TextWrapping="Wrap" />
+        </StackPanel>
+    </Grid>
+</UserControl>

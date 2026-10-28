@@ -44,6 +44,18 @@
             OnColor="{StaticResource SecondaryColor}"
             Visibility="Collapsed" />
 
+        <!-- Temporizadores (foco…): Doto 700 16 px, tracking .02em. -->
+        <TextBlock
+            x:Name="RightText"
+            Grid.Column="3"
+            VerticalAlignment="Center"
+            CharacterSpacing="20"
+            FontFamily="{StaticResource FontDisplay}"
+            FontSize="16"
+            FontWeight="Bold"
+            Foreground="{StaticResource PrimaryBrush}"
+            Visibility="Collapsed" />
+
         <!-- Ecualizador: 5 columnas × 4 filas, puntos 2 px, gap 1,5. Tick 100 ms; se congela en pausa. -->
         <c:DotMatrix
             x:Name="Equalizer"

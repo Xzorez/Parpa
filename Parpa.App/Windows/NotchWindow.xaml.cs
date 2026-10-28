@@ -1,11 +1,13 @@
-using System.Diagnostics;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Parpa.Interop;
 using Parpa.Services;
 using Parpa.ViewModels;
 using Parpa.Views;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.System;
 using Windows.UI.ViewManagement;
 using WinRT.Interop;
 
@@ -15,10 +17,12 @@ namespace Parpa.AppWindows;
 /// Ventana del notch: sin borde, siempre encima, no activable y transparente.
 /// Tamaño fijo = mayor estado + orejas + margen de sombra; la forma se dibuja dentro.
 /// El ratón solo se captura dentro de la región (forma actual + <c>hoverSens</c>), fuera pasa a las apps de debajo.
+/// Solo se activa cuando hace falta escribir (nota, nueva tarea) y devuelve el foco al terminar.
 /// </summary>
-public sealed partial class NotchWindow : Window
+public sealed partial class NotchWindow : Window, IKeyboardHost
 {
     private const double ShadowMargin = 24;
+    private static readonly TimeSpan SnoozeDelay = TimeSpan.FromMinutes(10);
 
     private readonly IntPtr _hwnd;
     private readonly ParpaSettings _s;
@@ -31,11 +35,18 @@ public sealed partial class NotchWindow : Window
     private readonly SystemMonitor _system;
     private readonly NoticeCenter _notices;
     private readonly FullscreenWatcher _fullscreen;
+    private readonly ClipboardService _clipboard;
+    private readonly ShelfService _shelf;
+    private readonly TasksService _tasks = new();
+    private readonly NotesService _notes = new();
+    private readonly FocusService _focus;
     private readonly IdleView _idle = new();
     private readonly CompactView _compact = new();
     private readonly OsdView _osd = new();
+    private readonly BannerView _banner = new();
     private readonly PeekView _peek = new();
-    private readonly OpenView _open = new();
+    private readonly DropView _drop = new();
+    private readonly OpenView _open;
 
     private readonly double _ear = Tokens.Current.Radius("ear");
     private readonly double _logicalWidth;
@@ -46,6 +57,10 @@ public sealed partial class NotchWindow : Window
     private FrameworkElement? _shownView;
     private Win32.RECT _monitorBounds;  // monitor donde está el notch, en píxeles físicos
     private bool _hiddenForFullscreen;
+    private bool _typing;
+    private IntPtr _previousForeground;
+    private DropKind? _dragKind;
+    private string? _dragText;
 
     public NotchWindow(ParpaSettings settings)
     {
@@ -63,28 +78,37 @@ public sealed partial class NotchWindow : Window
         ConfigureWindow();
         SystemBackdrop = new WinUIEx.TransparentTintBackdrop();
 
-        _vm = new NotchViewModel(settings);
+        _vm = new NotchViewModel(settings, SettingsService.Current.Wins);
+        _system = new SystemMonitor(_vm, _s);
+        _notices = new NoticeCenter(_vm, _s);
+        _clipboard = new ClipboardService(_hwnd, _s);
+        _shelf = new ShelfService(_s, _clipboard);
+        _focus = new FocusService(_s);
+        _open = new OpenView(new NotchServices(_vm, _s, this, _system, _notices, _clipboard, _shelf, _tasks, _notes, _focus));
         _vm.Changed += OnStateChanged;
 
         Shape.Fill = Tokens.Current.Dark["bg"];
         Shape.AddView(_idle, anchorLeft: false);
         Shape.AddView(_compact, anchorLeft: false);
         Shape.AddView(_osd, anchorLeft: false);
+        Shape.AddView(_banner, anchorLeft: false);
         Shape.AddView(_peek, anchorLeft: true);
+        Shape.AddView(_drop, anchorLeft: true);
         Shape.AddView(_open, anchorLeft: true);
         Shape.TransitionCompleted += () => UpdateRegion(_geometry, null);
         _idle.Apply(_s, ReducedMotion);
-        _open.SetPage(_vm.Page);
 
         _clock.MinuteChanged += () => { _idle.Apply(_s, ReducedMotion); _open.Apply(_s); };
 
         _hotkey = new HotkeyService(_hwnd);
         _hotkey.Pressed += _vm.OnHotkey;
-        if (!_hotkey.Register(_s.Keys))
-            Debug.WriteLine($"Parpa: atajo {string.Join("+", _s.Keys)} en uso por otra app");
 
         _outside = new OutsideClickWatcher(ScreenRegion);
-        _outside.ClickedOutside += _vm.OnClickedOutside;
+        _outside.ClickedOutside += () =>
+        {
+            EndTextInput(restoreFocus: false); // el clic ya lleva el foco a la otra app
+            _vm.OnClickedOutside();
+        };
 
         _wndProc = WndProc;
         Win32.SetWindowSubclass(_hwnd, _wndProc, 1, IntPtr.Zero);
@@ -95,11 +119,9 @@ public sealed partial class NotchWindow : Window
         _shownView = _idle;
         _idle.SetAnimating(true);
 
-        _system = new SystemMonitor(_vm, _s);
         _system.Start();
-
-        _notices = new NoticeCenter(_vm, _s);
         _ = _notices.StartAsync();
+        WireWindows();
 
         // Pantalla completa en el monitor del notch + hideFull: se aparta (sin tapar ni capturar clics) y los avisos esperan.
         _fullscreen = new FullscreenWatcher(_hwnd, () => _monitorBounds);
@@ -113,7 +135,70 @@ public sealed partial class NotchWindow : Window
         };
         _fullscreen.Start();
 
-        Closed += (_, _) => { _hotkey.Dispose(); _outside.Dispose(); _system.Dispose(); _notices.Dispose(); };
+        // Atajo ocupado: error breve una vez al arrancar, con enlace a Ajustes.
+        if (!_hotkey.Register(_s.Keys))
+        {
+            Log.Info($"Atajo {string.Join("+", _s.Keys)} en uso por otra app");
+            _vm.ShowIndicator(new NotchIndicator(string.Empty, Loc.Get("empty_errors_hotkey_taken"), string.Empty, 0,
+                Loc.Get("empty_errors_settings_link"), Banner: true));
+        }
+
+        Closed += (_, _) =>
+        {
+            _hotkey.Dispose();
+            _outside.Dispose();
+            _system.Dispose();
+            _notices.Dispose();
+        };
+    }
+
+    /// <summary>Portapapeles, tareas y foco: lo que aparece en el notch cerrado.</summary>
+    private void WireWindows()
+    {
+        _clipboard.Start();
+        // Ctrl+C en cualquier app → aviso breve "COPIADO" (VER lleva al Portapapeles).
+        _clipboard.Copied += entry =>
+        {
+            if (_vm.IsOpen) return;
+            _vm.EnqueuePeek(new NotchPeek(
+                Glyph: "copias",
+                Head: $"{Loc.Get("windows_clip")} · {Loc.Get("peek_copied")}",
+                When: string.Empty,
+                Body: entry.Text.ReplaceLineEndings(" "),
+                PrimaryLabel: Loc.Get("peek_view"),
+                SecondaryLabel: Loc.Get("peek_ok"),
+                Priority: NotchPeek.PriorityInfo,
+                IsCall: false,
+                OnPrimary: () => _vm.ShowPage(NotchPage.Clip),
+                Key: "copied"));
+        };
+
+        // Tarea a su hora: HECHO / POSPONER (10 min). No molestar la silencia.
+        _tasks.Due += task =>
+        {
+            if (_s.Dnd) return;
+            _vm.EnqueuePeek(new NotchPeek(
+                Glyph: "tareas",
+                Head: $"{Loc.Get("peek_task_due")} · {task.Time}",
+                When: string.Empty,
+                Body: task.Text,
+                PrimaryLabel: Loc.Get("home_done"),
+                SecondaryLabel: Loc.Get("peek_snooze"),
+                Priority: NotchPeek.PriorityMessage,
+                IsCall: false,
+                OnPrimary: () => _tasks.Toggle(task.Id),
+                OnSecondary: () => _tasks.Snooze(task.Id, SnoozeDelay)));
+        };
+
+        // Sesión de foco en marcha o en pausa → actividad "FOCO" con el tiempo en Doto.
+        _focus.Changed += () => _vm.SetActivity(NotchViewModel.ActivityFocus,
+            _focus.State == FocusService.FocusState.Idle ? null : new NotchActivity(
+                SizeToken: "focus",
+                Glyph: "foco",
+                Label: Loc.Get("compact_focus"),
+                Sub: string.Empty,
+                IsPlaying: _focus.State == FocusService.FocusState.Running,
+                RightText: FocusService.Format(_focus.Remaining)));
     }
 
     /// <summary>Muestra la ventana sin quitar el foco a la app activa (salvo que esté apartada por pantalla completa).</summary>
@@ -121,6 +206,40 @@ public sealed partial class NotchWindow : Window
     {
         if (!_hiddenForFullscreen) Win32.ShowWindow(_hwnd, Win32.SW_SHOWNOACTIVATE);
     }
+
+    // ---- Teclado (IKeyboardHost) ----
+
+    /// <summary>
+    /// Solo aquí se activa la ventana: hay un campo de texto que necesita el teclado.
+    /// Se recuerda la app que tenía el foco para devolvérselo al terminar.
+    /// </summary>
+    public void BeginTextInput(Control control)
+    {
+        if (!_typing)
+        {
+            var foreground = Win32.GetForegroundWindow();
+            if (foreground != _hwnd) _previousForeground = foreground;
+            _typing = true;
+            _vm.SetHoldOpen(true);
+            Win32.SetForegroundWindow(_hwnd);
+            Activate();
+        }
+        DispatcherQueue.TryEnqueue(() => control.Focus(FocusState.Programmatic));
+    }
+
+    public void EndTextInput() => EndTextInput(restoreFocus: true);
+
+    private void EndTextInput(bool restoreFocus)
+    {
+        if (!_typing) return;
+        _typing = false;
+        _vm.SetHoldOpen(false);
+        if (restoreFocus && _previousForeground != IntPtr.Zero && Win32.GetForegroundWindow() == _hwnd)
+            Win32.SetForegroundWindow(_previousForeground);
+        _previousForeground = IntPtr.Zero;
+    }
+
+    // ---- Ventana ----
 
     private void ConfigureWindow()
     {
@@ -221,22 +340,31 @@ public sealed partial class NotchWindow : Window
     {
         var from = _geometry;
         _geometry = _vm.Geometry;
+        var accent = Tokens.Current.Accent(_s.Accent);
 
         FrameworkElement view;
         switch (_vm.State)
         {
+            case NotchState.Drop:
+                _drop.Show(_vm.Drop!.Value);
+                view = _drop;
+                break;
             case NotchState.Open:
-                _open.SetPage(_vm.Page);
                 _open.Height = _geometry.Height;
                 _open.Apply(_s);
+                _open.Show(_vm.Page, _vm.IsLauncher);
                 view = _open;
                 break;
             case NotchState.Peek:
-                _peek.Show(_vm, Tokens.Current.Accent(_s.Accent));
+                _peek.Show(_vm, accent);
                 view = _peek;
                 break;
+            case NotchState.Osd when _vm.Indicator!.Banner:
+                _banner.Show(_vm.Indicator, accent);
+                view = _banner;
+                break;
             case NotchState.Osd:
-                _osd.Show(_vm.Indicator!, Tokens.Current.Accent(_s.Accent));
+                _osd.Show(_vm.Indicator!, accent);
                 view = _osd;
                 break;
             case NotchState.Activity:
@@ -253,6 +381,11 @@ public sealed partial class NotchWindow : Window
         _idle.SetAnimating(view == _idle);
         _compact.SetVisible(view == _compact);
         _peek.SetVisible(view == _peek);
+        if (view != _open && _shownView == _open)
+        {
+            _open.Hide();
+            EndTextInput();
+        }
         if (_vm.IsOpen) _outside.Start();
         else _outside.Stop();
 
@@ -280,6 +413,9 @@ public sealed partial class NotchWindow : Window
                 return new IntPtr(1);
             case Win32.WM_HOTKEY when _hotkey.HandleMessage(msg, wParam):
                 return IntPtr.Zero;
+            case ClipboardService.WM_CLIPBOARDUPDATE:
+                DispatcherQueue.TryEnqueue(_clipboard.OnClipboardUpdate);
+                return IntPtr.Zero;
             case Win32.WM_DPICHANGED:
             case Win32.WM_DISPLAYCHANGE:
                 var result = Win32.DefSubclassProc(hWnd, msg, wParam, lParam);
@@ -288,6 +424,8 @@ public sealed partial class NotchWindow : Window
         }
         return Win32.DefSubclassProc(hWnd, msg, wParam, lParam);
     }
+
+    // ---- Ratón y teclado ----
 
     private void Root_PointerEntered(object sender, PointerRoutedEventArgs e) => _vm.OnPointerEntered();
 
@@ -298,5 +436,107 @@ public sealed partial class NotchWindow : Window
         if (e.GetCurrentPoint(Root).Properties.IsLeftButtonPressed) _vm.OnClicked();
     }
 
-    private void Root_PointerWheelChanged(object sender, PointerRoutedEventArgs e) => _vm.OnWheel();
+    private void Root_PointerWheelChanged(object sender, PointerRoutedEventArgs e) =>
+        _vm.OnWheel(e.GetCurrentPoint(Root).Properties.MouseWheelDelta);
+
+    /// <summary>Esc: deja de escribir; si no se estaba escribiendo, cierra.</summary>
+    private void Root_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Escape) return;
+        e.Handled = true;
+        if (_typing) EndTextInput();
+        else _vm.RequestClose();
+    }
+
+    // ---- Arrastrar y soltar: archivo → Bandeja, texto → nota, enlace → Portapapeles ----
+
+    private async void Root_DragEnter(object sender, DragEventArgs e)
+    {
+        var deferral = e.GetDeferral();
+        try
+        {
+            (_dragKind, _dragText) = await ClassifyAsync(e.DataView);
+            e.AcceptedOperation = _dragKind is null ? DataPackageOperation.None : DataPackageOperation.Copy;
+            if (_dragKind is { } kind) _vm.DragEntered(kind);
+        }
+        finally
+        {
+            deferral.Complete();
+        }
+    }
+
+    private void Root_DragOver(object sender, DragEventArgs e)
+    {
+        e.AcceptedOperation = _dragKind is null ? DataPackageOperation.None : DataPackageOperation.Copy;
+        e.DragUIOverride.IsCaptionVisible = false; // la etiqueta ya la dibuja el notch
+    }
+
+    private void Root_DragLeave(object sender, DragEventArgs e)
+    {
+        _dragKind = null;
+        _vm.DragEnded(null);
+    }
+
+    private async void Root_Drop(object sender, DragEventArgs e)
+    {
+        var kind = _dragKind;
+        var text = _dragText;
+        _dragKind = null;
+        var deferral = e.GetDeferral();
+        try
+        {
+            switch (kind)
+            {
+                case DropKind.File:
+                    var items = await e.DataView.GetStorageItemsAsync();
+                    var first = _shelf.Add(items.Select(i => i.Path).Where(p => !string.IsNullOrEmpty(p)));
+                    _open.Shelf.Select(first);
+                    _vm.DragEnded(NotchPage.Shelf);
+                    break;
+                case DropKind.Text when text is not null:
+                    _notes.Add(text);
+                    _vm.DragEnded(NotchPage.Notes);
+                    break;
+                case DropKind.Link when text is not null:
+                    _clipboard.Add(text, announce: false);
+                    _vm.DragEnded(NotchPage.Clip);
+                    break;
+                default:
+                    _vm.DragEnded(null);
+                    break;
+            }
+            e.AcceptedOperation = DataPackageOperation.Copy;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Soltar: no se pudo leer lo soltado", ex);
+            _vm.DragEnded(null);
+        }
+        finally
+        {
+            deferral.Complete();
+        }
+    }
+
+    /// <summary>Qué se arrastra: archivos, enlace (web o texto que es una URL) o texto.</summary>
+    private static async Task<(DropKind?, string?)> ClassifyAsync(DataPackageView data)
+    {
+        try
+        {
+            if (data.Contains(StandardDataFormats.StorageItems)) return (DropKind.File, null);
+            if (data.Contains(StandardDataFormats.WebLink)) return (DropKind.Link, (await data.GetWebLinkAsync()).ToString());
+            if (data.Contains(StandardDataFormats.Text))
+            {
+                var text = (await data.GetTextAsync()).Trim();
+                if (text.Length == 0) return (null, null);
+                var isLink = Uri.TryCreate(text, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https" && !text.Contains(' ');
+                return (isLink ? DropKind.Link : DropKind.Text, text);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Soltar: formato no legible", ex);
+        }
+        return (null, null);
+    }
 }

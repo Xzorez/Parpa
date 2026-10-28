@@ -21,6 +21,7 @@ public sealed partial class DotMatrix : Grid
     public static readonly DependencyProperty GapProperty = Register(nameof(Gap), typeof(double), 1.0);
     public static readonly DependencyProperty OnColorProperty = Register(nameof(OnColor), typeof(Color), Color.FromArgb(255, 0xf2, 0xf2, 0xf0));
     public static readonly DependencyProperty OffColorProperty = Register(nameof(OffColor), typeof(Color), Color.FromArgb(0, 0, 0, 0));
+    public static readonly DependencyProperty CountProperty = Register(nameof(Count), typeof(int), -1);
 
     private ShapeVisual? _visual;
     private CompositionColorBrush? _onBrush;
@@ -42,6 +43,9 @@ public sealed partial class DotMatrix : Grid
     public double Gap { get => (double)GetValue(GapProperty); set => SetValue(GapProperty, value); }
     public Color OnColor { get => (Color)GetValue(OnColorProperty); set => SetValue(OnColorProperty, value); }
     public Color OffColor { get => (Color)GetValue(OffColorProperty); set => SetValue(OffColorProperty, value); }
+
+    /// <summary>Solo se dibujan los primeros N puntos (−1 = todos), p. ej. 25 minutos en filas de 17.</summary>
+    public int Count { get => (int)GetValue(CountProperty); set => SetValue(CountProperty, value); }
 
     /// <summary>Celdas por filas (Columns × Rows). Si se asigna, sustituye a <see cref="Glyph"/>.</summary>
     public bool[]? Cells
@@ -77,7 +81,7 @@ public sealed partial class DotMatrix : Grid
         _visual.Size = new Vector2((float)Width, (float)Height);
         _visual.Shapes.Clear();
 
-        _dots = new CompositionSpriteShape[Columns * Rows];
+        _dots = new CompositionSpriteShape[Count >= 0 ? Math.Min(Count, Columns * Rows) : Columns * Rows];
         for (var i = 0; i < _dots.Length; i++)
         {
             var geometry = compositor.CreateEllipseGeometry();
@@ -94,7 +98,7 @@ public sealed partial class DotMatrix : Grid
 
     private void ApplyCells()
     {
-        if (_dots.Length == 0) return;
+        if (_dots.Length == 0 || _onBrush is null) return;
         var cells = _cells ?? (Glyph is { Length: > 0 } name ? Glyphs.Get(name) : null);
         for (var i = 0; i < _dots.Length; i++)
             _dots[i].FillBrush = cells is not null && i < cells.Length && cells[i] ? _onBrush : _offBrush;

@@ -28,6 +28,9 @@ public sealed class NoticeCenter : IDisposable
     /// <summary>Permiso de Windows para leer avisos (Inicio y Ajustes muestran el estado denegado en la fase 4).</summary>
     public UserNotificationListenerAccess Access => _notifications.Access;
 
+    /// <summary>Vuelve a comprobar el permiso (tras pulsar ACTIVAR).</summary>
+    public Task<bool> RetryAsync() => _notifications.RetryAsync();
+
     public Task StartAsync()
     {
         _notifications.Arrived += OnArrived;

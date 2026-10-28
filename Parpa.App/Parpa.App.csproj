@@ -31,6 +31,7 @@
     <PackageReference Include="WinUIEx" Version="2.9.3" />
     <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
     <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="PDFsharp" Version="6.2.4" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,33 @@
+<UserControl
+    x:Class="Parpa.Views.DropView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:Parpa.Controls"
+    Width="420"
+    Height="84">
+
+    <!-- Soltar: padding 10 14 14; zona de puntos #5a5a60 (7 px, radio 16) con glifo + etiqueta sobre negro. -->
+    <Grid Padding="14,10,14,14">
+        <c:DotPattern DotColor="{StaticResource TertiaryColor}" Spacing="7" CornerRadius="16" />
+        <StackPanel
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Orientation="Horizontal"
+            Spacing="10">
+            <c:DotMatrix
+                x:Name="DropGlyph"
+                VerticalAlignment="Center"
+                OnColor="{StaticResource PrimaryColor}"
+                OffColor="{StaticResource GlyphOffColor}" />
+            <Border Padding="6,3" Background="{StaticResource BgBrush}">
+                <TextBlock
+                    x:Name="DropLabel"
+                    CharacterSpacing="120"
+                    FontFamily="{StaticResource FontMono}"
+                    FontSize="10"
+                    FontWeight="Medium"
+                    Foreground="{StaticResource PrimaryBrush}" />
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>

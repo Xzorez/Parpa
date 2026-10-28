@@ -22,6 +22,15 @@ public sealed class SystemMonitor : IDisposable
         _s = settings;
     }
 
+    public MediaService Media => _media;
+
+    /// <summary>Filas de la tarjeta SISTEMA: batería (null sin batería), volumen y señal.</summary>
+    public (int? Battery, int Volume, int Wifi) Snapshot() =>
+        (PowerService.HasBattery ? PowerService.Percent : null, _audio.Volume, _network.SignalPercent);
+
+    /// <summary>Cambió algo de la tarjeta SISTEMA (volumen, red, batería).</summary>
+    public event Action? SystemChanged;
+
     public void Start()
     {
         _media.Changed += OnMediaChanged;
@@ -52,7 +61,7 @@ public sealed class SystemMonitor : IDisposable
     private void OnMediaChanged()
     {
         var now = _media.Current;
-        _vm.SetActivity(now is null ? null : new NotchActivity(
+        _vm.SetActivity(NotchViewModel.ActivityMusic, now is null ? null : new NotchActivity(
             SizeToken: "music",
             Glyph: "musica",
             Label: Loc.Upper(now.Title.Length > 0 ? now.Title : Loc.Get("home_music")),
@@ -62,6 +71,7 @@ public sealed class SystemMonitor : IDisposable
 
     private void OnVolumeChanged(int percent, bool muted)
     {
+        SystemChanged?.Invoke();
         if (!_s.Osd) return;
         var level = muted ? 0 : percent;
         _vm.ShowIndicator(new NotchIndicator(
@@ -109,6 +119,7 @@ public sealed class SystemMonitor : IDisposable
 
     private void OnNetworkChanged(bool online)
     {
+        SystemChanged?.Invoke();
         if (!_s.Wifi) return;
         var name = Loc.Upper(_network.NetworkName);
         var sub = _network.IsWifi ? $"{Loc.Upper(Loc.Get("quick_wifi"))} · {name}" : name;

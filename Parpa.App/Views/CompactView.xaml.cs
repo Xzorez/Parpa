@@ -33,7 +33,10 @@ public sealed partial class CompactView : UserControl
         LabelMain.Text = activity.Label;
         LabelSub.Text = activity.Sub.Length > 0 ? " " + activity.Sub : string.Empty;
         ToolTipService.SetToolTip(this, string.IsNullOrEmpty(activity.Sub) ? activity.Label : $"{activity.Label} · {activity.Sub}");
-        _playing = activity.IsPlaying;
+        RightText.Text = activity.RightText ?? string.Empty;
+        RightText.Visibility = activity.RightText is null ? Visibility.Collapsed : Visibility.Visible;
+        Equalizer.Visibility = activity.RightText is null ? Visibility.Visible : Visibility.Collapsed;
+        _playing = activity.IsPlaying && activity.RightText is null;
         UpdateTimer();
     }
 

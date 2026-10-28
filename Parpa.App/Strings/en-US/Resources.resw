@@ -58,6 +58,8 @@
   <data name="peek_dnd_blocked" xml:space="preserve"><value>☾ DO NOT DISTURB IS ON</value></data>
   <data name="peek_app_blocked" xml:space="preserve"><value>✕ ALERTS OFF FOR THIS APP</value></data>
   <data name="peek_ignore" xml:space="preserve"><value>IGNORE</value></data>
+  <data name="peek_view" xml:space="preserve"><value>VIEW</value></data>
+  <data name="peek_ok" xml:space="preserve"><value>OK</value></data>
   <data name="peek_new_from" xml:space="preserve"><value>New message from {name}</value></data>
   <data name="peek_new_hidden" xml:space="preserve"><value>You have a new message</value></data>
   <data name="osd_volume" xml:space="preserve"><value>VOLUME</value></data>
@@ -88,6 +90,14 @@
   <data name="shelf_act_zip" xml:space="preserve"><value>ZIP</value></data>
   <data name="shelf_act_copy_path" xml:space="preserve"><value>COPY PATH</value></data>
   <data name="shelf_act_remove" xml:space="preserve"><value>REMOVE</value></data>
+  <data name="shelf_done_path" xml:space="preserve"><value>✓ PATH COPIED</value></data>
+  <data name="shelf_done_created" xml:space="preserve"><value>✓ {file} CREATED</value></data>
+  <data name="shelf_done_folder" xml:space="preserve"><value>✓ OPENING FOLDER…</value></data>
+  <data name="shelf_verb_compress" xml:space="preserve"><value>compress</value></data>
+  <data name="shelf_verb_png" xml:space="preserve"><value>convert</value></data>
+  <data name="shelf_verb_merge" xml:space="preserve"><value>merge</value></data>
+  <data name="shelf_verb_zip" xml:space="preserve"><value>zip</value></data>
+  <data name="shelf_need_two_pdf" xml:space="preserve"><value>ADD ANOTHER PDF TO MERGE</value></data>
   <data name="clip_empty" xml:space="preserve"><value>COPY SOMETHING WITH {keys} AND IT SHOWS UP HERE</value></data>
   <data name="clip_copy" xml:space="preserve"><value>COPY</value></data>
   <data name="clip_pin" xml:space="preserve"><value>PIN</value></data>
@@ -107,6 +117,9 @@
   <data name="notes_delete" xml:space="preserve"><value>DELETE</value></data>
   <data name="notes_empty" xml:space="preserve"><value>No notes yet</value></data>
   <data name="notes_empty_2" xml:space="preserve"><value>You can also drag text from any app up to the notch.</value></data>
+  <data name="notes_saved_list" xml:space="preserve"><value>SAVED</value></data>
+  <data name="notes_note_n" xml:space="preserve"><value>NOTE {n}</value></data>
+  <data name="notes_copied" xml:space="preserve"><value>COPIED</value></data>
   <data name="empty_errors_no_music" xml:space="preserve"><value>Nothing playing</value></data>
   <data name="empty_errors_no_music_2" xml:space="preserve"><value>Hit play in any app and it’ll show up here.</value></data>
   <data name="empty_errors_notif_denied" xml:space="preserve"><value>I can’t read your notifications</value></data>
@@ -114,6 +127,7 @@
   <data name="empty_errors_enable" xml:space="preserve"><value>TURN ON</value></data>
   <data name="empty_errors_notif_path" xml:space="preserve"><value>OPENS SETTINGS › PRIVACY › NOTIFICATIONS · CAN BE HIDDEN</value></data>
   <data name="empty_errors_action_failed" xml:space="preserve"><value>Couldn’t {action} “{file}”: another app has it open.</value></data>
+  <data name="empty_errors_action_failed_generic" xml:space="preserve"><value>Couldn’t {action} “{file}”.</value></data>
   <data name="empty_errors_retry" xml:space="preserve"><value>RETRY</value></data>
   <data name="empty_errors_player_unsupported" xml:space="preserve"><value>PLAYER NOT SUPPORTED</value></data>
   <data name="empty_errors_player_unsupported_2" xml:space="preserve"><value>THIS APP DOESN’T SHARE WHAT’S PLAYING</value></data>

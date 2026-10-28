@@ -74,6 +74,8 @@
     "dnd_blocked":    { "es": "☾ NO MOLESTAR ACTIVO", "en": "☾ DO NOT DISTURB IS ON" },
     "app_blocked":    { "es": "✕ AVISOS DE ESTA APP DESACTIVADOS", "en": "✕ ALERTS OFF FOR THIS APP" },
     "ignore":         { "es": "IGNORAR", "en": "IGNORE" },
+    "view":           { "es": "VER", "en": "VIEW" },
+    "ok":             { "es": "OK", "en": "OK" },
     "new_from":       { "es": "Nuevo mensaje de {name}", "en": "New message from {name}" },
     "new_hidden":     { "es": "Tienes un mensaje nuevo", "en": "You have a new message" }
   },
@@ -109,7 +111,15 @@
     "act_merge_pdf": { "es": "UNIR PDF", "en": "MERGE PDF" },
     "act_zip":       { "es": "ZIP", "en": "ZIP" },
     "act_copy_path": { "es": "COPIAR RUTA", "en": "COPY PATH" },
-    "act_remove":    { "es": "QUITAR", "en": "REMOVE" }
+    "act_remove":    { "es": "QUITAR", "en": "REMOVE" },
+    "done_path":     { "es": "✓ RUTA COPIADA", "en": "✓ PATH COPIED" },
+    "done_created":  { "es": "✓ {file} CREADO", "en": "✓ {file} CREATED" },
+    "done_folder":   { "es": "✓ ABRIENDO CARPETA…", "en": "✓ OPENING FOLDER…" },
+    "verb_compress": { "es": "comprimir", "en": "compress" },
+    "verb_png":      { "es": "convertir", "en": "convert" },
+    "verb_merge":    { "es": "unir", "en": "merge" },
+    "verb_zip":      { "es": "comprimir", "en": "zip" },
+    "need_two_pdf":  { "es": "AÑADE OTRO PDF PARA UNIRLOS", "en": "ADD ANOTHER PDF TO MERGE" }
   },
   "clip": {
     "empty":      { "es": "COPIA ALGO CON {keys} Y APARECERÁ AQUÍ", "en": "COPY SOMETHING WITH {keys} AND IT SHOWS UP HERE" },
@@ -134,7 +144,10 @@
     "back":       { "es": "VOLVER", "en": "BACK" },
     "delete":     { "es": "BORRAR", "en": "DELETE" },
     "empty":      { "es": "Sin notas todavía", "en": "No notes yet" },
-    "empty_2":    { "es": "También puedes arrastrar texto desde cualquier app hasta el notch.", "en": "You can also drag text from any app up to the notch." }
+    "empty_2":    { "es": "También puedes arrastrar texto desde cualquier app hasta el notch.", "en": "You can also drag text from any app up to the notch." },
+    "saved_list": { "es": "GUARDADAS", "en": "SAVED" },
+    "note_n":     { "es": "NOTA {n}", "en": "NOTE {n}" },
+    "copied":     { "es": "COPIADA", "en": "COPIED" }
   },
   "empty_errors": {
     "no_music":        { "es": "Nada sonando", "en": "Nothing playing" },
@@ -144,6 +157,7 @@
     "enable":          { "es": "ACTIVAR", "en": "TURN ON" },
     "notif_path":      { "es": "ABRE CONFIGURACIÓN › PRIVACIDAD › NOTIFICACIONES · SE PUEDE OCULTAR", "en": "OPENS SETTINGS › PRIVACY › NOTIFICATIONS · CAN BE HIDDEN" },
     "action_failed":   { "es": "No pude {action} «{file}»: otra app lo tiene abierto.", "en": "Couldn’t {action} “{file}”: another app has it open." },
+    "action_failed_generic": { "es": "No pude {action} «{file}».", "en": "Couldn’t {action} “{file}”." },
     "retry":           { "es": "REINTENTAR", "en": "RETRY" },
     "player_unsupported":   { "es": "REPRODUCTOR NO COMPATIBLE", "en": "PLAYER NOT SUPPORTED" },
     "player_unsupported_2": { "es": "ESTA APP NO COMPARTE LO QUE SUENA", "en": "THIS APP DOESN’T SHARE WHAT’S PLAYING" },

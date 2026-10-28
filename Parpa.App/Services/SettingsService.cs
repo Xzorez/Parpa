@@ -104,7 +104,10 @@ public sealed class ParpaSettings
     [JsonPropertyName("content")] public string Content { get; set; } = "full";
     [JsonPropertyName("notifDur")] public double NotifDur { get; set; } = 4.5;
     [JsonPropertyName("quickReply")] public bool QuickReply { get; set; } = true;
+    /// <summary>Sin uso: Windows no expone la letra de lo que suena (Inicio queda siempre a 176 px). Se conserva por compatibilidad del esquema.</summary>
     [JsonPropertyName("lyrics")] public bool Lyrics { get; set; } = true;
+    /// <summary>Tarjeta "No puedo leer tus avisos" ocultada por el usuario en Inicio.</summary>
+    [JsonPropertyName("notifCardHidden")] public bool NotifCardHidden { get; set; }
     [JsonPropertyName("micAlways")] public bool MicAlways { get; set; } = true;
     [JsonPropertyName("homeCards")] public Dictionary<string, bool> HomeCards { get; set; } = new();
     [JsonPropertyName("pomo")] public int Pomo { get; set; } = 25;
