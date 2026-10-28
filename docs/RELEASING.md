@@ -13,6 +13,8 @@
    git push origin main --tags
    ```
 
+   Repositorio: <https://github.com/Xzorez/Parpa>.
+
 El flujo **Publicar versión** (`.github/workflows/release.yml`) crea, para x64 y arm64:
 
 - `Parpa-Setup-<versión>-<arch>.exe` (Inno Setup, por usuario, sin administrador),

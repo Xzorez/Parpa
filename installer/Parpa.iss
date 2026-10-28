@@ -20,7 +20,7 @@
 
 ; Repositorio de GitHub (propietario/nombre) para los enlaces de "Programas instalados".
 #ifndef Repo
-  #define Repo "OWNER/Parpa"
+  #define Repo "Xzorez/Parpa"
 #endif
 
 #define AppName "Parpa"
