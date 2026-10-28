@@ -1,0 +1,127 @@
+name: Publicar versión
+
+# Al subir una etiqueta vX.Y.Z: instaladores x64 y arm64, firma con SignPath (si está configurada),
+# sumas SHA-256, manifiestos de winget y un borrador en GitHub Releases para revisarlo y publicarlo.
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  installer:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [x64, arm64]
+    env:
+      TAG: ${{ github.ref_name }}
+      SIGN: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Versión
+        shell: pwsh
+        run: '"VERSION=$($env:TAG.TrimStart(''v''))" >> $env:GITHUB_ENV'
+
+      - name: Publicar
+        shell: pwsh
+        run: ./tools/build-installer.ps1 -Version $env:VERSION -Arch ${{ matrix.arch }} -Step publish
+
+      # ---- Firma de Parpa.exe antes de empaquetarlo ----
+      - name: Subir app sin firmar
+        if: env.SIGN == 'true'
+        id: unsigned-app
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-app-${{ matrix.arch }}
+          path: artifacts/publish-${{ matrix.arch }}
+
+      - name: Firmar app (SignPath)
+        if: env.SIGN == 'true'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: app
+          github-artifact-id: ${{ steps.unsigned-app.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: artifacts/publish-${{ matrix.arch }}
+
+      # ---- Instalador ----
+      - name: Inno Setup
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) { choco install innosetup -y --no-progress }
+
+      - name: Crear instalador
+        shell: pwsh
+        run: ./tools/build-installer.ps1 -Version $env:VERSION -Arch ${{ matrix.arch }} -Step installer
+
+      - name: Subir instalador sin firmar
+        if: env.SIGN == 'true'
+        id: unsigned-setup
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-setup-${{ matrix.arch }}
+          path: artifacts/Parpa-Setup-*.exe
+
+      - name: Firmar instalador (SignPath)
+        if: env.SIGN == 'true'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: installer
+          github-artifact-id: ${{ steps.unsigned-setup.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: artifacts
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: setup-${{ matrix.arch }}
+          path: artifacts/Parpa-Setup-*.exe
+          if-no-files-found: error
+
+  release:
+    needs: installer
+    runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: setup-*
+          path: artifacts
+          merge-multiple: true
+
+      - name: Sumas y manifiestos de winget
+        shell: pwsh
+        run: |
+          $version = $env:TAG.TrimStart('v')
+          $setups = Get-ChildItem artifacts -Filter 'Parpa-Setup-*.exe'
+          $setups | ForEach-Object { "$((Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower())  $($_.Name)" } |
+            Set-Content artifacts/SHA256SUMS.txt -Encoding ascii
+          ./tools/winget-manifests.ps1 -Version $version -Repo $env:GITHUB_REPOSITORY -Installers $setups.FullName -OutDir artifacts/winget
+          Compress-Archive artifacts/winget/* artifacts/winget-manifests-$version.zip
+
+      - name: Borrador en GitHub Releases
+        shell: pwsh
+        run: |
+          $version = $env:TAG.TrimStart('v')
+          gh release create $env:TAG --draft --title "Parpa $version" --generate-notes `
+            (Get-ChildItem artifacts -Filter 'Parpa-Setup-*.exe').FullName `
+            artifacts/SHA256SUMS.txt "artifacts/winget-manifests-$version.zip"
