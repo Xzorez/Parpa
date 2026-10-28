@@ -54,6 +54,8 @@ jobs:
           artifact-configuration-slug: app
           github-artifact-id: ${{ steps.unsigned-app.outputs.artifact-id }}
           wait-for-completion: true
+          # Cada firma se aprueba a mano en SignPath: una hora de margen.
+          wait-for-completion-timeout-in-seconds: 3600
           output-artifact-directory: artifacts/publish-${{ matrix.arch }}
 
       # ---- Instalador ----
@@ -85,6 +87,8 @@ jobs:
           artifact-configuration-slug: installer
           github-artifact-id: ${{ steps.unsigned-setup.outputs.artifact-id }}
           wait-for-completion: true
+          # Cada firma se aprueba a mano en SignPath: una hora de margen.
+          wait-for-completion-timeout-in-seconds: 3600
           output-artifact-directory: artifacts
 
       - uses: actions/upload-artifact@v4
@@ -122,6 +126,7 @@ jobs:
         shell: pwsh
         run: |
           $version = $env:TAG.TrimStart('v')
-          gh release create $env:TAG --draft --title "Parpa $version" --generate-notes `
+          $notes = 'Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org). [Code signing policy](https://xzorez.github.io/Parpa/#firma)'
+          gh release create $env:TAG --draft --title "Parpa $version" --notes $notes --generate-notes `
             (Get-ChildItem artifacts -Filter 'Parpa-Setup-*.exe').FullName `
             artifacts/SHA256SUMS.txt "artifacts/winget-manifests-$version.zip"

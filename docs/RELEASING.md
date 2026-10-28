@@ -63,6 +63,10 @@ Sin firma, Windows SmartScreen avisa de "editor desconocido" al instalar. SignPa
 
 Con `SIGNPATH_ORGANIZATION_ID` definida, el flujo firma automáticamente; sin ella, publica sin firmar.
 
+Cada versión pide cuatro firmas (app e instalador, x64 y arm64) y cada una se **aprueba a mano** en SignPath: el flujo espera hasta una hora por cada una.
+
+La política de firma que exige SignPath Foundation está en la web (`site/index.html`, sección `#firma`), en el README y al principio de las notas de cada release.
+
 ## 3. winget
 
 La primera vez (y en cada versión, hasta que se automatice):

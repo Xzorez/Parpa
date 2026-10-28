@@ -27,6 +27,14 @@ Gratis · código abierto (MIT) · Windows 10 (2004+) y 11 · 64 bits · españo
 
 Todo se queda en tu PC: sin cuentas, sin servidores, sin telemetría. Detalles en [PRIVACY.md](PRIVACY.md).
 
+## Política de firma de código · Code signing policy
+
+**Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).**
+
+- Autores y revisores · Committers and reviewers: [Xzorez](https://github.com/Xzorez)
+- Aprobación de firmas · Approvers: [Xzorez](https://github.com/Xzorez)
+- Privacidad · Privacy: this program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. See [PRIVACY.md](PRIVACY.md).
+
 ## Compilar
 
 Requisitos: .NET 8 SDK y Windows 10 SDK (o Visual Studio 2022 con la carga de trabajo de WinUI).

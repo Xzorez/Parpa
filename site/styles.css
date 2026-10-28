@@ -137,6 +137,15 @@ h1 { margin: 0; font: 600 clamp(40px, 6.4vw, 76px)/1 Geist, sans-serif; letter-s
 .copy.done .copy-state { color: oklch(0.78 0.14 150); }
 .requirements { font: 12px var(--mono); letter-spacing: .06em; color: var(--ink-3); }
 
+/* Política de firma de código (requisito de SignPath Foundation) */
+.signing { margin-top: 40px; display: flex; flex-direction: column; gap: 12px; max-width: 760px; }
+.signing p { margin: 0; font-size: 15px; line-height: 1.55; }
+.signing a { text-decoration: underline; text-underline-offset: 2px; }
+.signing dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 8px 20px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.signing dt { font: 500 12px var(--mono); letter-spacing: .06em; color: var(--ink-3); padding-top: 2px; }
+.signing dd { margin: 0; }
+@media (max-width: 560px) { .signing dl { grid-template-columns: 1fr; gap: 2px; } .signing dd { margin-bottom: 8px; } }
+
 /* Pie */
 footer { border-top: 1px solid var(--line); }
 footer .wrap { padding-top: 28px; padding-bottom: 28px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; font: 13px Geist, sans-serif; color: var(--ink-2); }
