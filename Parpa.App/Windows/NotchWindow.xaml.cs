@@ -28,7 +28,10 @@ public sealed partial class NotchWindow : Window
     private readonly ClockService _clock = new();
     private readonly UISettings _uiSettings = new();
     private readonly Win32.SubclassProc _wndProc;
+    private readonly SystemMonitor _system;
     private readonly IdleView _idle = new();
+    private readonly CompactView _compact = new();
+    private readonly OsdView _osd = new();
     private readonly OpenView _open = new();
 
     private readonly double _ear = Tokens.Current.Radius("ear");
@@ -37,6 +40,7 @@ public sealed partial class NotchWindow : Window
     private double _scale = 1;          // píxeles físicos por unidad de diseño (DPI × size)
     private Win32.RECT _region;         // región actual, en coordenadas de la ventana
     private NotchGeometry _geometry;
+    private FrameworkElement? _shownView;
 
     public NotchWindow(ParpaSettings settings)
     {
@@ -59,12 +63,14 @@ public sealed partial class NotchWindow : Window
 
         Shape.Fill = Tokens.Current.Dark["bg"];
         Shape.AddView(_idle, anchorLeft: false);
+        Shape.AddView(_compact, anchorLeft: false);
+        Shape.AddView(_osd, anchorLeft: false);
         Shape.AddView(_open, anchorLeft: true);
         Shape.TransitionCompleted += () => UpdateRegion(_geometry, null);
-        _idle.Apply(_s);
+        _idle.Apply(_s, ReducedMotion);
         _open.SetPage(_vm.Page);
 
-        _clock.MinuteChanged += () => { _idle.Apply(_s); _open.Apply(_s); };
+        _clock.MinuteChanged += () => { _idle.Apply(_s, ReducedMotion); _open.Apply(_s); };
 
         _hotkey = new HotkeyService(_hwnd);
         _hotkey.Pressed += _vm.OnHotkey;
@@ -80,8 +86,13 @@ public sealed partial class NotchWindow : Window
         _geometry = _vm.Geometry;
         Reposition();
         Shape.Show(_idle, _geometry, motion: null);
+        _shownView = _idle;
+        _idle.SetAnimating(true);
 
-        Closed += (_, _) => { _hotkey.Dispose(); _outside.Dispose(); };
+        _system = new SystemMonitor(_vm, _s);
+        _system.Start();
+
+        Closed += (_, _) => { _hotkey.Dispose(); _outside.Dispose(); _system.Dispose(); };
     }
 
     /// <summary>Muestra la ventana sin quitar el foco a la app activa.</summary>
@@ -186,28 +197,43 @@ public sealed partial class NotchWindow : Window
         var from = _geometry;
         _geometry = _vm.Geometry;
 
-        FrameworkElement view = _idle;
-        if (_vm.IsOpen)
+        FrameworkElement view;
+        switch (_vm.State)
         {
-            _open.SetPage(_vm.Page);
-            _open.Height = _geometry.Height;
-            _open.Apply(_s);
-            view = _open;
-            _outside.Start();
-        }
-        else
-        {
-            _idle.Apply(_s);
-            _outside.Stop();
+            case NotchState.Open:
+                _open.SetPage(_vm.Page);
+                _open.Height = _geometry.Height;
+                _open.Apply(_s);
+                view = _open;
+                break;
+            case NotchState.Osd:
+                _osd.Show(_vm.Indicator!, Tokens.Current.Accent(_s.Accent));
+                view = _osd;
+                break;
+            case NotchState.Activity:
+                _compact.Show(_vm.Activity!);
+                view = _compact;
+                break;
+            default:
+                _idle.Apply(_s, ReducedMotion);
+                view = _idle;
+                break;
         }
 
+        // Solo se anima lo que se ve: en reposo no corre ningún temporizador innecesario.
+        _idle.SetAnimating(view == _idle);
+        _compact.SetVisible(view == _compact);
+        if (_vm.IsOpen) _outside.Start();
+        else _outside.Stop();
+
+        if (from == _geometry && view == _shownView) return; // solo cambió el contenido (p. ej. otro volumen)
+        _shownView = view;
         UpdateRegion(from, _geometry);
-        Shape.Show(view, _geometry, CurrentMotion());
+        Shape.Show(view, _geometry, ReducedMotion ? Tokens.Current.ReducedMotion : Tokens.Current.ShapeMotion);
     }
 
-    /// <summary>450 ms con rebote; 150 ms "ease" si el ajuste o Windows piden animaciones reducidas.</summary>
-    private Tokens.Motion CurrentMotion() =>
-        _s.Anim == "reduced" || !_uiSettings.AnimationsEnabled ? Tokens.Current.ReducedMotion : Tokens.Current.ShapeMotion;
+    /// <summary>Animaciones reducidas por el ajuste <c>anim</c> o por Windows ("Efectos de animación").</summary>
+    private bool ReducedMotion => _s.Anim == "reduced" || !_uiSettings.AnimationsEnabled;
 
     private IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam, IntPtr id, IntPtr data)
     {

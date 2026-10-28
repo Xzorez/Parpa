@@ -34,4 +34,16 @@ public static class Loc
     }
 
     public static string Get(string key) => Map.TryGetValue(key, _context)?.ValueAsString ?? key;
+
+    /// <summary>Sustituye marcadores <c>{nombre}</c>: <c>Loc.Format("osd_display_n", ("n", 1))</c>.</summary>
+    public static string Format(string key, params (string Name, object Value)[] args)
+    {
+        var text = Get(key);
+        foreach (var (name, value) in args)
+            text = text.Replace("{" + name + "}", Convert.ToString(value, Culture));
+        return text;
+    }
+
+    /// <summary>Etiquetas mono en MAYÚSCULAS con la cultura activa.</summary>
+    public static string Upper(string text) => text.ToUpper(Culture);
 }
