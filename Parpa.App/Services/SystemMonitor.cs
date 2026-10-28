@@ -57,7 +57,7 @@ public sealed class SystemMonitor : IDisposable
             Glyph: "musica",
             Label: Loc.Upper(now.Title.Length > 0 ? now.Title : Loc.Get("home_music")),
             Sub: Loc.Upper(now.Artist),
-            IsPlaying: now.IsPlaying));
+            IsPlaying: true));
     }
 
     private void OnVolumeChanged(int percent, bool muted)
