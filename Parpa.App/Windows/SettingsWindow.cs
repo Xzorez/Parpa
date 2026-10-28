@@ -37,6 +37,7 @@ public sealed class SettingsWindow : Window
     private readonly DispatcherTimerLite _toastTimer;
     private string _section = "general";
     private bool _recording;
+    private bool _animateSection;
 
     /// <summary>Fila de ajuste: etiqueta, descripción y control. <see cref="Opacity"/> &lt; 1 si depende de otro ajuste apagado.</summary>
     private sealed record Row(string Label, string Desc, Func<FrameworkElement> Control, double Opacity = 1);
@@ -67,6 +68,7 @@ public sealed class SettingsWindow : Window
 
         _toastTimer = new DispatcherTimerLite(TimeSpan.FromSeconds(2.5), () => _toast.Text = string.Empty);
         Content = BuildShell(out var dragRegion);
+        Motion.WindowIn((FrameworkElement)Content);
         SetTitleBar(dragRegion);
 
         SettingsService.Current.Changed += Render;
@@ -220,6 +222,13 @@ public sealed class SettingsWindow : Window
         foreach (var item in RowsFor(_section))
             list.Children.Add(item is Head head ? HeadView(head.Label) : RowView((Row)item, null));
         _content.Children.Add(list);
+        if (_animateSection)
+        {
+            // Sección nueva: el título y las filas entran escalonados (los cambios de ajuste no animan la lista).
+            _animateSection = false;
+            Motion.FadeUp(_title, 0, TimeSpan.Zero, Motion.Quick, fromX: -8);
+            Motion.StaggerIn(_content.Children.Take(_content.Children.Count - 1).Concat(list.Children), 8, 16, 16);
+        }
     }
 
     /// <summary>Secciones del lateral: glifo + nombre; la elegida con fondo #1a1a1d.</summary>
@@ -235,6 +244,7 @@ public sealed class SettingsWindow : Window
             label.VerticalAlignment = VerticalAlignment.Center;
             row.Children.Add(label);
             var item = new Border { Padding = new Thickness(10, 9, 10, 9), CornerRadius = new CornerRadius(8), Background = selected ? Theme.Brush("navSelected") : Ui.Clear, Child = row };
+            Motion.SmoothBackground(item);
             item.PointerEntered += (_, _) => { if (!selected) item.Background = Theme.Brush("card"); };
             item.PointerExited += (_, _) => { if (!selected) item.Background = Ui.Clear; };
             item.Tapped += (_, e) =>
@@ -242,6 +252,7 @@ public sealed class SettingsWindow : Window
                 e.Handled = true;
                 SoundService.Play("page");
                 _section = id;
+                _animateSection = true;
                 _search.Text = string.Empty;
                 Render();
             };
@@ -407,7 +418,9 @@ public sealed class SettingsWindow : Window
         {
             e.Handled = true;
             SoundService.Play("click");
-            set(!on);
+            // La perilla se desliza primero; aplicar el ajuste redibuja la sección.
+            SwitchVisual.Flip(view, !on);
+            Motion.AfterTransition(() => set(!on));
         };
         return view;
     }

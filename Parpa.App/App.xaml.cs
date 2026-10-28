@@ -17,6 +17,8 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        // Cualquier fallo no previsto queda en %APPDATA%\Parpa\parpa.log con su pila.
+        UnhandledException += (_, e) => Log.Error($"Sin capturar: {e.Exception}", e.Exception);
     }
 
     public static new App Current => (App)Application.Current;
@@ -43,6 +45,9 @@ public partial class App : Application
         var arguments = Environment.GetCommandLineArgs();
         if (!s.WelcomeDone || arguments.Contains("--welcome")) ShowWelcome();
         if (arguments.Contains("--settings")) OpenSettings();
+        // "--open <home|clip|shelf|todo|notes|quick|menu>": abre el notch en esa ventana.
+        var open = Array.IndexOf(arguments, "--open");
+        if (open >= 0 && open + 1 < arguments.Length) _notch.OpenPage(arguments[open + 1]);
     }
 
     /// <summary>Idioma, tema e inicio con Windows: se aplican al instante al cambiar un ajuste.</summary>

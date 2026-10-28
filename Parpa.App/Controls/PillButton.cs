@@ -42,6 +42,9 @@ public sealed partial class PillButton : Grid
         VerticalAlignment = VerticalAlignment.Center;
         Children.Add(_label);
         Pill.SetIsPill(this, true);
+        // Hover y pulsación suaves: fondo/opacidad en 0,2 s y un leve hundimiento al pulsar.
+        Motion.SmoothBackground(this);
+        Motion.PressFeedback(this);
         PointerEntered += (_, _) => { _hover = true; ApplyStyle(); };
         PointerExited += (_, _) => { _hover = false; ApplyStyle(); };
         Tapped += OnTapped;
@@ -71,7 +74,7 @@ public sealed partial class PillButton : Grid
             Background = Res("PrimaryBrush");
             BorderThickness = new Thickness(0);
             _label.Foreground = Res("BgBrush");
-            Opacity = _hover ? 0.85 : 1;
+            Motion.SetOpacity(this, _hover ? 0.85f : 1f);
         }
         else
         {
@@ -79,7 +82,7 @@ public sealed partial class PillButton : Grid
             BorderBrush = Res("BorderBrush");
             BorderThickness = new Thickness(1);
             _label.Foreground = Foreground ?? Res("PrimaryBrush");
-            Opacity = 1;
+            Motion.SetOpacity(this, 1f);
         }
     }
 }

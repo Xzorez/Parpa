@@ -30,6 +30,9 @@ public sealed partial class ShelfView : UserControl, INotchPageView
 
     private static T Res<T>(string key) => (T)Application.Current.Resources[key];
 
+    public IEnumerable<UIElement> EntranceItems =>
+        EmptyPanel.Visibility == Visibility.Visible ? [EmptyPanel] : Tiles.Children.Append(Detail.Visibility == Visibility.Visible ? Detail : PickHint);
+
     public void OnShown()
     {
         _shown = true;
@@ -126,6 +129,7 @@ public sealed partial class ShelfView : UserControl, INotchPageView
             Child = content,
             CanDrag = true,
         };
+        Motion.PressFeedback(tile);
         tile.Tapped += (_, e) =>
         {
             e.Handled = true;
@@ -200,6 +204,8 @@ public sealed partial class ShelfView : UserControl, INotchPageView
                 TextTrimming = TextTrimming.CharacterEllipsis,
             },
         };
+        Motion.SmoothBackground(button);
+        Motion.PressFeedback(button);
         button.PointerEntered += (_, _) => button.Background = Res<Brush>("BorderAltBrush");
         button.PointerExited += (_, _) => button.Background = Res<Brush>("GlyphOffBrush");
         button.Tapped += async (_, e) =>

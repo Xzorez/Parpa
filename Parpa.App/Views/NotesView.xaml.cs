@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Parpa.Controls;
 using Parpa.Services;
 using Windows.System;
 using Windows.UI.Core;
@@ -26,6 +27,9 @@ public sealed partial class NotesView : UserControl, INotchPageView
     }
 
     private static T Res<T>(string key) => (T)Application.Current.Resources[key];
+
+    public IEnumerable<UIElement> EntranceItems =>
+        NotePanel.Visibility == Visibility.Visible ? [NotePanel] : EmptyPanel.Visibility == Visibility.Visible ? [EmptyPanel] : Rows.Children;
 
     public void OnShown()
     {
@@ -57,11 +61,11 @@ public sealed partial class NotesView : UserControl, INotchPageView
         EmptyPanel.Visibility = notes.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         ListPanel.Visibility = notes.Count > 0 && _open is null ? Visibility.Visible : Visibility.Collapsed;
         NotePanel.Visibility = _open is not null ? Visibility.Visible : Visibility.Collapsed;
-        SavedCount.Text = notes.Count.ToString();
+        SavedCount.Text = notes.Count.ToString("00");
 
         if (_open is not null)
         {
-            var number = notes.Count - notes.ToList().IndexOf(_open);
+            var number = notes.ToList().IndexOf(_open) + 1;
             NoteTitle.Text = Loc.Format("notes_note_n", ("n", number.ToString("00")));
             NoteTime.Text = ClockService.Format(_open.Created, _app.Settings.H24);
             NoteText.Text = _open.Text;
@@ -87,14 +91,14 @@ public sealed partial class NotesView : UserControl, INotchPageView
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-            var index = new TextBlock { Style = Res<Style>("RowIndex"), FontSize = 12, Text = (notes.Count - i).ToString("00") };
+            var index = new TextBlock { Style = Res<Style>("RowIndex"), FontSize = 12, Text = (i + 1).ToString("00") };
             var text = new TextBlock { Style = Res<Style>("RowText"), Text = note.Text.ReplaceLineEndings(" ") };
             var time = new TextBlock
             {
                 Style = Res<Style>("RowMeta"),
                 FontSize = 9,
                 Foreground = Res<Brush>("QuaternaryBrush"),
-                Text = ClockService.Format(note.Created, _app.Settings.H24),
+                Text = ClockService.FormatRelative(note.Created, _app.Settings.H24),
             };
             var delete = new TextBlock
             {
@@ -118,6 +122,7 @@ public sealed partial class NotesView : UserControl, INotchPageView
             row.Children.Add(time);
             row.Children.Add(delete);
 
+            Motion.SmoothBackground(row);
             row.PointerEntered += (_, _) => row.Background = Res<Brush>("CardBrush");
             row.PointerExited += (_, _) => row.Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
             row.Tapped += (_, e) =>

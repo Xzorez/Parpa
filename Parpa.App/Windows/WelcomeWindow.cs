@@ -32,6 +32,7 @@ public sealed class WelcomeWindow : Window
     private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _faceTimer;
     private DotMatrix? _face;
     private int _step;
+    private int _slide; // 1 avanzar, -1 volver, 0 sin animación
     private int _tick;
     private bool _recording;
 
@@ -55,6 +56,7 @@ public sealed class WelcomeWindow : Window
         _faceTimer.Tick += (_, _) => { _tick++; DrawFace(); };
 
         Content = BuildShell();
+        Motion.WindowIn((FrameworkElement)Content);
         ((FrameworkElement)Content).KeyDown += OnKeyDown;
         Loc.LanguageChanged += Render;
         Theme.Changed += Render;
@@ -102,21 +104,31 @@ public sealed class WelcomeWindow : Window
         Title = Loc.Get("app_name");
         ((Grid)Content).Background = Theme.Brush("windowBg");
 
-        // Indicador de pasos: el actual 28 px, el resto 8 px; hechos en claro.
-        _dots.Children.Clear();
+        // Indicador de pasos: el actual 28 px, el resto 8 px; hechos en claro. El ancho y el color cambian con transición.
+        if (_dots.Children.Count == 0)
+            for (var i = 0; i < Steps; i++)
+                _dots.Children.Add(Motion.SmoothBackground(new Border { Height = 4, Width = 8, CornerRadius = new CornerRadius(2) }));
         for (var i = 0; i < Steps; i++)
-            _dots.Children.Add(new Border { Height = 4, Width = i == _step ? 28 : 8, CornerRadius = new CornerRadius(2), Background = Theme.Brush(i <= _step ? "primary" : "border") });
+        {
+            var dot = (Border)_dots.Children[i];
+            dot.Background = Theme.Brush(i <= _step ? "primary" : "border");
+            Motion.AnimateSize(dot, i == _step ? 28 : 8, null, TimeSpan.FromMilliseconds(300));
+        }
 
         _stepHost.Children.Clear();
         _face = null;
-        _stepHost.Children.Add(_step switch
+        FrameworkElement step = _step switch
         {
             0 => Hello(),
             1 => Position(),
             2 => Shortcut(),
             3 => Apps(),
             _ => Done(),
-        });
+        };
+        _stepHost.Children.Add(step);
+        // El paso nuevo llega deslizándose: desde la derecha al avanzar, desde la izquierda al volver.
+        if (_slide != 0) Motion.FadeUp(step, 0, TimeSpan.Zero, TimeSpan.FromMilliseconds(300), fromX: 28 * _slide);
+        _slide = 0;
 
         // Paso final: "VER DE NUEVO" a la izquierda y el botón cierra.
         _back.Text = _step == Steps - 1 ? Loc.Get("welcome_again") : "‹ " + Loc.Get("welcome_back");
@@ -141,6 +153,7 @@ public sealed class WelcomeWindow : Window
         }
         _recording = false;
         _step++;
+        _slide = 1;
         if (_step == Steps - 1) SettingsService.Current.Update(s => s.WelcomeDone = true);
         SoundService.Play(_step == Steps - 1 ? "confirm" : "page");
         Render();
@@ -151,6 +164,7 @@ public sealed class WelcomeWindow : Window
         if (_step == 0) return;
         _recording = false;
         _step = _step == Steps - 1 ? 0 : _step - 1;
+        _slide = -1;
         SoundService.Play("page");
         Render();
     }

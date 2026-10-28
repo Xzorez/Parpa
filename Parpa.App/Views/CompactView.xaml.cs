@@ -1,6 +1,7 @@
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Parpa.Controls;
 using Parpa.Services;
 using Parpa.ViewModels;
 
@@ -30,6 +31,8 @@ public sealed partial class CompactView : UserControl
         Moon.Visibility = doNotDisturb ? Visibility.Visible : Visibility.Collapsed;
         Width = Tokens.Current.NotchSize(activity.SizeToken).W;
         ActivityGlyph.Glyph = activity.Glyph;
+        // Canción nueva (u otra actividad): el título entra deslizándose un poco.
+        if (LabelMain.Text.Length > 0 && LabelMain.Text != activity.Label) Motion.FadeUp(Label, 0, TimeSpan.Zero, TimeSpan.FromMilliseconds(260), fromX: 8);
         LabelMain.Text = activity.Label;
         LabelSub.Text = activity.Sub.Length > 0 ? " " + activity.Sub : string.Empty;
         ToolTipService.SetToolTip(this, string.IsNullOrEmpty(activity.Sub) ? activity.Label : $"{activity.Label} · {activity.Sub}");

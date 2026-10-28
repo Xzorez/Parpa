@@ -118,7 +118,21 @@ public sealed partial class NotchShape : Grid
             fadeIn.Duration = m.Duration - lead;
             fadeIn.DelayTime = lead;
             fadeIn.DelayBehavior = AnimationDelayBehavior.SetInitialValueBeforeDelay;
-            ElementCompositionPreview.GetElementVisual(view).StartAnimation("Opacity", fadeIn);
+            var viewVisual = ElementCompositionPreview.GetElementVisual(view);
+            viewVisual.StartAnimation("Opacity", fadeIn);
+
+            // Además del fundido, el contenido nuevo "asienta" desde 0,97 con origen centro-superior.
+            if (!Motion.Reduced)
+            {
+                viewVisual.CenterPoint = new Vector3((float)(double.IsNaN(view.Width) ? view.ActualWidth : view.Width) / 2, 0, 0);
+                var settle = _compositor.CreateVector3KeyFrameAnimation();
+                settle.InsertKeyFrame(0f, new Vector3(0.97f, 0.97f, 1));
+                settle.InsertKeyFrame(1f, Vector3.One, Motion.EaseOut(_compositor));
+                settle.Duration = fadeIn.Duration;
+                settle.DelayTime = lead;
+                settle.DelayBehavior = AnimationDelayBehavior.SetInitialValueBeforeDelay;
+                viewVisual.StartAnimation("Scale", settle);
+            }
 
             if (previous is not null)
             {

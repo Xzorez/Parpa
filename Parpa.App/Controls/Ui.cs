@@ -61,23 +61,32 @@ public static class Ui
             CornerRadius = new CornerRadius(8),
             VerticalAlignment = VerticalAlignment.Center,
         };
+        var views = new List<(Border Option, TextBlock Text)>();
         foreach (var (value, label) in options)
         {
             var selected = EqualityComparer<T>.Default.Equals(value, current);
             var text = Mono(label, 10, selected ? "bg" : "secondary", 60, medium: true);
-            var option = new Border
+            var option = Motion.SmoothBackground(new Border
             {
                 Padding = new Thickness(padX, padY, padX, padY),
                 CornerRadius = new CornerRadius(5),
                 Background = selected ? Theme.Brush("primary") : Clear,
                 Child = text,
-            };
+            });
+            views.Add((option, text));
             option.Tapped += (_, e) =>
             {
                 e.Handled = true;
                 if (selected) return;
                 SoundService.Play("click");
-                pick(value);
+                // La selección cambia de segmento con transición y después se aplica.
+                foreach (var (o, t) in views)
+                {
+                    var isNew = o == option;
+                    o.Background = isNew ? Theme.Brush("primary") : Clear;
+                    t.Foreground = Theme.Brush(isNew ? "bg" : "secondary");
+                }
+                Motion.AfterTransition(() => pick(value));
             };
             panel.Children.Add(option);
         }

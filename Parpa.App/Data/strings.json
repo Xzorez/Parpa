@@ -52,7 +52,14 @@
     "dnd":       { "es": "No molestar", "en": "Do not disturb" },
     "focus":     { "es": "Modo foco", "en": "Focus mode" },
     "mic":       { "es": "Micro", "en": "Mic" },
-    "theme":     { "es": "Tema", "en": "Theme" }
+    "theme":     { "es": "Tema", "en": "Theme" },
+    "sounds":    { "es": "Sonidos", "en": "Sounds" },
+    "mascot":    { "es": "Mascota", "en": "Mascot" },
+    "minimal":   { "es": "Modo minimal", "en": "Minimal mode" },
+    "hide_full": { "es": "Ocultar en juegos", "en": "Hide in games" },
+    "no_focus":  { "es": "Sin quitar foco", "en": "Keep focus" },
+    "on":        { "es": "ACTIVADO", "en": "ON" },
+    "off":       { "es": "NO", "en": "OFF" }
   },
   "peek": {
     "reply":          { "es": "RESPONDER", "en": "REPLY" },
@@ -348,6 +355,7 @@
     "sec":   { "es": "{n} S", "en": "{n} S" },
     "ms":    { "es": "{n} MS", "en": "{n} MS" },
     "h24":   { "es": "24 H", "en": "24 H" },
-    "h12":   { "es": "12 H", "en": "12 H" }
+    "h12":   { "es": "12 H", "en": "12 H" },
+    "yesterday": { "es": "AYER", "en": "YESTERDAY" }
   }
 }

@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Parpa.Controls;
 using Parpa.Services;
 using Parpa.ViewModels;
 using Windows.UI;
@@ -21,6 +22,8 @@ public sealed partial class OpenView : UserControl
     {
         _app = app;
         InitializeComponent();
+        Motion.SmoothBackground(MenuButton);
+        Motion.PressFeedback(MenuButton);
         var tasks = new TasksView(app);
         tasks.HeaderChanged += UpdateHeaderRight;
         Shelf = new ShelfView(app);
@@ -48,14 +51,22 @@ public sealed partial class OpenView : UserControl
     public void Show(NotchPage page, bool launcher)
     {
         FrameworkElement next = launcher ? _launcher : _pages.GetValueOrDefault(page) ?? _pages[NotchPage.Home];
-        if (next != _current)
+        var switched = next != _current;
+        var arriving = switched || _hidden;
+        if (switched)
         {
             if (_current is INotchPageView old) old.OnHidden();
             if (_current is not null) _current.Visibility = Visibility.Collapsed;
+            // Cambio de ventana con el notch ya abierto: la nueva entra con un fundido corto.
+            if (_current is not null && !_hidden) Motion.FadeUp(next, 6, TimeSpan.Zero, Motion.Quick);
             _current = next;
             next.Visibility = Visibility.Visible;
         }
+        _hidden = false;
         (next as INotchPageView)?.OnShown();
+        // Al llegar a una ventana, sus filas/tarjetas entran escalonadas (solo entonces, no en cada refresco).
+        if (arriving && next is INotchPageView arrived) Motion.StaggerIn(arrived.EntranceItems);
+        if (switched) Motion.FadeUp(PageTitle, 0, TimeSpan.Zero, Motion.Quick, fromX: -6);
 
         // Cabecera: glifo + título de la ventana; en el menú, solo "MENÚ".
         PageGlyph.Visibility = launcher ? Visibility.Collapsed : Visibility.Visible;
@@ -69,7 +80,10 @@ public sealed partial class OpenView : UserControl
     public void Hide()
     {
         if (_current is INotchPageView view) view.OnHidden();
+        _hidden = true;
     }
+
+    private bool _hidden = true;
 
     public void Apply(ParpaSettings s) =>
         Clock.Text = s.Clock ? ClockService.Format(DateTime.Now, s.H24) : string.Empty;

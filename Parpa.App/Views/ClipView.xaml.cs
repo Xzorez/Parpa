@@ -19,6 +19,8 @@ public sealed partial class ClipView : UserControl, INotchPageView
 
     private static T Res<T>(string key) => (T)Application.Current.Resources[key];
 
+    public IEnumerable<UIElement> EntranceItems => ListScroll.Visibility == Visibility.Visible ? Rows.Children : Empty.Children;
+
     public void OnShown()
     {
         _shown = true;

@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Parpa.Controls;
 using Parpa.Services;
 using Parpa.ViewModels;
 using Windows.UI;
@@ -41,7 +42,7 @@ public sealed partial class OsdView : UserControl
         {
             var filled = (i + 0.5) / BarCount <= indicator.Level / 100;
             _bars[i].Background = filled ? _filled : _empty;
-            _bars[i].Height = filled ? 4 + Math.Round(i / (double)BarCount * 10) : 4;
+            Motion.AnimateSize(_bars[i], null, filled ? 4 + Math.Round(i / (double)BarCount * 10) : 4, TimeSpan.FromMilliseconds(120));
         }
     }
 }

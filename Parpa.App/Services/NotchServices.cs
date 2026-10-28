@@ -37,4 +37,7 @@ public interface INotchPageView
 
     /// <summary>Texto a la derecha de la cabecera en vez del reloj (p. ej. "5 / 5" con todo hecho).</summary>
     (string Text, Windows.UI.Color Color)? HeaderRight => null;
+
+    /// <summary>Elementos que entran escalonados al llegar a esta ventana (filas, tarjetas, mosaicos).</summary>
+    IEnumerable<Microsoft.UI.Xaml.UIElement> EntranceItems => [];
 }

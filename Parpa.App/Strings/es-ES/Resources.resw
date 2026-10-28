@@ -39,6 +39,13 @@
   <data name="quick_focus" xml:space="preserve"><value>Modo foco</value></data>
   <data name="quick_mic" xml:space="preserve"><value>Micro</value></data>
   <data name="quick_theme" xml:space="preserve"><value>Tema</value></data>
+  <data name="quick_sounds" xml:space="preserve"><value>Sonidos</value></data>
+  <data name="quick_mascot" xml:space="preserve"><value>Mascota</value></data>
+  <data name="quick_minimal" xml:space="preserve"><value>Modo minimal</value></data>
+  <data name="quick_hide_full" xml:space="preserve"><value>Ocultar en juegos</value></data>
+  <data name="quick_no_focus" xml:space="preserve"><value>Sin quitar foco</value></data>
+  <data name="quick_on" xml:space="preserve"><value>ACTIVADO</value></data>
+  <data name="quick_off" xml:space="preserve"><value>NO</value></data>
   <data name="peek_reply" xml:space="preserve"><value>RESPONDER</value></data>
   <data name="peek_later" xml:space="preserve"><value>MÁS TARDE</value></data>
   <data name="peek_send" xml:space="preserve"><value>ENVIAR</value></data>
@@ -311,4 +318,5 @@
   <data name="time_ms" xml:space="preserve"><value>{n} MS</value></data>
   <data name="time_h24" xml:space="preserve"><value>24 H</value></data>
   <data name="time_h12" xml:space="preserve"><value>12 H</value></data>
+  <data name="time_yesterday" xml:space="preserve"><value>AYER</value></data>
 </root>

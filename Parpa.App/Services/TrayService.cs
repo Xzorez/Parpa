@@ -175,6 +175,7 @@ public sealed class TrayService : IDisposable
             Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent),
             Child = grid,
         };
+        Motion.SmoothBackground(item);
         item.PointerEntered += (_, _) => item.Background = Theme.Brush("navSelected");
         item.PointerExited += (_, _) => item.Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
         item.Tapped += (_, e) =>
@@ -187,12 +188,20 @@ public sealed class TrayService : IDisposable
     }
 
     /// <summary>Fila con interruptor 30×16 (perilla 10 px); el menú se rehace para reflejar el cambio.</summary>
-    private Border Toggle(string label, string right, bool on, Action change, Flyout flyout) =>
-        Item(label, right, () =>
+    private Border Toggle(string label, string right, bool on, Action change, Flyout flyout)
+    {
+        var view = SwitchVisual.Create(on, 30, 16, 10);
+        return Item(label, right, () =>
         {
-            change();
-            Fill(flyout);
-        }, SwitchVisual.Create(on, 30, 16, 10));
+            // La perilla se desliza y después se aplica (el menú se rehace para mostrar el estado nuevo).
+            SwitchVisual.Flip(view, !on);
+            Motion.AfterTransition(() =>
+            {
+                change();
+                Fill(flyout);
+            });
+        }, view);
+    }
 
     private static Style PresenterStyle()
     {

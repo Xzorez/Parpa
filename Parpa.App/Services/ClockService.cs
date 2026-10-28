@@ -27,4 +27,10 @@ public sealed class ClockService
     /// <summary>Hora con la cultura activa: 24 h o 12 h según el ajuste <c>h24</c>.</summary>
     public static string Format(DateTime time, bool h24) =>
         time.ToString(h24 ? "HH:mm" : "h:mm", Loc.Culture);
+
+    /// <summary>Hoy: la hora; ayer: "AYER"; antes: día y mes (como las notas del prototipo).</summary>
+    public static string FormatRelative(DateTime time, bool h24) =>
+        time.Date == DateTime.Today ? Format(time, h24)
+        : time.Date == DateTime.Today.AddDays(-1) ? Loc.Get("time_yesterday")
+        : Loc.Upper(time.ToString("d MMM", Loc.Culture).TrimEnd('.'));
 }

@@ -1,16 +1,14 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using NAudio.CoreAudioApi;
 using Parpa.Controls;
 using Parpa.Services;
-using Windows.Devices.Radios;
 
 namespace Parpa.Views;
 
 /// <summary>
-/// Ajustes rápidos (ventana "quick"): 6 mosaicos de 62 px (radio 14, padding 10 12) — Wi-Fi, Bluetooth,
-/// No molestar, Modo foco, Micro y Tema — y abajo el volumen de sonidos (14 barras) + "TODOS LOS AJUSTES ›".
+/// Ajustes rápidos (ventana "quick"): 6 mosaicos de 62 px (radio 14, padding 10 12) — No molestar, Sonidos,
+/// Mascota, Modo minimal, Ocultar en juegos y Sin quitar foco — y abajo el volumen de sonidos + "TODOS LOS AJUSTES ›".
 /// </summary>
 public sealed partial class QuickView : Grid, INotchPageView
 {
@@ -35,14 +33,15 @@ public sealed partial class QuickView : Grid, INotchPageView
         RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
+        // Los mismos seis que el prototipo (Notch Prototipo.dc.html › tiles).
         _tileDefs =
         [
-            new("quick_wifi", "wifi", () => ReadRadio(RadioKind.WiFi), () => ToggleRadio(RadioKind.WiFi)),
-            new("quick_bluetooth", "cascos", () => ReadRadio(RadioKind.Bluetooth), () => ToggleRadio(RadioKind.Bluetooth)),
-            new("quick_dnd", "luna", () => Task.FromResult<bool?>(_app.Settings.Dnd), () => Update(s => s.Dnd = !s.Dnd)),
-            new("quick_focus", "foco", () => Task.FromResult<bool?>(_app.Focus.State == FocusService.FocusState.Running), () => { _app.Focus.Toggle(); return Task.CompletedTask; }),
-            new("quick_mic", "micro", () => Task.FromResult(MicOn()), () => { ToggleMic(); return Task.CompletedTask; }),
-            new("quick_theme", "brillo", () => Task.FromResult<bool?>(Theme.IsLight), () => Update(s => s.Theme = Theme.IsLight ? "dark" : "light")),
+            Setting("quick_dnd", "luna", s => s.Dnd, (s, v) => s.Dnd = v),
+            Setting("quick_sounds", "sonido", s => s.Sounds, (s, v) => s.Sounds = v),
+            Setting("quick_mascot", "cara", s => s.Mascot, (s, v) => s.Mascot = v),
+            Setting("quick_minimal", "linea", s => s.Minimal, (s, v) => s.Minimal = v),
+            Setting("quick_hide_full", "juego", s => s.HideFull, (s, v) => s.HideFull = v),
+            Setting("quick_no_focus", "ojo", s => s.NoFocus, (s, v) => s.NoFocus = v),
         ];
 
         for (var c = 0; c < 3; c++) _tiles.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -123,6 +122,12 @@ public sealed partial class QuickView : Grid, INotchPageView
         return Task.CompletedTask;
     }
 
+    /// <summary>Mosaico que alterna un ajuste booleano.</summary>
+    private Tile Setting(string labelKey, string glyph, Func<ParpaSettings, bool> get, Action<ParpaSettings, bool> set) =>
+        new(labelKey, glyph, () => Task.FromResult<bool?>(get(_app.Settings)), () => Update(s => set(s, !get(s))));
+
+    public IEnumerable<UIElement> EntranceItems => _tiles.Children.Append(Children[1]);
+
     public void OnShown()
     {
         _shown = true;
@@ -141,7 +146,7 @@ public sealed partial class QuickView : Grid, INotchPageView
         {
             var bar = (Border)_bars.Children[i];
             var filled = (i + 0.5) / VolumeBars <= fraction + 0.001;
-            bar.Height = filled ? 5 + Math.Round(i / (double)VolumeBars * 9) : 5;
+            Motion.AnimateSize(bar, null, filled ? 5 + Math.Round(i / (double)VolumeBars * 9) : 5, TimeSpan.FromMilliseconds(150));
             bar.Background = Theme.Brush(filled ? "primary" : "border");
         }
         _volumeValue.Text = $"{_app.Settings.Vol}%";
@@ -165,7 +170,7 @@ public sealed partial class QuickView : Grid, INotchPageView
         var glyph = new DotMatrix { Glyph = def.Glyph, OnColor = fg.Color };
         var status = new TextBlock
         {
-            Text = state is null ? "—" : Loc.Get(on ? "settings_on" : "settings_off"),
+            Text = state is null ? "—" : Loc.Get(on ? "quick_on" : "quick_off"),
             FontFamily = Res<FontFamily>("FontMono"),
             FontSize = 9,
             CharacterSpacing = 80,
@@ -194,78 +199,33 @@ public sealed partial class QuickView : Grid, INotchPageView
         content.Children.Add(label);
         top.VerticalAlignment = VerticalAlignment.Top;
 
-        var tile = new Border
+        var tile = Motion.SmoothBackground(new Border
         {
             Padding = new Thickness(12, 10, 12, 10),
             CornerRadius = new CornerRadius(14),
             Background = on ? Theme.Brush("primary") : Res<Brush>("CardBrush"),
             Opacity = state is null ? 0.45 : 1,
             Child = content,
-        };
-        tile.Tapped += async (_, e) =>
+        });
+        Motion.PressFeedback(tile);
+        tile.Tapped += (_, e) =>
         {
             e.Handled = true;
             if (state is null) return;
             SoundService.Play("click");
-            await def.Toggle();
-            await RenderAsync();
+            // El mosaico cambia de color con transición y después se aplica el ajuste (que lo redibuja todo).
+            var next = !on;
+            tile.Background = next ? Theme.Brush("primary") : Res<Brush>("CardBrush");
+            var nextFg = Theme.Brush(next ? "bg" : "primary");
+            glyph.OnColor = nextFg.Color;
+            status.Foreground = label.Foreground = nextFg;
+            status.Text = Loc.Get(next ? "quick_on" : "quick_off");
+            Motion.AfterTransition(async () =>
+            {
+                await def.Toggle();
+                await RenderAsync();
+            });
         };
         return tile;
-    }
-
-    // ---- Wi-Fi y Bluetooth (Windows.Devices.Radios) ----
-
-    private static async Task<Radio?> FindRadio(RadioKind kind)
-    {
-        try
-        {
-            if (await Radio.RequestAccessAsync() != RadioAccessStatus.Allowed) return null;
-            return (await Radio.GetRadiosAsync()).FirstOrDefault(r => r.Kind == kind);
-        }
-        catch (Exception ex)
-        {
-            Log.Error($"Radios: no se pudo leer {kind}", ex);
-            return null;
-        }
-    }
-
-    private static async Task<bool?> ReadRadio(RadioKind kind) =>
-        await FindRadio(kind) is { } radio ? radio.State == RadioState.On : null;
-
-    private static async Task ToggleRadio(RadioKind kind)
-    {
-        if (await FindRadio(kind) is not { } radio) return;
-        var result = await radio.SetStateAsync(radio.State == RadioState.On ? RadioState.Off : RadioState.On);
-        if (result != RadioAccessStatus.Allowed) Log.Info($"Radios: {kind} → {result}");
-    }
-
-    // ---- Micro (entrada por defecto) ----
-
-    private static bool? MicOn()
-    {
-        try
-        {
-            using var enumerator = new MMDeviceEnumerator();
-            using var mic = enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Communications);
-            return !mic.AudioEndpointVolume.Mute;
-        }
-        catch (Exception)
-        {
-            return null; // sin micrófono
-        }
-    }
-
-    private static void ToggleMic()
-    {
-        try
-        {
-            using var enumerator = new MMDeviceEnumerator();
-            using var mic = enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Communications);
-            mic.AudioEndpointVolume.Mute = !mic.AudioEndpointVolume.Mute;
-        }
-        catch (Exception ex)
-        {
-            Log.Error("Micro: no se pudo cambiar", ex);
-        }
     }
 }

@@ -39,6 +39,9 @@ public sealed partial class TasksView : UserControl, INotchPageView
     private string CountText =>
         Loc.Format("todo_count", ("done", _app.Tasks.Items.Count(t => t.Done)), ("total", _app.Tasks.Items.Count));
 
+    public IEnumerable<UIElement> EntranceItems =>
+        DonePanel.Visibility == Visibility.Visible ? DonePanel.Children : Rows.Children.Append(NewLabel);
+
     public void OnShown()
     {
         _shown = true;

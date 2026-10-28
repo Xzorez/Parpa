@@ -63,6 +63,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     private string? _dragText;
     private readonly MinimalView _minimal = new();
     private bool _wasOpen;
+    private bool _focusedOnOpen;
     private NotchPage? _lastPage;
     private NotchPeek? _lastPeek;
     private string _registeredKeys = string.Empty;
@@ -244,6 +245,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         if (!_typing) return;
         _typing = false;
         _vm.SetHoldOpen(false);
+        if (_focusedOnOpen) return; // sin "quitar el foco": el notch sigue con él hasta cerrarse
         if (restoreFocus && _previousForeground != IntPtr.Zero && Win32.GetForegroundWindow() == _hwnd)
             Win32.SetForegroundWindow(_previousForeground);
         _previousForeground = IntPtr.Zero;
@@ -405,12 +407,36 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
 
         // "Ocultar si no hay actividad": en reposo el notch es invisible (se puede seguir abriendo con el ratón).
         Shape.Opacity = _s.HideIdle && _vm.State == NotchState.Idle ? 0 : 1;
+        ApplyOpenFocus();
         PlayTransitionSounds(view);
 
         if (from == _geometry && view == _shownView) return; // solo cambió el contenido (p. ej. otro volumen)
         _shownView = view;
         UpdateRegion(from, _geometry);
         Shape.Show(view, _geometry, ReducedMotion ? Tokens.Current.ReducedMotion : Tokens.Current.ShapeMotion);
+    }
+
+    /// <summary>
+    /// "Expandir sin quitar el foco" desactivado: al abrirse el notch toma el foco (se puede escribir sin pulsar)
+    /// y al cerrarse lo devuelve a la app de antes.
+    /// </summary>
+    private void ApplyOpenFocus()
+    {
+        if (_vm.IsOpen && !_wasOpen && !_s.NoFocus)
+        {
+            var foreground = Win32.GetForegroundWindow();
+            if (foreground != _hwnd) _previousForeground = foreground;
+            _focusedOnOpen = true;
+            Win32.SetForegroundWindow(_hwnd);
+            Activate();
+        }
+        else if (!_vm.IsOpen && _wasOpen && _focusedOnOpen)
+        {
+            _focusedOnOpen = false;
+            if (_previousForeground != IntPtr.Zero && Win32.GetForegroundWindow() == _hwnd)
+                Win32.SetForegroundWindow(_previousForeground);
+            _previousForeground = IntPtr.Zero;
+        }
     }
 
     /// <summary>open/close al abrir y cerrar, page al cambiar de ventana, notify con un aviso nuevo, ring en llamadas.</summary>
@@ -428,6 +454,14 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         _wasOpen = _vm.IsOpen;
         _lastPage = page;
         _lastPeek = peek;
+    }
+
+    /// <summary>Abre el notch en una ventana por su id ("menu" = menú de burbujas).</summary>
+    public void OpenPage(string id)
+    {
+        var page = NotchPage.Implemented.FirstOrDefault(p => p.Id == id) ?? NotchPage.Home;
+        _vm.ShowPage(page);
+        if (id == "menu") _vm.ToggleLauncher();
     }
 
     /// <summary>Menú de bandeja › Abrir Parpa.</summary>

@@ -160,9 +160,9 @@
                 Padding="12"
                 Background="{StaticResource CardBrush}"
                 CornerRadius="14">
-                <StackPanel Spacing="9">
+                <StackPanel Spacing="6">
                     <TextBlock x:Name="SystemLabel" Style="{StaticResource CardLabel}" />
-                    <StackPanel x:Name="SystemRows" Spacing="9" />
+                    <StackPanel x:Name="SystemRows" Spacing="6" />
                 </StackPanel>
             </Border>
 

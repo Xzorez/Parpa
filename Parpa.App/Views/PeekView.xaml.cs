@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Parpa.Controls;
 using Parpa.Services;
 using Parpa.ViewModels;
 using Windows.UI;
@@ -24,6 +25,9 @@ public sealed partial class PeekView : UserControl
     public PeekView()
     {
         InitializeComponent();
+        Motion.SmoothBackground(SecondaryButton);
+        Motion.PressFeedback(SecondaryButton);
+        Motion.PressFeedback(PrimaryButton);
         _barTimer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         _barTimer.Interval = TimeSpan.FromMilliseconds(100);
         _barTimer.Tick += (_, _) => DrawBar();
@@ -79,9 +83,9 @@ public sealed partial class PeekView : UserControl
         _vm?.PeekSecondary();
     }
 
-    private void PrimaryButton_PointerEntered(object sender, PointerRoutedEventArgs e) => PrimaryButton.Opacity = 0.85;
+    private void PrimaryButton_PointerEntered(object sender, PointerRoutedEventArgs e) => Motion.SetOpacity(PrimaryButton, 0.85f);
 
-    private void PrimaryButton_PointerExited(object sender, PointerRoutedEventArgs e) => PrimaryButton.Opacity = 1;
+    private void PrimaryButton_PointerExited(object sender, PointerRoutedEventArgs e) => Motion.SetOpacity(PrimaryButton, 1f);
 
     private void SecondaryButton_PointerEntered(object sender, PointerRoutedEventArgs e) => SecondaryButton.Background = _hoverBrush;
 

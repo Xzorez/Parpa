@@ -24,6 +24,8 @@ public sealed partial class HomeView : UserControl, INotchPageView
     {
         _app = app;
         InitializeComponent();
+        Motion.PressFeedback(FocusCard);
+        foreach (var control in new FrameworkElement[] { PreviousButton, PlayPauseButton, NextButton }) Motion.PressFeedback(control);
 
         _progressTimer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         _progressTimer.Interval = TimeSpan.FromSeconds(1);
@@ -66,6 +68,10 @@ public sealed partial class HomeView : UserControl, INotchPageView
     }
 
     private static T Res<T>(string key) => (T)Application.Current.Resources[key];
+
+    /// <summary>Tarjetas (o la tarjeta de permiso) entran escalonadas.</summary>
+    public IEnumerable<UIElement> EntranceItems =>
+        DeniedPanel.Visibility == Visibility.Visible ? DeniedPanel.Children : Cards.Children.Where(c => c.Visibility == Visibility.Visible);
 
     public void OnShown()
     {
