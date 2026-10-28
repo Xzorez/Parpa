@@ -313,6 +313,16 @@
   <data name="settings_import_failed" xml:space="preserve"><value>NO SE PUDO IMPORTAR</value></data>
   <data name="settings_version" xml:space="preserve"><value>Versión</value></data>
   <data name="settings_version_d" xml:space="preserve"><value>Parpa {v} · código abierto (MIT)</value></data>
+  <data name="settings_updates" xml:space="preserve"><value>Actualizaciones</value></data>
+  <data name="settings_updates_ok_d" xml:space="preserve"><value>Estás al día · versión {v}</value></data>
+  <data name="settings_updates_new_d" xml:space="preserve"><value>Hay una versión nueva: {v}</value></data>
+  <data name="settings_updates_error_d" xml:space="preserve"><value>No se pudo comprobar. Revisa la conexión.</value></data>
+  <data name="settings_updates_check" xml:space="preserve"><value>BUSCAR</value></data>
+  <data name="settings_updates_checking" xml:space="preserve"><value>BUSCANDO…</value></data>
+  <data name="settings_updates_download" xml:space="preserve"><value>DESCARGAR</value></data>
+  <data name="settings_updates_ok" xml:space="preserve"><value>✓ ESTÁS AL DÍA</value></data>
+  <data name="settings_updates_new" xml:space="preserve"><value>✓ VERSIÓN {v} DISPONIBLE</value></data>
+  <data name="settings_updates_error" xml:space="preserve"><value>NO SE PUDO COMPROBAR</value></data>
   <data name="time_min" xml:space="preserve"><value>{n} MIN</value></data>
   <data name="time_sec" xml:space="preserve"><value>{n} S</value></data>
   <data name="time_ms" xml:space="preserve"><value>{n} MS</value></data>

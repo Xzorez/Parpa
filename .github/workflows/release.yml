@@ -20,9 +20,9 @@ jobs:
       TAG: ${{ github.ref_name }}
       SIGN: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
 
@@ -38,14 +38,14 @@ jobs:
       - name: Subir app sin firmar
         if: env.SIGN == 'true'
         id: unsigned-app
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unsigned-app-${{ matrix.arch }}
           path: artifacts/publish-${{ matrix.arch }}
 
       - name: Firmar app (SignPath)
         if: env.SIGN == 'true'
-        uses: signpath/github-action-submit-signing-request@v1
+        uses: signpath/github-action-submit-signing-request@v2
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
@@ -71,14 +71,14 @@ jobs:
       - name: Subir instalador sin firmar
         if: env.SIGN == 'true'
         id: unsigned-setup
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unsigned-setup-${{ matrix.arch }}
           path: artifacts/Parpa-Setup-*.exe
 
       - name: Firmar instalador (SignPath)
         if: env.SIGN == 'true'
-        uses: signpath/github-action-submit-signing-request@v1
+        uses: signpath/github-action-submit-signing-request@v2
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
@@ -91,7 +91,7 @@ jobs:
           wait-for-completion-timeout-in-seconds: 3600
           output-artifact-directory: artifacts
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: setup-${{ matrix.arch }}
           path: artifacts/Parpa-Setup-*.exe
@@ -104,9 +104,9 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       TAG: ${{ github.ref_name }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: setup-*
           path: artifacts

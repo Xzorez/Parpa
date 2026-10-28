@@ -38,6 +38,9 @@ public sealed class SettingsWindow : Window
     private string _section = "general";
     private bool _recording;
     private bool _animateSection;
+    private bool _checkingUpdates;
+    private UpdateService.Result? _update;
+    private bool _updateFailed;
 
     /// <summary>Fila de ajuste: etiqueta, descripción y control. <see cref="Opacity"/> &lt; 1 si depende de otro ajuste apagado.</summary>
     private sealed record Row(string Label, string Desc, Func<FrameworkElement> Control, double Opacity = 1);
@@ -398,7 +401,7 @@ public sealed class SettingsWindow : Window
                 yield return new Head(L("settings_h_data"));
                 yield return new Row(L("settings_export"), L("settings_export_d"), () => Button(L("settings_export_btn"), ExportAsync));
                 yield return new Row(L("settings_import"), L("settings_import_d"), () => Button(L("settings_import_btn"), ImportAsync));
-                yield return new Row(L("settings_version"), Loc.Format("settings_version_d", ("v", TrayService.Version)), () => new Border());
+                yield return new Row(L("settings_updates"), UpdatesDescription(), UpdatesButton);
                 break;
 
             case "shortcuts":
@@ -732,6 +735,46 @@ public sealed class SettingsWindow : Window
         if (file is null) return;
         var ok = SettingsService.Current.Import(await File.ReadAllTextAsync(file.Path));
         ShowToast(L(ok ? "settings_imported" : "settings_import_failed"), ok);
+    }
+
+    // ---- Actualizaciones (solo al pulsar BUSCAR) ----
+
+    private string UpdatesDescription() =>
+        _updateFailed ? L("settings_updates_error_d")
+        : _update is { Newer: true } u ? Loc.Format("settings_updates_new_d", ("v", u.Latest))
+        : _update is not null ? Loc.Format("settings_updates_ok_d", ("v", TrayService.Version))
+        : Loc.Format("settings_version_d", ("v", TrayService.Version));
+
+    /// <summary>BUSCAR → BUSCANDO… → al día, o DESCARGAR si hay una versión nueva (abre su página en GitHub).</summary>
+    private FrameworkElement UpdatesButton()
+    {
+        var label = _checkingUpdates ? "settings_updates_checking" : _update is { Newer: true } ? "settings_updates_download" : "settings_updates_check";
+        var button = new PillButton { Text = L(label), Primary = true, Padding = new Thickness(12, 7, 12, 7), Opacity = _checkingUpdates ? 0.6 : 1 };
+        button.Click += async (_, _) =>
+        {
+            if (_checkingUpdates) return;
+            if (_update is { Newer: true } newer)
+            {
+                await Launcher.LaunchUriAsync(new Uri(newer.Url));
+                return;
+            }
+            await CheckUpdatesAsync();
+        };
+        return button;
+    }
+
+    private async Task CheckUpdatesAsync()
+    {
+        _checkingUpdates = true;
+        Render();
+        var result = await UpdateService.CheckAsync();
+        _checkingUpdates = false;
+        _update = result;
+        _updateFailed = result is null;
+        Render();
+        if (result is null) ShowToast(L("settings_updates_error"), success: false);
+        else if (result.Newer) ShowToast(Loc.Format("settings_updates_new", ("v", result.Latest)), success: true);
+        else ShowToast(L("settings_updates_ok"), success: true);
     }
 
     private void ShowToast(string message, bool success)
