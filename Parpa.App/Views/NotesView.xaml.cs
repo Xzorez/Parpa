@@ -134,6 +134,7 @@ public sealed partial class NotesView : UserControl, INotchPageView
     {
         if (Draft.Text.Trim().Length == 0) return;
         _app.Notes.Add(Draft.Text);
+        SoundService.Play("confirm");
         Draft.Text = string.Empty;
     }
 

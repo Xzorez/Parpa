@@ -47,7 +47,7 @@ public sealed class ClipboardService
         // Lo que copia Parpa (volver a copiar del historial) no se repite.
         GetWindowThreadProcessId(GetClipboardOwner(), out var ownerPid);
         if (ownerPid == Environment.ProcessId) return;
-        if (IsPrivate()) return;
+        if (IsPrivate() || IsExcludedApp()) return;
 
         var text = ReadText()?.Trim();
         if (string.IsNullOrEmpty(text)) return;
@@ -101,6 +101,26 @@ public sealed class ClipboardService
         }
         return false;
     }
+
+    /// <summary>"No guardar desde": la app en primer plano al copiar está excluida en Ajustes (1Password, Bitwarden…).</summary>
+    private bool IsExcludedApp()
+    {
+        var excluded = _s.ClipExclude.Where(e => e.Value).Select(e => e.Key.Replace(" ", string.Empty)).ToList();
+        if (excluded.Count == 0) return false;
+        GetWindowThreadProcessId(GetForegroundWindow(), out var pid);
+        try
+        {
+            using var process = System.Diagnostics.Process.GetProcessById((int)pid);
+            var name = process.ProcessName.Replace(" ", string.Empty);
+            return excluded.Any(e => name.Contains(e, StringComparison.OrdinalIgnoreCase));
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+    }
+
+    [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
 
     private static bool IsPrivate()
     {

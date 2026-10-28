@@ -24,7 +24,7 @@
 
             <!-- Nada elegido: zona de puntos con la pista. -->
             <Grid x:Name="PickHint" Grid.Column="1">
-                <c:DotPattern DotColor="{StaticResource DotPatternColor}" Spacing="7" CornerRadius="14" />
+                <c:DotPattern DotBrush="{StaticResource DotPatternBrush}" Spacing="7" CornerRadius="14" />
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
                     <TextBlock
                         x:Name="PickTitle"
@@ -111,7 +111,7 @@
 
         <!-- Bandeja vacía: puntos #3a3a3f de 7 px, mascota contenta y dos líneas sobre fondo negro. -->
         <Grid x:Name="EmptyPanel" Visibility="Collapsed">
-            <c:DotPattern DotColor="{StaticResource DotPatternColor}" Spacing="7" CornerRadius="14" />
+            <c:DotPattern DotBrush="{StaticResource DotPatternBrush}" Spacing="7" CornerRadius="14" />
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
                 <Border
                     Padding="8"
@@ -124,8 +124,8 @@
                         Rows="5"
                         DotSize="3"
                         Gap="1.5"
-                        OnColor="{StaticResource PrimaryColor}"
-                        OffColor="{StaticResource MatrixOffColor}" />
+                        OnBrush="{StaticResource PrimaryBrush}"
+                        OffBrush="{StaticResource MatrixOffBrush}" />
                 </Border>
                 <Border Padding="6,3" HorizontalAlignment="Center" Background="{StaticResource BgBrush}">
                     <TextBlock

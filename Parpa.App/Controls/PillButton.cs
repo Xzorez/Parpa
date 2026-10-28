@@ -58,6 +58,7 @@ public sealed partial class PillButton : Grid
     private void OnTapped(object sender, TappedRoutedEventArgs e)
     {
         e.Handled = true;
+        Services.SoundService.Play("click");
         Click?.Invoke(this, EventArgs.Empty);
     }
 

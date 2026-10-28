@@ -13,7 +13,7 @@ public sealed partial class OsdView : UserControl
 
     private readonly Border[] _bars = new Border[BarCount];
     private readonly SolidColorBrush _filled = new();
-    private readonly SolidColorBrush _empty = new((Color)Application.Current.Resources["BorderColor"]);
+    private readonly SolidColorBrush _empty = Theme.Brush("border");
 
     public OsdView()
     {
@@ -28,7 +28,7 @@ public sealed partial class OsdView : UserControl
     /// <param name="accent">Color de acento elegido en Ajustes (glifo en alertas).</param>
     public void Show(NotchIndicator indicator, Color accent)
     {
-        var primary = (Color)Application.Current.Resources["PrimaryColor"];
+        var primary = Theme.Get("primary");
         IndicatorGlyph.Glyph = indicator.Glyph;
         IndicatorGlyph.OnColor = indicator.Alert ? accent : primary;
         Label.Text = indicator.Label;

@@ -38,7 +38,7 @@
                                 Height="48"
                                 Background="{StaticResource DividerBrush}"
                                 CornerRadius="8">
-                                <c:DotPattern DotColor="{StaticResource DotPatternColor}" Spacing="5" CornerRadius="8" />
+                                <c:DotPattern DotBrush="{StaticResource DotPatternBrush}" Spacing="5" CornerRadius="8" />
                                 <Image x:Name="Artwork" Stretch="UniformToFill" />
                             </Grid>
                             <StackPanel
@@ -68,8 +68,8 @@
                             Rows="1"
                             DotSize="4"
                             Gap="3"
-                            OnColor="{StaticResource PrimaryColor}"
-                            OffColor="{StaticResource BorderColor}" />
+                            OnBrush="{StaticResource PrimaryBrush}"
+                            OffBrush="{StaticResource BorderBrush}" />
                         <Grid Grid.Row="2">
                             <TextBlock
                                 x:Name="MusicPosition"
@@ -149,7 +149,7 @@
                         Columns="17"
                         DotSize="4"
                         Gap="2"
-                        OffColor="{StaticResource BorderColor}" />
+                        OffBrush="{StaticResource BorderBrush}" />
                 </Grid>
             </Border>
 
@@ -216,8 +216,8 @@
                     Rows="5"
                     DotSize="3"
                     Gap="1.5"
-                    OnColor="{StaticResource MutedColor}"
-                    OffColor="{StaticResource MatrixOffColor}" />
+                    OnBrush="{StaticResource MutedBrush}"
+                    OffBrush="{StaticResource MatrixOffBrush}" />
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
                     <TextBlock
                         x:Name="DeniedTitle"

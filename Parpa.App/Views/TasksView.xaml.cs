@@ -115,6 +115,7 @@ public sealed partial class TasksView : UserControl, INotchPageView
             row.Tapped += (_, e) =>
             {
                 e.Handled = true;
+                SoundService.Play(task.Done ? "tick" : "confirm");
                 _app.Tasks.Toggle(id);
             };
             Rows.Children.Add(row);

@@ -45,8 +45,11 @@ public sealed class ShelfService
     {
         _s = settings;
         _clipboard = clipboard;
-        // Lo que se borró o movió fuera de Parpa ya no está en la bandeja.
-        if (_store.Items.RemoveAll(i => !File.Exists(i.Path) && !Directory.Exists(i.Path)) > 0) _store.Save();
+        // Lo que se borró o movió fuera de Parpa ya no está en la bandeja; con "Vaciar al reiniciar", nada.
+        var removed = settings.ShelfClear
+            ? _store.Items.RemoveAll(_ => true)
+            : _store.Items.RemoveAll(i => !File.Exists(i.Path) && !Directory.Exists(i.Path));
+        if (removed > 0) _store.Save();
     }
 
     /// <returns>Índice del primer elemento añadido (para seleccionarlo).</returns>

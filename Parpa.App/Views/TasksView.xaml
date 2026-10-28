@@ -71,8 +71,8 @@
                 Rows="5"
                 DotSize="4"
                 Gap="2"
-                OnColor="{StaticResource PrimaryColor}"
-                OffColor="{StaticResource MatrixOffColor}" />
+                OnBrush="{StaticResource PrimaryBrush}"
+                OffBrush="{StaticResource MatrixOffBrush}" />
             <StackPanel HorizontalAlignment="Center" Spacing="4">
                 <TextBlock
                     x:Name="DoneTitle"

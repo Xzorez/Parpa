@@ -17,8 +17,8 @@
         <c:DotMatrix
             x:Name="ActivityGlyph"
             VerticalAlignment="Center"
-            OnColor="{StaticResource PrimaryColor}"
-            OffColor="{StaticResource GlyphOffColor}" />
+            OnBrush="{StaticResource PrimaryBrush}"
+            OffBrush="{StaticResource GlyphOffBrush}" />
 
         <TextBlock
             x:Name="Label"
@@ -41,7 +41,7 @@
             Grid.Column="2"
             VerticalAlignment="Center"
             Glyph="luna"
-            OnColor="{StaticResource SecondaryColor}"
+            OnBrush="{StaticResource SecondaryBrush}"
             Visibility="Collapsed" />
 
         <!-- Temporizadores (foco…): Doto 700 16 px, tracking .02em. -->
@@ -65,7 +65,7 @@
             Rows="4"
             DotSize="2"
             Gap="1.5"
-            OnColor="{StaticResource PrimaryColor}"
-            OffColor="{StaticResource GlyphOffColor}" />
+            OnBrush="{StaticResource PrimaryBrush}"
+            OffBrush="{StaticResource GlyphOffBrush}" />
     </Grid>
 </UserControl>

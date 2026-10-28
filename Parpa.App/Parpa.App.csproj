@@ -8,6 +8,7 @@
     <Product>Parpa</Product>
     <Version>0.1.0</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\Icon\app.ico</ApplicationIcon>
     <Platforms>x64;ARM64</Platforms>
     <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
     <RuntimeIdentifier Condition="'$(Platform)' == 'ARM64'">win-arm64</RuntimeIdentifier>
@@ -38,6 +39,7 @@
     <Content Include="Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Assets\Fonts\*" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Assets\Icon\*.png" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\Icon\*.ico" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <Import Project="..\tools\GenerateResw.targets" />

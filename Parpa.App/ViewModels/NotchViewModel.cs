@@ -7,7 +7,7 @@ namespace Parpa.ViewModels;
 /// <summary>
 /// Estados del notch. Prioridad (gana el primero): Arrastre &gt; Abierto &gt; Aviso &gt; Indicador &gt; Actividad &gt; Reposo.
 /// </summary>
-public enum NotchState { Idle, Activity, Osd, Peek, Open, Drop }
+public enum NotchState { Idle, Activity, Minimal, Osd, Peek, Open, Drop }
 
 /// <summary>Qué se arrastra sobre el notch.</summary>
 public enum DropKind { File, Text, Link }
@@ -25,8 +25,8 @@ public sealed record NotchPage(string Id, string TitleKey, string Glyph, string 
     public static readonly NotchPage Notes = new("notes", "windows_notes", "notas", "notes");
     public static readonly NotchPage Quick = new("quick", "windows_quick", "general", "quick");
 
-    /// <summary>Ventanas con vista propia. Ajustes rápidos llega en la fase 5 con la ventana de Ajustes.</summary>
-    public static readonly IReadOnlyList<NotchPage> Implemented = [Home, Clip, Shelf, Todo, Notes];
+    /// <summary>Ventanas con vista propia.</summary>
+    public static readonly IReadOnlyList<NotchPage> Implemented = [Home, Clip, Shelf, Todo, Notes, Quick];
 }
 
 /// <summary>
@@ -67,6 +67,9 @@ public sealed class NotchViewModel
 
     /// <summary>Orden de prioridad de las actividades (gana la primera presente).</summary>
     private static readonly string[] ActivityOrder = [ActivityFocus, ActivityMusic];
+
+    /// <summary>Alto del modo minimal (tokens.json › notch › minimal).</summary>
+    private const double MinimalHeight = 24;
 
     /// <summary>Ancho del error breve compacto (design/Icono y Estados.dc.html #11f).</summary>
     private const double BannerWidth = 300;
@@ -150,6 +153,11 @@ public sealed class NotchViewModel
         NotchState.Osd when Indicator!.Banner => new NotchGeometry(BannerWidth, Tokens.Current.NotchSize("idle").H, Tokens.Current.Radius("notchCompact")),
         NotchState.Osd => Size("osd", "notchCompact"),
         NotchState.Activity => Size(Activity!.SizeToken, "notchCompact"),
+        // Minimal: max(96, 0,6 × ancho compacto) × 24, radio 12.
+        NotchState.Minimal => new NotchGeometry(
+            Math.Max(96, 0.6 * Tokens.Current.NotchSize(Activity?.SizeToken ?? "idle").W),
+            MinimalHeight,
+            Tokens.Current.Radius("notchMinimal")),
         _ => Size("idle", "notchCompact"),
     };
 
@@ -310,12 +318,20 @@ public sealed class NotchViewModel
         TryShowNextPeek(update: true);
     }
 
+    /// <summary>Un ajuste cambió (minimal, ventanas visibles…): recalcula el estado.</summary>
+    public void Refresh()
+    {
+        if (_isOpen && !Pages.Contains(Page)) Page = NotchPage.Home;
+        Update();
+    }
+
     private void Update()
     {
         State = Drop is not null ? NotchState.Drop
             : _isOpen ? NotchState.Open
             : Peek is not null ? NotchState.Peek
             : Indicator is not null ? NotchState.Osd
+            : _s.Minimal ? NotchState.Minimal // sustituye a Actividad y Reposo
             : Activity is not null ? NotchState.Activity
             : NotchState.Idle;
         Changed?.Invoke();
@@ -413,7 +429,8 @@ public sealed class NotchViewModel
             return;
         }
         if (_isOpen || Drop is not null) return;
-        _openTimer.Interval = TimeSpan.FromMilliseconds(Math.Max(0, _s.OpenTime));
+        // En minimal se abre sin espera (como el prototipo): la línea es fina y cuesta acertar.
+        _openTimer.Interval = TimeSpan.FromMilliseconds(_s.Minimal ? 1 : Math.Max(1, _s.OpenTime));
         _openTimer.Start();
     }
 

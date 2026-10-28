@@ -148,6 +148,11 @@
   <data name="welcome_left" xml:space="preserve"><value>IZQUIERDA</value></data>
   <data name="welcome_center" xml:space="preserve"><value>CENTRO</value></data>
   <data name="welcome_right" xml:space="preserve"><value>DERECHA</value></data>
+  <data name="welcome_done_title" xml:space="preserve"><value>LISTO</value></data>
+  <data name="welcome_done_text" xml:space="preserve"><value>Pasa el ratón por arriba para abrirme. Me encontrarás también junto al reloj de Windows.</value></data>
+  <data name="welcome_again" xml:space="preserve"><value>VER DE NUEVO</value></data>
+  <data name="welcome_change_keys" xml:space="preserve"><value>CAMBIAR ATAJO</value></data>
+  <data name="welcome_end" xml:space="preserve"><value>TERMINAR</value></data>
   <data name="tray_open" xml:space="preserve"><value>Abrir Parpa</value></data>
   <data name="tray_open_settings" xml:space="preserve"><value>Abrir ajustes</value></data>
   <data name="tray_pause_1h" xml:space="preserve"><value>Pausar avisos 1 hora</value></data>
@@ -265,6 +270,42 @@
   <data name="settings_close" xml:space="preserve"><value>CERRAR</value></data>
   <data name="settings_on" xml:space="preserve"><value>SÍ</value></data>
   <data name="settings_off" xml:space="preserve"><value>NO</value></data>
+  <data name="settings_lang_es" xml:space="preserve"><value>ESPAÑOL</value></data>
+  <data name="settings_lang_en" xml:space="preserve"><value>ENGLISH</value></data>
+  <data name="settings_search" xml:space="preserve"><value>Buscar ajuste</value></data>
+  <data name="settings_results" xml:space="preserve"><value>Resultados</value></data>
+  <data name="settings_no_results" xml:space="preserve"><value>SIN RESULTADOS</value></data>
+  <data name="settings_preview" xml:space="preserve"><value>VISTA PREVIA</value></data>
+  <data name="settings_h_position" xml:space="preserve"><value>POSICIÓN</value></data>
+  <data name="settings_h_style" xml:space="preserve"><value>ESTILO</value></data>
+  <data name="settings_h_mascot" xml:space="preserve"><value>MASCOTA</value></data>
+  <data name="settings_h_content" xml:space="preserve"><value>CONTENIDO</value></data>
+  <data name="settings_h_data" xml:space="preserve"><value>DATOS</value></data>
+  <data name="settings_theme_d" xml:space="preserve"><value>Automático sigue el modo de Windows.</value></data>
+  <data name="settings_accent_d" xml:space="preserve"><value>Para lo que está en vivo: micro, cámara, llamadas.</value></data>
+  <data name="settings_anim_d" xml:space="preserve"><value>Reducidas evita rebotes y movimientos largos.</value></data>
+  <data name="settings_mascot_d" xml:space="preserve"><value>La cara de puntos que aparece en reposo.</value></data>
+  <data name="settings_content_d" xml:space="preserve"><value>Qué se ve del mensaje cuando llega.</value></data>
+  <data name="settings_notif_dur_d" xml:space="preserve"><value>Tiempo que el aviso se queda abierto.</value></data>
+  <data name="settings_notif_apps_d" xml:space="preserve"><value>Las que no estén aquí también pueden avisar.</value></data>
+  <data name="settings_sounds_d" xml:space="preserve"><value>Clics, avisos y cambios de ventana.</value></data>
+  <data name="settings_buds_d" xml:space="preserve"><value>Al conectar unos auriculares.</value></data>
+  <data name="settings_clip_limit_d" xml:space="preserve"><value>Elementos que se guardan.</value></data>
+  <data name="settings_clip_exclude_d" xml:space="preserve"><value>Nunca guarda lo que copies desde aquí.</value></data>
+  <data name="settings_shelf_clear_d" xml:space="preserve"><value>La bandeja empieza vacía cada vez que se abre Parpa.</value></data>
+  <data name="settings_shelf_actions_d" xml:space="preserve"><value>Aparecen al tocar un archivo según su tipo.</value></data>
+  <data name="settings_pomo_d" xml:space="preserve"><value>Duración de cada sesión de foco.</value></data>
+  <data name="settings_export" xml:space="preserve"><value>Exportar ajustes</value></data>
+  <data name="settings_export_d" xml:space="preserve"><value>Guarda un archivo con toda tu configuración.</value></data>
+  <data name="settings_export_btn" xml:space="preserve"><value>EXPORTAR</value></data>
+  <data name="settings_import" xml:space="preserve"><value>Importar ajustes</value></data>
+  <data name="settings_import_d" xml:space="preserve"><value>Carga una configuración guardada.</value></data>
+  <data name="settings_import_btn" xml:space="preserve"><value>IMPORTAR</value></data>
+  <data name="settings_exported" xml:space="preserve"><value>✓ AJUSTES EXPORTADOS</value></data>
+  <data name="settings_imported" xml:space="preserve"><value>✓ AJUSTES IMPORTADOS</value></data>
+  <data name="settings_import_failed" xml:space="preserve"><value>NO SE PUDO IMPORTAR</value></data>
+  <data name="settings_version" xml:space="preserve"><value>Versión</value></data>
+  <data name="settings_version_d" xml:space="preserve"><value>Parpa {v} · código abierto (MIT)</value></data>
   <data name="time_min" xml:space="preserve"><value>{n} MIN</value></data>
   <data name="time_sec" xml:space="preserve"><value>{n} S</value></data>
   <data name="time_ms" xml:space="preserve"><value>{n} MS</value></data>

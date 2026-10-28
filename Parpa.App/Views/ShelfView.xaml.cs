@@ -217,6 +217,7 @@ public sealed partial class ShelfView : UserControl, INotchPageView
         {
             var message = await _app.Shelf.RunAsync(action, item);
             if (message.Length > 0) ShowResult(message, success: true);
+            SoundService.Play(action == ShelfAction.Remove ? "click" : "confirm");
         }
         catch (Exception ex)
         {
@@ -225,6 +226,7 @@ public sealed partial class ShelfView : UserControl, INotchPageView
             var key = ex is IOException or UnauthorizedAccessException ? "empty_errors_action_failed" : "empty_errors_action_failed_generic";
             ShowResult(Loc.Format(key, ("action", Loc.Get(ShelfService.VerbKey(action))), ("file", item.Name)), success: false);
             _failed = (action, item);
+            SoundService.Play("decline");
             Retry.Visibility = Visibility.Visible;
         }
     }

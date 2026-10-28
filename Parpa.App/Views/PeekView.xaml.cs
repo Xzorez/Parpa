@@ -17,7 +17,7 @@ public sealed partial class PeekView : UserControl
     private static readonly Color CallGreen = Tokens.ParseOklch("oklch(0.72 0.17 150)");
 
     private readonly DispatcherQueueTimer _barTimer;
-    private readonly SolidColorBrush _hoverBrush = new((Color)Application.Current.Resources["GlyphOffColor"]);
+    private readonly SolidColorBrush _hoverBrush = Theme.Brush("glyphOff");
     private NotchViewModel? _vm;
     private int _filled = -1;
 
@@ -33,7 +33,7 @@ public sealed partial class PeekView : UserControl
     {
         _vm = vm;
         var peek = vm.Peek!;
-        var primary = (Color)Application.Current.Resources["PrimaryColor"];
+        var primary = Theme.Get("primary");
 
         PeekGlyph.Glyph = peek.Glyph;
         PeekGlyph.OnColor = peek.IsCall ? accent : primary;
@@ -45,7 +45,7 @@ public sealed partial class PeekView : UserControl
         PrimaryLabel.Text = peek.PrimaryLabel;
         PrimaryButton.Background = new SolidColorBrush(peek.IsCall ? CallGreen : primary);
         SecondaryLabel.Text = peek.SecondaryLabel;
-        SecondaryLabel.Foreground = new SolidColorBrush(peek.IsCall ? accent : (Color)Application.Current.Resources["SecondaryColor"]);
+        SecondaryLabel.Foreground = new SolidColorBrush(peek.IsCall ? accent : Theme.Get("secondary"));
 
         _filled = -1;
         DrawBar();

@@ -50,6 +50,13 @@ public sealed class SettingsService
         if (!userExists) Save();
     }
 
+    /// <summary>Cambia ajustes y los aplica al instante (todas las vistas escuchan <see cref="Changed"/>).</summary>
+    public void Update(Action<ParpaSettings> change)
+    {
+        change(S);
+        Save();
+    }
+
     public void Save()
     {
         Directory.CreateDirectory(DataFiles.UserDir);
@@ -60,6 +67,35 @@ public sealed class SettingsService
         };
         File.WriteAllText(FilePath, root.ToJsonString(DataFiles.JsonOptions));
         Changed?.Invoke();
+    }
+
+    /// <summary>Contenido de settings.json (para exportar).</summary>
+    public string Export() => File.Exists(FilePath) ? File.ReadAllText(FilePath) : string.Empty;
+
+    /// <summary>
+    /// Importa un settings.json exportado. Rellena los objetos actuales (los servicios guardan referencias a ellos).
+    /// </summary>
+    /// <returns><c>false</c> si el archivo no es válido.</returns>
+    public bool Import(string json)
+    {
+        try
+        {
+            if (JsonNode.Parse(json) is not JsonObject user || user["s"] is not JsonObject) return false;
+            var merged = DataFiles.ReadData("settings.default.json").AsObject();
+            Merge(merged, user);
+            var imported = merged["s"].Deserialize<ParpaSettings>(DataFiles.JsonOptions);
+            if (imported is null) return false;
+            foreach (var property in typeof(ParpaSettings).GetProperties().Where(p => p.CanWrite))
+                property.SetValue(S, property.GetValue(imported));
+            Wins.Clear();
+            foreach (var entry in merged["wins"]?.AsArray() ?? []) Wins.Add(entry?.DeepClone());
+            Save();
+            return true;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
     }
 
     private static void Merge(JsonObject target, JsonObject source)
@@ -108,6 +144,17 @@ public sealed class ParpaSettings
     [JsonPropertyName("lyrics")] public bool Lyrics { get; set; } = true;
     /// <summary>Tarjeta "No puedo leer tus avisos" ocultada por el usuario en Inicio.</summary>
     [JsonPropertyName("notifCardHidden")] public bool NotifCardHidden { get; set; }
+    /// <summary>Apps desde las que no se guarda lo copiado (Ajustes › Ventanas › Portapapeles).</summary>
+    [JsonPropertyName("clipExclude")] public Dictionary<string, bool> ClipExclude { get; set; } = new() { ["1Password"] = true, ["Bitwarden"] = true, ["KeePassXC"] = false };
+    /// <summary>La bandeja empieza vacía cada vez que se abre Parpa.</summary>
+    [JsonPropertyName("shelfClear")] public bool ShelfClear { get; set; }
+    /// <summary>Bienvenida completada (no se vuelve a mostrar al arrancar).</summary>
+    [JsonPropertyName("welcomeDone")] public bool WelcomeDone { get; set; }
+    /// <summary>Avisos en pausa hasta esta hora (menú de bandeja: "Pausar avisos 1 hora").</summary>
+    [JsonPropertyName("pausedUntil")] public DateTime? PausedUntil { get; set; }
+
+    /// <summary>No molestar activo: el ajuste o una pausa temporal en curso.</summary>
+    [JsonIgnore] public bool DndActive => Dnd || PausedUntil > DateTime.Now;
     [JsonPropertyName("micAlways")] public bool MicAlways { get; set; } = true;
     [JsonPropertyName("homeCards")] public Dictionary<string, bool> HomeCards { get; set; } = new();
     [JsonPropertyName("pomo")] public int Pomo { get; set; } = 25;

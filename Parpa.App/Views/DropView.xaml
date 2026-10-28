@@ -8,7 +8,7 @@
 
     <!-- Soltar: padding 10 14 14; zona de puntos #5a5a60 (7 px, radio 16) con glifo + etiqueta sobre negro. -->
     <Grid Padding="14,10,14,14">
-        <c:DotPattern DotColor="{StaticResource TertiaryColor}" Spacing="7" CornerRadius="16" />
+        <c:DotPattern DotBrush="{StaticResource TertiaryBrush}" Spacing="7" CornerRadius="16" />
         <StackPanel
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
@@ -17,8 +17,8 @@
             <c:DotMatrix
                 x:Name="DropGlyph"
                 VerticalAlignment="Center"
-                OnColor="{StaticResource PrimaryColor}"
-                OffColor="{StaticResource GlyphOffColor}" />
+                OnBrush="{StaticResource PrimaryBrush}"
+                OffBrush="{StaticResource GlyphOffBrush}" />
             <Border Padding="6,3" Background="{StaticResource BgBrush}">
                 <TextBlock
                     x:Name="DropLabel"

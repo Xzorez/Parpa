@@ -69,6 +69,7 @@ public sealed partial class ClipView : UserControl, INotchPageView
             row.Tapped += (_, e) =>
             {
                 e.Handled = true;
+                SoundService.Play("click");
                 if (_app.Clipboard.Copy(entry.Text)) time.Text = Loc.Get("notes_copied");
             };
             Rows.Children.Add(row);

@@ -154,6 +154,20 @@ public sealed partial class NotchShape : Grid
         root.RelativeSizeAdjustment = Vector2.One;
         root.Clip = _compositor.CreateInsetClip(); // oculta la parte del cuerpo que sube por encima de y = 0
 
+        // Sombra del tema claro: copias del cuerpo desplazadas 1, 2 y 3 px con negro muy tenue.
+        foreach (var (dy, alpha) in ShadowSteps)
+        {
+            var brush = _compositor.CreateColorBrush(Color.FromArgb(0, 0, 0, 0));
+            _shadowBrushes.Add((brush, alpha));
+            var layer = _compositor.CreateShapeVisual();
+            layer.RelativeSizeAdjustment = Vector2.One;
+            layer.Offset = new Vector3(0, dy, 0);
+            var sprite = _compositor.CreateSpriteShape(CreateBodyGeometry());
+            sprite.FillBrush = brush;
+            layer.Shapes.Add(sprite);
+            root.Children.InsertAtTop(layer);
+        }
+
         var body = _compositor.CreateShapeVisual();
         body.RelativeSizeAdjustment = Vector2.One;
         body.Shapes.Add(_compositor.CreateSpriteShape(CreateBodyGeometry()));
@@ -163,6 +177,22 @@ public sealed partial class NotchShape : Grid
         root.Children.InsertAtTop(CreateEar(left: true));
         root.Children.InsertAtTop(CreateEar(left: false));
         return root;
+    }
+
+    /// <summary>Desplazamiento y opacidad de cada paso de la sombra (≈ 0 1px 0 rgba(0,0,0,.06), suavizada).</summary>
+    private static readonly (float Dy, byte Alpha)[] ShadowSteps = [(3, 8), (2, 12), (1, 16)];
+
+    private readonly List<(CompositionColorBrush Brush, byte Alpha)> _shadowBrushes = new();
+
+    /// <summary>
+    /// Sombra del tema claro. El diseño pide además <c>0 8px 18px rgba(0,0,0,.14)</c>, pero la ventana solo existe
+    /// dentro de la forma + hoverSens (para dejar pasar los clics) y una DropShadow de Composition rompe su
+    /// transparencia, así que se dibuja una sombra corta que cabe en ese margen.
+    /// </summary>
+    public void SetShadow(bool on)
+    {
+        foreach (var (brush, alpha) in _shadowBrushes)
+            brush.Color = Color.FromArgb(on ? alpha : (byte)0, 0, 0, 0);
     }
 
     /// <summary>

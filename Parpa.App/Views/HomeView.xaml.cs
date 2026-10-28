@@ -39,7 +39,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
             var dots = new DotMatrix
             {
                 Columns = SystemDots, Rows = 1, DotSize = 3, Gap = 2, VerticalAlignment = VerticalAlignment.Center,
-                OnColor = Res<Color>("PrimaryColor"), OffColor = Res<Color>("BorderColor"),
+                OnBrush = Theme.Brush("primary"), OffBrush = Theme.Brush("border"),
             };
             var value = new TextBlock
             {

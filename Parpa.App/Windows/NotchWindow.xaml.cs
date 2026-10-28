@@ -61,6 +61,11 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     private IntPtr _previousForeground;
     private DropKind? _dragKind;
     private string? _dragText;
+    private readonly MinimalView _minimal = new();
+    private bool _wasOpen;
+    private NotchPage? _lastPage;
+    private NotchPeek? _lastPeek;
+    private string _registeredKeys = string.Empty;
 
     public NotchWindow(ParpaSettings settings)
     {
@@ -87,8 +92,11 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         _open = new OpenView(new NotchServices(_vm, _s, this, _system, _notices, _clipboard, _shelf, _tasks, _notes, _focus));
         _vm.Changed += OnStateChanged;
 
-        Shape.Fill = Tokens.Current.Dark["bg"];
+        OnThemeChanged();
+        Theme.Changed += OnThemeChanged;
+        SettingsService.Current.Changed += OnSettingsChanged;
         Shape.AddView(_idle, anchorLeft: false);
+        Shape.AddView(_minimal, anchorLeft: false);
         Shape.AddView(_compact, anchorLeft: false);
         Shape.AddView(_osd, anchorLeft: false);
         Shape.AddView(_banner, anchorLeft: false);
@@ -130,12 +138,14 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
             _hiddenForFullscreen = fullscreen && _s.HideFull;
             Log.Info($"Pantalla completa: {fullscreen} → notch {(_hiddenForFullscreen ? "oculto" : "visible")}");
             _vm.SetSuppressed(_hiddenForFullscreen);
+            SoundService.Suppressed = _hiddenForFullscreen;
             if (_hiddenForFullscreen) Win32.ShowWindow(_hwnd, Win32.SW_HIDE);
             else ShowWithoutActivation();
         };
         _fullscreen.Start();
 
         // Atajo ocupado: error breve una vez al arrancar, con enlace a Ajustes.
+        _registeredKeys = string.Join("+", _s.Keys);
         if (!_hotkey.Register(_s.Keys))
         {
             Log.Info($"Atajo {string.Join("+", _s.Keys)} en uso por otra app");
@@ -176,7 +186,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         // Tarea a su hora: HECHO / POSPONER (10 min). No molestar la silencia.
         _tasks.Due += task =>
         {
-            if (_s.Dnd) return;
+            if (_s.DndActive) return;
             _vm.EnqueuePeek(new NotchPeek(
                 Glyph: "tareas",
                 Head: $"{Loc.Get("peek_task_due")} · {task.Time}",
@@ -368,8 +378,12 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
                 view = _osd;
                 break;
             case NotchState.Activity:
-                _compact.Show(_vm.Activity!, _s.Dnd);
+                _compact.Show(_vm.Activity!, _s.DndActive);
                 view = _compact;
+                break;
+            case NotchState.Minimal:
+                _minimal.Show(_vm.Activity, _geometry);
+                view = _minimal;
                 break;
             default:
                 _idle.Apply(_s, ReducedMotion);
@@ -389,10 +403,59 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         if (_vm.IsOpen) _outside.Start();
         else _outside.Stop();
 
+        // "Ocultar si no hay actividad": en reposo el notch es invisible (se puede seguir abriendo con el ratón).
+        Shape.Opacity = _s.HideIdle && _vm.State == NotchState.Idle ? 0 : 1;
+        PlayTransitionSounds(view);
+
         if (from == _geometry && view == _shownView) return; // solo cambió el contenido (p. ej. otro volumen)
         _shownView = view;
         UpdateRegion(from, _geometry);
         Shape.Show(view, _geometry, ReducedMotion ? Tokens.Current.ReducedMotion : Tokens.Current.ShapeMotion);
+    }
+
+    /// <summary>open/close al abrir y cerrar, page al cambiar de ventana, notify con un aviso nuevo, ring en llamadas.</summary>
+    private void PlayTransitionSounds(FrameworkElement view)
+    {
+        var page = _vm.IsLauncher ? null : _vm.Page;
+        if (_vm.IsOpen && !_wasOpen) SoundService.Play("open");
+        else if (!_vm.IsOpen && _wasOpen) SoundService.Play("close");
+        else if (_vm.IsOpen && page != _lastPage) SoundService.Play("page");
+
+        var peek = _vm.Peek;
+        if (peek is not null && peek != _lastPeek) SoundService.Play(peek.IsCall ? "ring" : "notify");
+        SoundService.SetRinging(peek?.IsCall == true);
+
+        _wasOpen = _vm.IsOpen;
+        _lastPage = page;
+        _lastPeek = peek;
+    }
+
+    /// <summary>Menú de bandeja › Abrir Parpa.</summary>
+    public void OpenFromTray()
+    {
+        ShowWithoutActivation();
+        if (!_vm.IsOpen) _vm.OnHotkey();
+    }
+
+    /// <summary>Ajustes cambiados (ventana de Ajustes, rápidos, bandeja): se aplican al instante.</summary>
+    private void OnSettingsChanged()
+    {
+        Reposition();
+        var keys = string.Join("+", _s.Keys);
+        if (keys != _registeredKeys)
+        {
+            _registeredKeys = keys;
+            if (!_hotkey.Register(_s.Keys)) Log.Info($"Atajo {keys} en uso por otra app");
+        }
+        _idle.Apply(_s, ReducedMotion);
+        _open.Apply(_s);
+        _vm.Refresh();
+    }
+
+    private void OnThemeChanged()
+    {
+        Shape.Fill = Theme.Get("bg");
+        Shape.SetShadow(Theme.IsLight);
     }
 
     /// <summary>Animaciones reducidas por el ajuste <c>anim</c> o por Windows ("Efectos de animación").</summary>
@@ -491,6 +554,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
                     var items = await e.DataView.GetStorageItemsAsync();
                     var first = _shelf.Add(items.Select(i => i.Path).Where(p => !string.IsNullOrEmpty(p)));
                     _open.Shelf.Select(first);
+                    SoundService.Play("confirm");
                     _vm.DragEnded(NotchPage.Shelf);
                     break;
                 case DropKind.Text when text is not null:

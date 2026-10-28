@@ -43,7 +43,7 @@ public sealed partial class LauncherView : Grid, INotchPageView
         Height = AreaHeight;
         Children.Add(_canvas);
 
-        _mascot = new DotMatrix { Columns = 13, Rows = 5, DotSize = 4, Gap = 1.5, OnColor = Res<Color>("PrimaryColor"), OffColor = Res<Color>("GlyphOffColor") };
+        _mascot = new DotMatrix { Columns = 13, Rows = 5, DotSize = 4, Gap = 1.5, OnBrush = Theme.Brush("primary"), OffBrush = Theme.Brush("glyphOff") };
         _mascotPill = new Border
         {
             Width = 108,
@@ -161,7 +161,7 @@ public sealed partial class LauncherView : Grid, INotchPageView
         label.Text = Loc.Get(page.TitleKey);
         label.Foreground = Res<Brush>("PrimaryBrush");
 
-        root.PointerEntered += (_, _) => SetHover(page.Id);
+        root.PointerEntered += (_, _) => { SoundService.Play("tick"); SetHover(page.Id); };
         root.PointerExited += (_, _) => SetHover(null);
         root.Tapped += (_, e) => { e.Handled = true; _app.Vm.ShowPage(page); };
         return new Bubble(page, root, circle, glyph, label, look);
@@ -239,7 +239,7 @@ public sealed partial class LauncherView : Grid, INotchPageView
             var isHover = _hover == bubble.Page.Id;
             bubble.Circle.Fill = isHover ? new SolidColorBrush(HoverFill) : Res<Brush>("CardBrush");
             bubble.Circle.Stroke = isHover ? Res<Brush>("PrimaryBrush") : null;
-            bubble.Glyph.OnColor = Res<Color>(isHover ? "PrimaryColor" : "SoftColor");
+            bubble.Glyph.OnColor = Theme.Get(isHover ? "primary" : "soft");
             bubble.Label.Opacity = isHover ? 1 : 0;
             bubble.Root.Opacity = _hover is not null && !isHover ? 0.45 : 1;
             bubble.Root.RenderTransformOrigin = new Windows.Foundation.Point(0.5, 0.5);

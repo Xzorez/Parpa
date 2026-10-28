@@ -74,7 +74,7 @@ public sealed class SystemMonitor : IDisposable
         SystemChanged?.Invoke();
         if (!_s.Osd) return;
         var level = muted ? 0 : percent;
-        _vm.ShowIndicator(new NotchIndicator(
+        Show("tick", new NotchIndicator(
             Glyph: "sonido",
             Label: Loc.Get("osd_volume"),
             Sub: Loc.Get(_audio.IsHeadphones ? "osd_headphones" : "osd_speakers"),
@@ -85,7 +85,7 @@ public sealed class SystemMonitor : IDisposable
     private void OnBrightnessChanged(int percent)
     {
         if (!_s.Osd) return;
-        _vm.ShowIndicator(new NotchIndicator(
+        Show("tick", new NotchIndicator(
             Glyph: "brillo",
             Label: Loc.Get("osd_brightness"),
             Sub: Loc.Format("osd_display_n", ("n", 1)),
@@ -96,7 +96,7 @@ public sealed class SystemMonitor : IDisposable
     private void OnChargerConnected(int percent)
     {
         if (!_s.Battery) return;
-        _vm.ShowIndicator(new NotchIndicator(
+        Show("notify", new NotchIndicator(
             Glyph: "bateria",
             Label: Loc.Get("osd_charging"),
             Sub: Loc.Get("osd_charger_in"),
@@ -108,7 +108,7 @@ public sealed class SystemMonitor : IDisposable
     private void OnBatteryLow(int percent)
     {
         if (!_s.Battery) return;
-        _vm.ShowIndicator(new NotchIndicator(
+        Show("decline", new NotchIndicator(
             Glyph: "bateria",
             Label: Loc.Get("osd_battery_low"),
             Sub: Loc.Format("osd_battery_left", ("pct", $"{percent}%")),
@@ -123,7 +123,7 @@ public sealed class SystemMonitor : IDisposable
         if (!_s.Wifi) return;
         var name = Loc.Upper(_network.NetworkName);
         var sub = _network.IsWifi ? $"{Loc.Upper(Loc.Get("quick_wifi"))} · {name}" : name;
-        _vm.ShowIndicator(new NotchIndicator(
+        Show(online ? "notify" : "decline", new NotchIndicator(
             Glyph: "wifi",
             Label: Loc.Get(online ? "osd_online" : "osd_offline"),
             Sub: sub,
@@ -135,12 +135,19 @@ public sealed class SystemMonitor : IDisposable
     private void OnHeadphones(string deviceName)
     {
         if (!_s.Buds) return;
-        _vm.ShowIndicator(new NotchIndicator(
+        Show("notify", new NotchIndicator(
             Glyph: "cascos",
             Label: Loc.Get("osd_headphones"),
             Sub: Loc.Upper(deviceName),
             Level: 100,
             Value: "OK"));
+    }
+
+    /// <summary>Indicador + su sonido (tick para niveles, notify para avisos, decline si algo se pierde).</summary>
+    private void Show(string sound, NotchIndicator indicator)
+    {
+        _vm.ShowIndicator(indicator);
+        SoundService.Play(sound);
     }
 
     public void Dispose()

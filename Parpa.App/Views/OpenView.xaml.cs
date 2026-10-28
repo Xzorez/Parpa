@@ -31,6 +31,7 @@ public sealed partial class OpenView : UserControl
             [NotchPage.Shelf] = Shelf,
             [NotchPage.Todo] = tasks,
             [NotchPage.Notes] = new NotesView(app),
+            [NotchPage.Quick] = new QuickView(app),
         };
         _launcher = new LauncherView(app);
         foreach (var view in _pages.Values.Append(_launcher))

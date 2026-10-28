@@ -23,8 +23,8 @@
                 <c:DotMatrix
                     x:Name="PageGlyph"
                     VerticalAlignment="Center"
-                    OnColor="{StaticResource PrimaryColor}"
-                    OffColor="{StaticResource GlyphOffColor}" />
+                    OnBrush="{StaticResource PrimaryBrush}"
+                    OffBrush="{StaticResource GlyphOffBrush}" />
                 <TextBlock
                     x:Name="PageTitle"
                     VerticalAlignment="Center"
@@ -52,7 +52,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Glyph="menu"
-                    OnColor="{StaticResource SecondaryColor}" />
+                    OnBrush="{StaticResource SecondaryBrush}" />
             </Border>
 
             <TextBlock

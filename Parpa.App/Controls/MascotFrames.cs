@@ -94,6 +94,9 @@ public static class MascotFrames
     /// <summary>Contenta y quieta ("^ ^"), para estados vacíos.</summary>
     public static bool[] HappyStill() => Happy(0);
 
+    /// <summary>Contenta, abajo o una fila arriba (para botar al ritmo que se quiera).</summary>
+    public static bool[] HappyAt(bool up) => Happy(up ? 3 : 0);
+
     /// <summary>Apagada (ojos cerrados, sin "z"): permiso de avisos denegado.</summary>
     public static bool[] Off()
     {

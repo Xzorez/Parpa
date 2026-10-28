@@ -47,7 +47,7 @@ public sealed class NoticeCenter : IDisposable
             Log.Info($"Avisos: «{notice.App}» desactivada en Ajustes");
             return;
         }
-        if (_s.Dnd && !isCall) return; // No molestar: se descarta en silencio; las llamadas siguen entrando
+        if (_s.DndActive && !isCall) return; // No molestar: se descarta en silencio; las llamadas siguen entrando
         if (isCall) Log.Info($"Avisos: «{notice.App}» es una llamada");
 
         var app = Loc.Upper(notice.App);

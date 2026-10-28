@@ -19,8 +19,8 @@
             Rows="5"
             DotSize="3"
             Gap="1.5"
-            OnColor="{StaticResource PrimaryColor}"
-            OffColor="{StaticResource MatrixOffColor}" />
+            OnBrush="{StaticResource PrimaryBrush}"
+            OffBrush="{StaticResource MatrixOffBrush}" />
         <TextBlock
             x:Name="Clock"
             VerticalAlignment="Center"
@@ -33,7 +33,7 @@
             x:Name="Moon"
             VerticalAlignment="Center"
             Glyph="luna"
-            OnColor="{StaticResource SecondaryColor}"
+            OnBrush="{StaticResource SecondaryBrush}"
             Visibility="Collapsed" />
     </StackPanel>
 </UserControl>

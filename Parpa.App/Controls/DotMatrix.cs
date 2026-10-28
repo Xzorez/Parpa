@@ -3,6 +3,7 @@ using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Media;
 using Parpa.Services;
 using Windows.UI;
 
@@ -22,7 +23,11 @@ public sealed partial class DotMatrix : Grid
     public static readonly DependencyProperty OnColorProperty = Register(nameof(OnColor), typeof(Color), Color.FromArgb(255, 0xf2, 0xf2, 0xf0));
     public static readonly DependencyProperty OffColorProperty = Register(nameof(OffColor), typeof(Color), Color.FromArgb(0, 0, 0, 0));
     public static readonly DependencyProperty CountProperty = Register(nameof(Count), typeof(int), -1);
+    public static readonly DependencyProperty OnBrushProperty = Register(nameof(OnBrush), typeof(SolidColorBrush), null);
+    public static readonly DependencyProperty OffBrushProperty = Register(nameof(OffBrush), typeof(SolidColorBrush), null);
 
+    private (SolidColorBrush Brush, long Token)? _onWatch;
+    private (SolidColorBrush Brush, long Token)? _offWatch;
     private ShapeVisual? _visual;
     private CompositionColorBrush? _onBrush;
     private CompositionColorBrush? _offBrush;
@@ -44,6 +49,12 @@ public sealed partial class DotMatrix : Grid
     public Color OnColor { get => (Color)GetValue(OnColorProperty); set => SetValue(OnColorProperty, value); }
     public Color OffColor { get => (Color)GetValue(OffColorProperty); set => SetValue(OffColorProperty, value); }
 
+    /// <summary>Color de los puntos encendidos que sigue a un pincel del tema (cambia con oscuro/claro).</summary>
+    public SolidColorBrush? OnBrush { get => (SolidColorBrush?)GetValue(OnBrushProperty); set => SetValue(OnBrushProperty, value); }
+
+    /// <summary>Color de los puntos apagados que sigue a un pincel del tema.</summary>
+    public SolidColorBrush? OffBrush { get => (SolidColorBrush?)GetValue(OffBrushProperty); set => SetValue(OffBrushProperty, value); }
+
     /// <summary>Solo se dibujan los primeros N puntos (−1 = todos), p. ej. 25 minutos en filas de 17.</summary>
     public int Count { get => (int)GetValue(CountProperty); set => SetValue(CountProperty, value); }
 
@@ -60,10 +71,22 @@ public sealed partial class DotMatrix : Grid
     private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var m = (DotMatrix)d;
-        if (e.Property == OnColorProperty && m._onBrush is not null) m._onBrush.Color = m.OnColor;
-        else if (e.Property == OffColorProperty && m._offBrush is not null) m._offBrush.Color = m.OffColor;
+        if (e.Property == OnColorProperty) { if (m._onBrush is not null) m._onBrush.Color = m.OnColor; }
+        else if (e.Property == OffColorProperty) { if (m._offBrush is not null) m._offBrush.Color = m.OffColor; }
+        else if (e.Property == OnBrushProperty) m._onWatch = Watch(m._onWatch, m.OnBrush, c => m.OnColor = c);
+        else if (e.Property == OffBrushProperty) m._offWatch = Watch(m._offWatch, m.OffBrush, c => m.OffColor = c);
         else if (e.Property == GlyphProperty) { m._cells = null; m.ApplyCells(); }
         else m.Rebuild();
+    }
+
+    /// <summary>Copia el color del pincel y lo sigue cuando cambia (tema).</summary>
+    internal static (SolidColorBrush, long)? Watch((SolidColorBrush Brush, long Token)? old, SolidColorBrush? brush, Action<Color> apply)
+    {
+        if (old is { } o) o.Brush.UnregisterPropertyChangedCallback(SolidColorBrush.ColorProperty, o.Token);
+        if (brush is null) return null;
+        apply(brush.Color);
+        var token = brush.RegisterPropertyChangedCallback(SolidColorBrush.ColorProperty, (s, _) => apply(((SolidColorBrush)s).Color));
+        return (brush, token);
     }
 
     private void Rebuild()

@@ -17,7 +17,7 @@
             <c:DotMatrix
                 x:Name="PeekGlyph"
                 VerticalAlignment="Center"
-                OffColor="{StaticResource GlyphOffColor}" />
+                OffBrush="{StaticResource GlyphOffBrush}" />
             <TextBlock
                 x:Name="Head"
                 Grid.Column="1"
@@ -102,7 +102,7 @@
             Rows="1"
             DotSize="2"
             Gap="2"
-            OnColor="{StaticResource TertiaryColor}"
-            OffColor="{StaticResource GlyphOffColor}" />
+            OnBrush="{StaticResource TertiaryBrush}"
+            OffBrush="{StaticResource GlyphOffBrush}" />
     </StackPanel>
 </UserControl>
