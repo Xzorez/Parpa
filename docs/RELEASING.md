@@ -65,7 +65,7 @@ Con `SIGNPATH_ORGANIZATION_ID` definida, el flujo firma automáticamente; sin el
 
 Cada versión pide cuatro firmas (app e instalador, x64 y arm64) y cada una se **aprueba a mano** en SignPath: el flujo espera hasta una hora por cada una.
 
-La política de firma que exige SignPath Foundation está en la web (`site/index.html`, sección `#firma`), en el README y al principio de las notas de cada release.
+SignPath Foundation rechazó la primera solicitud (octubre de 2026) por falta de reputación pública: piden estrellas, forks, artículos o menciones. Cuando Parpa las tenga, se puede volver a pedir. Antes hay que recuperar la política de firma que exigen (commit `fdf1c16`: sección `#firma` de la web, README y primera línea de las notas de cada release). Mientras no esté aprobado, esa política no se publica.
 
 ## 3. winget
 

@@ -126,7 +126,6 @@ jobs:
         shell: pwsh
         run: |
           $version = $env:TAG.TrimStart('v')
-          $notes = 'Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org). [Code signing policy](https://xzorez.github.io/Parpa/#firma)'
-          gh release create $env:TAG --draft --title "Parpa $version" --notes $notes --generate-notes `
+          gh release create $env:TAG --draft --title "Parpa $version" --generate-notes `
             (Get-ChildItem artifacts -Filter 'Parpa-Setup-*.exe').FullName `
             artifacts/SHA256SUMS.txt "artifacts/winget-manifests-$version.zip"
