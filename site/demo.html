@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parpa · demo</title>
+<meta name="description" content="Prueba Parpa en el navegador: pasa el ratón por el notch, abre sus ventanas y simula música, avisos y volumen.">
+<meta name="theme-color" content="#0b0b0c">
+<link rel="icon" href="assets/app.ico" sizes="any">
+<link rel="icon" href="assets/app-32.png" type="image/png">
+<link rel="preload" href="assets/fonts/Doto-Variable.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="assets/fonts/GeistMono-Variable.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="demo.css">
+</head>
+<body class="demo-body">
+
+<header class="top">
+  <div class="wrap top-row">
+    <a class="brand" href="./" aria-label="Parpa"><span class="logo"><i></i><i></i></span><span class="wordmark">PARPA</span></a>
+    <nav>
+      <a class="anchor" href="./" data-t="nav_back">← INICIO</a>
+      <button class="lang" type="button" id="lang">[EN]</button>
+      <a class="pill" href="./#descargar" data-t="nav_download">DESCARGAR</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap demo-main">
+  <div class="demo-intro">
+    <div class="section-head"><span class="index">[ DEMO ]</span><span class="eyebrow" data-t="eyebrow">PRUÉBALO EN EL NAVEGADOR</span></div>
+    <h1 class="demo-title" data-t="title">Juega con el notch.</h1>
+    <p class="demo-lead" data-t="lead">Es la misma isla que verás arriba de tu pantalla en Windows, con sus medidas y animaciones. Pasa el ratón por encima, abre sus ventanas y usa los botones de abajo para simular lo que pasa en tu PC.</p>
+  </div>
+
+  <div class="desk" id="desk">
+    <div class="wallpaper"></div>
+    <div class="hint" id="hint"><span data-t="hint">PASA EL RATÓN POR EL NOTCH</span> ↑</div>
+
+    <div class="n-wrap" id="nwrap">
+      <div class="n-hit" id="nhit"></div>
+      <div class="n-shape" id="nshape">
+        <div class="n-ear n-ear-l"></div>
+        <div class="n-ear n-ear-r"></div>
+        <div class="n-body" id="nbody"><div class="n-content" id="ncontent"></div></div>
+      </div>
+    </div>
+
+    <div class="dropzone" id="dropzone"></div>
+    <div class="flash" id="flash"></div>
+
+    <div class="taskbar-d">
+      <span class="tb-start"><i></i><i></i><i></i><i></i></span>
+      <span class="tb-apps"><i class="on"></i><i></i><i></i><i></i></span>
+      <span class="tb-clock" id="tbclock">20:30</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <span class="eyebrow" data-t="simulate">SIMULAR</span>
+      <span class="mono-s" data-t="local">NADA SALE DE TU NAVEGADOR</span>
+    </div>
+    <div class="panel-grid">
+      <button class="sim" data-sim="music"><span class="g" data-g="musica"></span><span id="sim-music" data-t="sim_play">PONER MÚSICA</span></button>
+      <button class="sim" data-sim="notify"><span class="g" data-g="mensaje"></span><span data-t="sim_notify">RECIBIR UN AVISO</span></button>
+      <button class="sim" data-sim="voldown"><span class="g" data-g="sonido"></span><span data-t="sim_voldown">VOLUMEN −</span></button>
+      <button class="sim" data-sim="volup"><span class="g" data-g="sonido"></span><span data-t="sim_volup">VOLUMEN +</span></button>
+      <button class="sim" data-sim="bright"><span class="g" data-g="brillo"></span><span data-t="sim_bright">BRILLO</span></button>
+      <button class="sim" data-sim="copy"><span class="g" data-g="copias"></span><span data-t="sim_copy">COPIAR UN TEXTO</span></button>
+      <button class="sim" data-sim="file"><span class="g" data-g="bandeja"></span><span data-t="sim_file">SOLTAR UN ARCHIVO</span></button>
+      <button class="sim" data-sim="toggle"><span class="g" data-g="inicio"></span><span data-t="sim_toggle">WIN + ALT + N</span></button>
+    </div>
+    <ul class="tips">
+      <li data-t="tip1">Pasa el ratón por el notch para abrirlo; al salir se cierra.</li>
+      <li data-t="tip2">La rueda del ratón cambia de ventana. Esc lo cierra.</li>
+      <li data-t="tip3">Arrastra archivos de tu PC hasta el notch: van a la Bandeja.</li>
+      <li data-t="tip4">Selecciona cualquier texto de esta página y pulsa Ctrl + C: aparecerá en el Portapapeles.</li>
+    </ul>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap footer-row">
+    <span class="wordmark">PARPA</span>
+    <span class="mono-s" data-t="footer">CÓDIGO ABIERTO CON LICENCIA MIT</span>
+    <span class="spacer"></span>
+    <a href="./" data-t="footer_home">WEB</a>
+    <a href="https://github.com/Xzorez/Parpa">GITHUB</a>
+    <a href="./#descargar" data-t="footer_download">DESCARGAR</a>
+  </div>
+</footer>
+
+<script src="demo.js"></script>
+</body>
+</html>
