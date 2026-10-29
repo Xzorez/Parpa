@@ -6,7 +6,7 @@
     <RootNamespace>Parpa</RootNamespace>
     <AssemblyName>Parpa</AssemblyName>
     <Product>Parpa</Product>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Company>Parpa</Company>
     <Copyright>© 2026 Xzorez · MIT</Copyright>
     <!-- Solo los recursos de idioma de la app (es/en): el resto de carpetas de idioma no se publican. -->
