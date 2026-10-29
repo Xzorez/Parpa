@@ -31,9 +31,10 @@ public sealed record NotchPage(string Id, string TitleKey, string Glyph, string 
 
 /// <summary>
 /// Actividad en vivo del notch compacto. <see cref="SizeToken"/> da el ancho (tokens.json › notch).
-/// A la derecha: ecualizador si <see cref="RightText"/> es null; si no, ese texto en Doto (temporizadores).
+/// A la derecha: punto vivo en acento si <see cref="Live"/> (micro/cámara); si no, ecualizador si
+/// <see cref="RightText"/> es null, o ese texto en Doto (temporizadores).
 /// </summary>
-public sealed record NotchActivity(string SizeToken, string Glyph, string Label, string Sub, bool IsPlaying, string? RightText = null);
+public sealed record NotchActivity(string SizeToken, string Glyph, string Label, string Sub, bool IsPlaying, string? RightText = null, bool Live = false);
 
 /// <summary>
 /// Indicador del sistema (340×40). <see cref="Level"/> 0–100 llena las 16 barras.
@@ -62,11 +63,12 @@ public sealed record NotchPeek(
 
 public sealed class NotchViewModel
 {
+    public const string ActivityPrivacy = "privacy";
     public const string ActivityFocus = "focus";
     public const string ActivityMusic = "music";
 
-    /// <summary>Orden de prioridad de las actividades (gana la primera presente).</summary>
-    private static readonly string[] ActivityOrder = [ActivityFocus, ActivityMusic];
+    /// <summary>Orden de prioridad de las actividades (gana la primera presente). Micro/cámara siempre delante.</summary>
+    private static readonly string[] ActivityOrder = [ActivityPrivacy, ActivityFocus, ActivityMusic];
 
     /// <summary>Alto del modo minimal (tokens.json › notch › minimal).</summary>
     private const double MinimalHeight = 24;
@@ -89,6 +91,7 @@ public sealed class NotchViewModel
     private bool _pointerInside;
     private bool _suppressed;
     private bool _holdOpen;
+    private bool _dotOnly;
     private DateTime _lastWheel;
     private TimeSpan _peekTotal;
     private TimeSpan _peekRemaining;
@@ -318,6 +321,18 @@ public sealed class NotchViewModel
         TryShowNextPeek(update: true);
     }
 
+    /// <summary>
+    /// Pantalla completa con micro/cámara en uso y <c>micAlways</c>: solo queda el punto rojo (minimal)
+    /// y el notch no se abre con el ratón, para no tapar ni robar clics.
+    /// </summary>
+    public void SetDotOnly(bool dotOnly)
+    {
+        if (_dotOnly == dotOnly) return;
+        _dotOnly = dotOnly;
+        if (dotOnly) Close();
+        Update();
+    }
+
     /// <summary>Un ajuste cambió (minimal, ventanas visibles…): recalcula el estado.</summary>
     public void Refresh()
     {
@@ -331,7 +346,7 @@ public sealed class NotchViewModel
             : _isOpen ? NotchState.Open
             : Peek is not null ? NotchState.Peek
             : Indicator is not null ? NotchState.Osd
-            : _s.Minimal ? NotchState.Minimal // sustituye a Actividad y Reposo
+            : _s.Minimal || _dotOnly ? NotchState.Minimal // sustituye a Actividad y Reposo
             : Activity is not null ? NotchState.Activity
             : NotchState.Idle;
         Changed?.Invoke();
@@ -363,7 +378,7 @@ public sealed class NotchViewModel
     /// <summary>Rueda sobre el notch: cerrado abre Inicio; abierto cambia de ventana (si <c>wheel</c>).</summary>
     public void OnWheel(int delta)
     {
-        if (!_s.Wheel || DateTime.UtcNow - _lastWheel < WheelThrottle) return;
+        if (!_s.Wheel || _dotOnly || DateTime.UtcNow - _lastWheel < WheelThrottle) return;
         _lastWheel = DateTime.UtcNow;
         if (!_isOpen)
         {
@@ -423,6 +438,7 @@ public sealed class NotchViewModel
     {
         _pointerInside = true;
         _closeTimer.Stop();
+        if (_dotOnly) return;
         if (Peek is not null)
         {
             PausePeek(); // hover pausa el aviso; no abre el notch encima de él
@@ -448,7 +464,7 @@ public sealed class NotchViewModel
     /// <summary>Clic en el notch: abre en la última ventana.</summary>
     public void OnClicked()
     {
-        if (_isOpen || Peek is not null) return; // en un aviso, los clics van a sus botones
+        if (_isOpen || Peek is not null || _dotOnly) return; // en un aviso, los clics van a sus botones
         Open(_lastPage);
     }
 

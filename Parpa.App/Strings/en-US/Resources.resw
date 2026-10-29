@@ -18,6 +18,8 @@
   <data name="compact_idle" xml:space="preserve"><value>IDLE</value></data>
   <data name="compact_focus" xml:space="preserve"><value>FOCUS</value></data>
   <data name="compact_mic_cam" xml:space="preserve"><value>MIC · CAMERA</value></data>
+  <data name="compact_mic" xml:space="preserve"><value>MIC</value></data>
+  <data name="compact_camera" xml:space="preserve"><value>CAMERA</value></data>
   <data name="compact_download" xml:space="preserve"><value>DOWNLOAD</value></data>
   <data name="compact_in_call" xml:space="preserve"><value>IN CALL</value></data>
   <data name="compact_reply_ready" xml:space="preserve"><value>REPLY READY</value></data>
@@ -273,6 +275,7 @@
   <data name="settings_wifi_d" xml:space="preserve"><value>When the connection drops or comes back.</value></data>
   <data name="settings_buds" xml:space="preserve"><value>Headphone alerts</value></data>
   <data name="settings_low_power" xml:space="preserve"><value>Battery saver</value></data>
+  <data name="settings_low_power_d" xml:space="preserve"><value>Fewer animations and refreshes when unplugged.</value></data>
   <data name="settings_reset" xml:space="preserve"><value>RESET</value></data>
   <data name="settings_close" xml:space="preserve"><value>CLOSE</value></data>
   <data name="settings_on" xml:space="preserve"><value>ON</value></data>

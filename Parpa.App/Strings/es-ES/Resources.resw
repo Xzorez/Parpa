@@ -18,6 +18,8 @@
   <data name="compact_idle" xml:space="preserve"><value>REPOSO</value></data>
   <data name="compact_focus" xml:space="preserve"><value>FOCO</value></data>
   <data name="compact_mic_cam" xml:space="preserve"><value>MICRO · CÁMARA</value></data>
+  <data name="compact_mic" xml:space="preserve"><value>MICRO</value></data>
+  <data name="compact_camera" xml:space="preserve"><value>CÁMARA</value></data>
   <data name="compact_download" xml:space="preserve"><value>DESCARGA</value></data>
   <data name="compact_in_call" xml:space="preserve"><value>EN LLAMADA</value></data>
   <data name="compact_reply_ready" xml:space="preserve"><value>RESPUESTA LISTA</value></data>
@@ -273,6 +275,7 @@
   <data name="settings_wifi_d" xml:space="preserve"><value>Al perder o recuperar la conexión.</value></data>
   <data name="settings_buds" xml:space="preserve"><value>Avisos de auriculares</value></data>
   <data name="settings_low_power" xml:space="preserve"><value>Ahorro de batería</value></data>
+  <data name="settings_low_power_d" xml:space="preserve"><value>Sin cargador, menos animaciones y refresco.</value></data>
   <data name="settings_reset" xml:space="preserve"><value>RESTABLECER</value></data>
   <data name="settings_close" xml:space="preserve"><value>CERRAR</value></data>
   <data name="settings_on" xml:space="preserve"><value>SÍ</value></data>

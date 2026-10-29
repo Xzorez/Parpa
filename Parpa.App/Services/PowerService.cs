@@ -21,6 +21,15 @@ public sealed class PowerService
 
     public static int Percent => PowerManager.RemainingChargePercent;
 
+    /// <summary>
+    /// Ahorro de batería (ajuste <c>lowPower</c>): con batería y sin cargador, menos animaciones y refresco.
+    /// En un PC de sobremesa nunca se activa.
+    /// </summary>
+    public static bool SaverActive => SettingsService.Current?.S.LowPower == true && HasBattery && !IsPluggedIn;
+
+    /// <summary>Se enchufó o desenchufó el cargador (puede cambiar <see cref="SaverActive"/>).</summary>
+    public static event Action? SaverChanged;
+
     public void Start()
     {
         if (!HasBattery) return;
@@ -37,6 +46,7 @@ public sealed class PowerService
         var plugged = IsPluggedIn;
         var percent = Percent;
         if (plugged && !_pluggedIn) ChargerConnected?.Invoke(percent);
+        if (plugged != _pluggedIn) SaverChanged?.Invoke();
         _pluggedIn = plugged;
 
         if (percent > LowBatteryPercent) _lowNotified = false;

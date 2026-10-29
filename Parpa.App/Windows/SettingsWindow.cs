@@ -334,6 +334,7 @@ public sealed class SettingsWindow : Window
                 yield return new Head(L("settings_h_visibility"));
                 yield return new Row(L("settings_minimal"), L("settings_minimal_d"), () => Toggle(s.Minimal, v => Set(x => x.Minimal = v)));
                 yield return new Row(L("settings_hide_full"), L("settings_hide_full_d"), () => Toggle(s.HideFull, v => Set(x => x.HideFull = v)));
+                yield return new Row(L("settings_mic_always"), L("settings_mic_always_d"), () => Toggle(s.MicAlways, v => Set(x => x.MicAlways = v)), s.HideFull ? 1 : 0.4);
                 break;
 
             case "look":
@@ -398,6 +399,7 @@ public sealed class SettingsWindow : Window
                 yield return new Row(L("settings_battery"), L("settings_battery_d"), () => Toggle(s.Battery, v => Set(x => x.Battery = v)));
                 yield return new Row(L("settings_wifi"), L("settings_wifi_d"), () => Toggle(s.Wifi, v => Set(x => x.Wifi = v)));
                 yield return new Row(L("settings_buds"), L("settings_buds_d"), () => Toggle(s.Buds, v => Set(x => x.Buds = v)));
+                yield return new Row(L("settings_low_power"), L("settings_low_power_d"), () => Toggle(s.LowPower, v => Set(x => x.LowPower = v)));
                 yield return new Head(L("settings_h_data"));
                 yield return new Row(L("settings_export"), L("settings_export_d"), () => Button(L("settings_export_btn"), ExportAsync));
                 yield return new Row(L("settings_import"), L("settings_import_d"), () => Button(L("settings_import_btn"), ImportAsync));

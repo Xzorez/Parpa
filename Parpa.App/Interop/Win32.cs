@@ -84,6 +84,15 @@ public static partial class Win32
     public delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdc, ref RECT rect, IntPtr data);
     public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
+    // ---- Registro: aviso de cambios (micro/cámara en uso) ----
+    public const uint REG_NOTIFY_CHANGE_NAME = 0x1;
+    public const uint REG_NOTIFY_CHANGE_LAST_SET = 0x4;
+    /// <summary>Windows 8+: el aviso no depende del hilo que lo pidió (vale desde el grupo de hilos).</summary>
+    public const uint REG_NOTIFY_THREAD_AGNOSTIC = 0x10000000;
+
+    [DllImport("advapi32.dll")]
+    public static extern int RegNotifyChangeKeyValue(Microsoft.Win32.SafeHandles.SafeRegistryHandle hKey, bool bWatchSubtree, uint dwNotifyFilter, Microsoft.Win32.SafeHandles.SafeWaitHandle hEvent, bool fAsynchronous);
+
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
     public static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
 

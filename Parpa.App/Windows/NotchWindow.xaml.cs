@@ -34,13 +34,14 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     private readonly Win32.SubclassProc _wndProc;
     private readonly SystemMonitor _system;
     private readonly NoticeCenter _notices;
-    private readonly FullscreenWatcher _fullscreen;
+    private readonly FullscreenWatcher _fullscreenWatcher;
     private readonly ClipboardService _clipboard;
     private readonly ShelfService _shelf;
     private readonly TasksService _tasks = new();
     private readonly NotesService _notes = new();
     private readonly FocusService _focus;
     private readonly MemoryTrim _trim;
+    private readonly PrivacyIndicatorService _privacy = new();
     private readonly IdleView _idle = new();
     private readonly CompactView _compact = new();
     private readonly OsdView _osd = new();
@@ -57,6 +58,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     private NotchGeometry _geometry;
     private FrameworkElement? _shownView;
     private Win32.RECT _monitorBounds;  // monitor donde está el notch, en píxeles físicos
+    private bool _fullscreen;
     private bool _hiddenForFullscreen;
     private bool _typing;
     private IntPtr _previousForeground;
@@ -134,22 +136,31 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         _ = _notices.StartAsync();
         WireWindows();
 
+        // Micro / cámara en uso: actividad "micro" con punto vivo, por delante de foco y música.
+        _privacy.Changed += _ => ShowPrivacy();
+        Loc.LanguageChanged += ShowPrivacy;
+        _privacy.Start();
+
+        // Ahorro de batería (lowPower): sin cargador, animaciones reducidas y menos refresco.
+        PowerService.SaverChanged += () => DispatcherQueue.TryEnqueue(() =>
+        {
+            Log.Info($"Ahorro de batería: {PowerService.SaverActive}");
+            _idle.Apply(_s, ReducedMotion);
+            _vm.Refresh();
+        });
+
         // Tras arrancar y cada vez que se cierra el notch: GC y recorte del working set.
         _trim.Schedule();
 
         // Pantalla completa en el monitor del notch + hideFull: se aparta (sin tapar ni capturar clics) y los avisos esperan.
-        _fullscreen = new FullscreenWatcher(_hwnd, () => _monitorBounds);
-        _fullscreen.Changed += fullscreen =>
+        _fullscreenWatcher = new FullscreenWatcher(_hwnd, () => _monitorBounds);
+        _fullscreenWatcher.Changed += fullscreen =>
         {
-            _hiddenForFullscreen = fullscreen && _s.HideFull;
-            Log.Info($"Pantalla completa: {fullscreen} → notch {(_hiddenForFullscreen ? "oculto" : "visible")}");
-            _vm.SetSuppressed(_hiddenForFullscreen);
-            _notices.SetRelaxed(_hiddenForFullscreen);
-            SoundService.Suppressed = _hiddenForFullscreen;
-            if (_hiddenForFullscreen) Win32.ShowWindow(_hwnd, Win32.SW_HIDE);
-            else ShowWithoutActivation();
+            _fullscreen = fullscreen;
+            Log.Info($"Pantalla completa: {fullscreen}");
+            ApplyFullscreen();
         };
-        _fullscreen.Start();
+        _fullscreenWatcher.Start();
 
         // Atajo ocupado: error breve una vez al arrancar, con enlace a Ajustes.
         _registeredKeys = string.Join("+", _s.Keys);
@@ -166,7 +177,37 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
             _outside.Dispose();
             _system.Dispose();
             _notices.Dispose();
+            _privacy.Dispose();
         };
+    }
+
+    private void ShowPrivacy()
+    {
+        var state = _privacy.State;
+        _vm.SetActivity(NotchViewModel.ActivityPrivacy, !state.Active ? null : new NotchActivity(
+            SizeToken: "mic",
+            Glyph: state.Mic ? "micro" : "ojo",
+            Label: Loc.Get(state.Mic && state.Camera ? "compact_mic_cam" : state.Mic ? "compact_mic" : "compact_camera"),
+            Sub: state.App.ToUpperInvariant(),
+            IsPlaying: false,
+            Live: true));
+        ApplyFullscreen();
+    }
+
+    /// <summary>
+    /// Pantalla completa + <c>hideFull</c>: el notch se aparta y los avisos esperan. Si además se están usando
+    /// el micro o la cámara y está <c>micAlways</c>, queda solo el punto rojo (sin abrirse con el ratón).
+    /// </summary>
+    private void ApplyFullscreen()
+    {
+        _hiddenForFullscreen = _fullscreen && _s.HideFull;
+        var dotOnly = _hiddenForFullscreen && _s.MicAlways && _privacy.State.Active;
+        _vm.SetSuppressed(_hiddenForFullscreen);
+        _vm.SetDotOnly(dotOnly);
+        _notices.SetRelaxed(_hiddenForFullscreen);
+        SoundService.Suppressed = _hiddenForFullscreen;
+        if (_hiddenForFullscreen && !dotOnly) Win32.ShowWindow(_hwnd, Win32.SW_HIDE);
+        else Win32.ShowWindow(_hwnd, Win32.SW_SHOWNOACTIVATE);
     }
 
     /// <summary>Portapapeles, tareas y foco: lo que aparece en el notch cerrado.</summary>
@@ -221,7 +262,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     /// <summary>Muestra la ventana sin quitar el foco a la app activa (salvo que esté apartada por pantalla completa).</summary>
     public void ShowWithoutActivation()
     {
-        if (!_hiddenForFullscreen) Win32.ShowWindow(_hwnd, Win32.SW_SHOWNOACTIVATE);
+        if (!_hiddenForFullscreen || (_s.MicAlways && _privacy.State.Active)) Win32.ShowWindow(_hwnd, Win32.SW_SHOWNOACTIVATE);
     }
 
     // ---- Teclado (IKeyboardHost) ----
@@ -386,11 +427,11 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
                 view = _osd;
                 break;
             case NotchState.Activity:
-                _compact.Show(_vm.Activity!, _s.DndActive);
+                _compact.Show(_vm.Activity!, _s.DndActive, accent);
                 view = _compact;
                 break;
             case NotchState.Minimal:
-                _minimal.Show(_vm.Activity, _geometry);
+                _minimal.Show(_vm.Activity, _geometry, accent);
                 view = _minimal;
                 break;
             default:
@@ -490,6 +531,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         }
         _idle.Apply(_s, ReducedMotion);
         _open.Apply(_s);
+        ApplyFullscreen(); // hideFull o micAlways pueden haber cambiado
         _vm.Refresh();
     }
 
@@ -499,8 +541,8 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         Shape.SetShadow(Theme.IsLight);
     }
 
-    /// <summary>Animaciones reducidas por el ajuste <c>anim</c> o por Windows ("Efectos de animación").</summary>
-    private bool ReducedMotion => _s.Anim == "reduced" || !_uiSettings.AnimationsEnabled;
+    /// <summary>Animaciones reducidas por el ajuste <c>anim</c>, por Windows ("Efectos de animación") o por ahorro de batería.</summary>
+    private bool ReducedMotion => _s.Anim == "reduced" || !_uiSettings.AnimationsEnabled || PowerService.SaverActive;
 
     private IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam, IntPtr id, IntPtr data)
     {

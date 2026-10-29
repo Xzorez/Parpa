@@ -1,5 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Shapes;
 using Parpa.Controls;
 using Parpa.Services;
 using Parpa.ViewModels;
@@ -21,16 +23,30 @@ public sealed partial class MinimalView : Grid
         OnBrush = Theme.Brush("secondary"),
     };
 
+    /// <summary>Micro/cámara en uso: en minimal se ve el punto rojo en vez del glifo.</summary>
+    private readonly Ellipse _liveDot = new()
+    {
+        Width = 6,
+        Height = 6,
+        HorizontalAlignment = HorizontalAlignment.Center,
+        VerticalAlignment = VerticalAlignment.Center,
+        Visibility = Visibility.Collapsed,
+    };
+
     public MinimalView()
     {
         Height = 24;
         Children.Add(_glyph);
+        Children.Add(_liveDot);
     }
 
-    public void Show(NotchActivity? activity, NotchGeometry geometry)
+    public void Show(NotchActivity? activity, NotchGeometry geometry, Windows.UI.Color accent)
     {
         Width = geometry.Width;
-        _glyph.Visibility = activity is null ? Visibility.Collapsed : Visibility.Visible;
+        var live = activity?.Live == true;
+        _glyph.Visibility = activity is null || live ? Visibility.Collapsed : Visibility.Visible;
+        _liveDot.Visibility = live ? Visibility.Visible : Visibility.Collapsed;
+        _liveDot.Fill = new SolidColorBrush(accent);
         if (activity is not null) _glyph.Glyph = activity.Glyph;
     }
 }

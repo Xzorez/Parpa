@@ -28,6 +28,8 @@
     "idle":         { "es": "REPOSO", "en": "IDLE" },
     "focus":        { "es": "FOCO", "en": "FOCUS" },
     "mic_cam":      { "es": "MICRO · CÁMARA", "en": "MIC · CAMERA" },
+    "mic":          { "es": "MICRO", "en": "MIC" },
+    "camera":       { "es": "CÁMARA", "en": "CAMERA" },
     "download":     { "es": "DESCARGA", "en": "DOWNLOAD" },
     "in_call":      { "es": "EN LLAMADA", "en": "IN CALL" },
     "reply_ready":  { "es": "RESPUESTA LISTA", "en": "REPLY READY" }
@@ -309,6 +311,7 @@
     "wifi_d":         { "es": "Al perder o recuperar la conexión.", "en": "When the connection drops or comes back." },
     "buds":           { "es": "Avisos de auriculares", "en": "Headphone alerts" },
     "low_power":      { "es": "Ahorro de batería", "en": "Battery saver" },
+    "low_power_d":    { "es": "Sin cargador, menos animaciones y refresco.", "en": "Fewer animations and refreshes when unplugged." },
     "reset":          { "es": "RESTABLECER", "en": "RESET" },
     "close":          { "es": "CERRAR", "en": "CLOSE" },
     "on":             { "es": "SÍ", "en": "ON" },

@@ -22,9 +22,9 @@ public static class Motion
     public static readonly TimeSpan Quick = TimeSpan.FromMilliseconds(200);
     public static readonly TimeSpan Pop = TimeSpan.FromMilliseconds(260);
 
-    /// <summary>Animaciones reducidas: nada de rebotes ni desplazamientos.</summary>
+    /// <summary>Animaciones reducidas (ajuste, Windows o ahorro de batería): nada de rebotes ni desplazamientos.</summary>
     public static bool Reduced =>
-        SettingsService.Current?.S.Anim == "reduced" || !UiSettings.AnimationsEnabled;
+        SettingsService.Current?.S.Anim == "reduced" || !UiSettings.AnimationsEnabled || PowerService.SaverActive;
 
     private static Compositor CompositorOf(UIElement element) => ElementCompositionPreview.GetElementVisual(element).Compositor;
 
