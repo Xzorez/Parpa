@@ -24,6 +24,8 @@
     tick_size: '43 MB',
     tick_license: 'MIT LICENSE',
     tick_admin: 'NO ADMIN RIGHTS',
+    tick_free: 'FREE',
+    tick_privacy: 'NO ACCOUNTS · NO TRACKING',
     features_eyebrow: 'WHAT IT DOES',
     features_title: 'Everything you check often, in one place.',
     f1_t: 'What’s playing',
@@ -89,7 +91,9 @@
 
   function applyLang() {
     document.documentElement.lang = lang;
+    stopDecoding();
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    decode(document.querySelector('h1'), 1100);
     document.title = t('title');
     document.querySelector('meta[name=description]').content = t('description');
     const button = document.getElementById('lang');
@@ -117,6 +121,7 @@
     grid.replaceChildren(...rows.join('').split('').map(ch => {
       const dot = document.createElement('i');
       dot.style.background = ch === 'X' ? ON : off;
+      if (ch === 'X') dot.dataset.on = '';
       return dot;
     }));
   }
@@ -167,7 +172,11 @@
     notch.style.height = s.h + 'px';
     body.style.borderRadius = `0 0 ${s.r}px ${s.r}px`;
     states.forEach(el => { el.hidden = el.dataset.state !== s.k; });
-    dots.querySelectorAll('.dot').forEach((d, k) => d.classList.toggle('on', k === i));
+    // Quitar y volver a poner "on" reinicia el relleno rojo del estado actual.
+    const all = dots.querySelectorAll('.dot');
+    all.forEach(d => d.classList.remove('on'));
+    void dots.offsetWidth;
+    all[i]?.classList.add('on');
     stateName.textContent = s[lang].toUpperCase();
   }
 
@@ -208,13 +217,165 @@
     .then(r => (r.ok ? r.json() : null))
     .then(release => {
       if (!release) return;
-      document.getElementById('version').textContent = release.tag_name.replace(/^v/, '');
+      document.querySelectorAll('.version').forEach(el => { el.textContent = release.tag_name.replace(/^v/, ''); });
       const asset = release.assets?.find(a => /^Parpa-Setup-.*-x64\.exe$/.test(a.name));
       if (asset) document.getElementById('installer').href = asset.browser_download_url;
     })
     .catch(() => { /* sin conexión con GitHub: enlace a Releases */ });
 
+  // ---- Titulares que se "descifran" (Doto es monoespaciada: el ancho no baila) ----
+  const NOISE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%+=*';
+  function decode(el, duration = 800) {
+    if (reduced || !el) return;
+    const text = el.textContent;
+    cancelAnimationFrame(el._decode);
+    el.classList.add('decoding');
+    const start = performance.now();
+    const run = now => {
+      const p = Math.min(1, (now - start) / duration);
+      const done = Math.floor(p * text.length);
+      let out = '';
+      for (let k = 0; k < text.length; k++) {
+        const ch = text[k];
+        out += k < done || ch === ' ' ? ch : NOISE[(Math.random() * NOISE.length) | 0];
+      }
+      el.textContent = out;
+      if (p < 1) el._decode = requestAnimationFrame(run);
+      else { el.textContent = text; el.classList.remove('decoding'); }
+    };
+    el._decode = requestAnimationFrame(run);
+  }
+  function stopDecoding() {
+    document.querySelectorAll('.decoding').forEach(el => { cancelAnimationFrame(el._decode); el.classList.remove('decoding'); });
+  }
+
+  // ---- Glifos que se encienden punto a punto ----
+  function lightUp(grid, step = 9) {
+    if (reduced || !grid) return;
+    const cells = [...grid.children];
+    const order = cells.map((_, k) => k).sort(() => Math.random() - 0.5);
+    cells.forEach(c => { clearTimeout(c._t); c.style.background = '#1d1d20'; });
+    order.forEach((k, n) => { cells[k]._t = setTimeout(() => { cells[k].style.background = cells[k].dataset.on !== undefined ? ON : '#1d1d20'; }, 80 + n * step); });
+  }
+  document.querySelectorAll('.cell').forEach(cell => cell.addEventListener('pointerenter', () => lightUp(cell.querySelector('.g7l'), 4)));
+
+  // ---- Contadores: los ceros "buscan" su valor y el 100 sube ----
+  function count(el) {
+    if (reduced) return;
+    const to = Number(el.dataset.to);
+    const start = performance.now(), duration = 1000;
+    const run = now => {
+      const p = Math.min(1, (now - start) / duration);
+      el.textContent = p >= 1 ? to : to === 0 ? (Math.random() * 10) | 0 : Math.round(to * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(run);
+    };
+    requestAnimationFrame(run);
+  }
+
+  // ---- Entradas al hacer scroll ----
+  const REVEAL = '.section-head, .section h2, .section-lead, .cell, .zero, .text-link, .specs > div, .download > *';
+  document.querySelectorAll(REVEAL).forEach(el => {
+    const siblings = [...el.parentElement.children].filter(c => c.matches(REVEAL));
+    el.style.setProperty('--d', Math.min(siblings.indexOf(el), 8) * 70 + 'ms');
+    el.classList.add('reveal');
+  });
+  function onReveal(el) {
+    el.classList.add('in');
+    if (el.matches('h2')) decode(el, 700);
+    if (el.matches('.cell')) setTimeout(() => lightUp(el.querySelector('.g7l')), parseInt(el.style.getPropertyValue('--d')) || 0);
+    if (el.matches('.zero')) setTimeout(() => count(el.querySelector('.count')), parseInt(el.style.getPropertyValue('--d')) || 0);
+  }
+  if (reduced || !('IntersectionObserver' in window)) {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+  } else {
+    const io = new IntersectionObserver(entries => entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      io.unobserve(e.target);
+      onReveal(e.target);
+    }), { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  }
+
+  // ---- La franja se duplica para deslizarse sin cortes ----
+  const ticker = document.getElementById('ticker');
+  [...ticker.children].forEach(item => { const copy = item.cloneNode(true); copy.setAttribute('aria-hidden', 'true'); ticker.appendChild(copy); });
+
+  // ---- Los ojos del logo y del icono parpadean de vez en cuando ----
+  if (!reduced) {
+    const eyes = [document.querySelector('.logo'), document.querySelector('.app-icon')];
+    const blink = () => {
+      eyes.forEach(e => e.classList.add('blink'));
+      setTimeout(() => eyes.forEach(e => e.classList.remove('blink')), 140);
+      setTimeout(blink, 2800 + Math.random() * 3200);
+    };
+    setTimeout(blink, 2000);
+  }
+
+  // ---- Rejilla de puntos de la portada: onda suave y luz alrededor del ratón ----
+  const hero = document.getElementById('hero');
+  const field = document.getElementById('field');
+  const ctx = field.getContext('2d');
+  const GAP = 16, LEVELS = 12;
+  const pointer = { x: -1e4, y: -1e4 };
+  let fw = 0, fh = 0, heroVisible = true, raf = 0;
+
+  function resizeField() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    fw = hero.clientWidth; fh = hero.clientHeight;
+    field.width = Math.round(fw * dpr); field.height = Math.round(fh * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawField(performance.now());
+  }
+
+  function drawField(now) {
+    ctx.clearRect(0, 0, fw, fh);
+    const time = reduced ? 0 : now / 1000;
+    // Se agrupan los puntos por brillo: una sola ruta por nivel en vez de miles de fillStyle.
+    const buckets = Array.from({ length: LEVELS }, () => new Path2D());
+    const hot = new Path2D();
+    for (let y = GAP / 2; y < fh; y += GAP) {
+      for (let x = GAP / 2; x < fw; x += GAP) {
+        const dx = x - pointer.x, dy = y - pointer.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const near = Math.max(0, 1 - dist / 150);
+        const wave = reduced ? 0 : Math.max(0, Math.sin(x * 0.011 + y * 0.007 - time * 1.1)) ** 6;
+        const glow = Math.min(1, near * near + wave * 0.35);
+        const radius = 1.15 + glow * 0.75;
+        if (dist < 11) { hot.moveTo(x + radius, y); hot.arc(x, y, radius + 0.4, 0, Math.PI * 2); continue; }
+        const path = buckets[Math.min(LEVELS - 1, Math.round(glow * (LEVELS - 1)))];
+        path.moveTo(x + radius, y);
+        path.arc(x, y, radius, 0, Math.PI * 2);
+      }
+    }
+    buckets.forEach((path, k) => {
+      const c = Math.round(29 + (k / (LEVELS - 1)) * (150 - 29));
+      ctx.fillStyle = `rgb(${c},${c},${c + 4})`;
+      ctx.fill(path);
+    });
+    ctx.fillStyle = '#e5383b';
+    ctx.fill(hot);
+  }
+
+  // ~40 fps bastan para una onda lenta: en pantallas de 144 Hz se ahorran dos de cada tres dibujados.
+  let lastDraw = 0;
+  function loop(now) {
+    if (now - lastDraw >= 24) { lastDraw = now; drawField(now); }
+    raf = heroVisible && !document.hidden ? requestAnimationFrame(loop) : 0;
+  }
+  function start() { if (!raf && !reduced) raf = requestAnimationFrame(loop); }
+
+  hero.addEventListener('pointermove', e => {
+    const r = hero.getBoundingClientRect();
+    pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top;
+    if (reduced) drawField(0);
+  });
+  hero.addEventListener('pointerleave', () => { pointer.x = pointer.y = -1e4; if (reduced) drawField(0); });
+  new ResizeObserver(resizeField).observe(hero);
+  new IntersectionObserver(([e]) => { heroVisible = e.isIntersecting; if (heroVisible) start(); }).observe(hero);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) start(); });
+
   scale();
   applyLang();
   frame();
+  start();
 })();
