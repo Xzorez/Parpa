@@ -226,7 +226,7 @@
   <data name="settings_hide_full" xml:space="preserve"><value>Ocultar en pantalla completa</value></data>
   <data name="settings_hide_full_d" xml:space="preserve"><value>Se aparta en juegos, vídeos y presentaciones.</value></data>
   <data name="settings_mic_always" xml:space="preserve"><value>Micro y cámara siempre visibles</value></data>
-  <data name="settings_mic_always_d" xml:space="preserve"><value>El punto rojo se ve aunque el notch esté oculto.</value></data>
+  <data name="settings_mic_always_d" xml:space="preserve"><value>En pantalla completa, el punto rojo se ve 3 s y desaparece.</value></data>
   <data name="settings_theme" xml:space="preserve"><value>Tema</value></data>
   <data name="settings_theme_dark" xml:space="preserve"><value>OSCURO</value></data>
   <data name="settings_theme_light" xml:space="preserve"><value>CLARO</value></data>

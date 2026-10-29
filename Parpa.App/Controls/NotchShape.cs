@@ -190,8 +190,67 @@ public sealed partial class NotchShape : Grid
 
         root.Children.InsertAtTop(CreateEar(left: true));
         root.Children.InsertAtTop(CreateEar(left: false));
+        _shapeParts.AddRange(root.Children); // sombra, cuerpo y orejas (todo menos el punto)
         root.Children.InsertAtTop(CreateLiveDot());
         return root;
+    }
+
+    private readonly List<Visual> _shapeParts = new();
+
+    /// <summary>Escala del notch escondido: plano contra el borde superior y algo más estrecho.</summary>
+    private static readonly Vector3 Retracted = new(0.6f, 0f, 1f);
+    private int _visibilityId;
+
+    /// <summary>
+    /// Se esconde metiéndose en el borde superior (pantalla completa, o cuando tiene que quitarse):
+    /// se aplana desde arriba en 300 ms con aceleración. <paramref name="done"/> corre al terminar,
+    /// salvo que otra animación de esconder/mostrar lo haya sustituido.
+    /// </summary>
+    public void Retract(bool reduced, Action done)
+    {
+        var id = ++_visibilityId;
+        var visual = ScaleVisual();
+        var retract = _compositor.CreateVector3KeyFrameAnimation();
+        retract.InsertKeyFrame(1f, Retracted, reduced
+            ? _compositor.CreateLinearEasingFunction()
+            : _compositor.CreateCubicBezierEasingFunction(new Vector2(.5f, 0f), new Vector2(.9f, .5f)));
+        retract.Duration = TimeSpan.FromMilliseconds(reduced ? 120 : 300);
+        var batch = _compositor.CreateScopedBatch(CompositionBatchTypes.Animation);
+        visual.StartAnimation("Scale", retract);
+        batch.End();
+        var dispatcher = DispatcherQueue.GetForCurrentThread();
+        batch.Completed += (_, _) => dispatcher.TryEnqueue(() => { if (id == _visibilityId) done(); });
+    }
+
+    /// <summary>Vuelve a salir del borde superior con el rebote de la forma (450 ms).</summary>
+    public void Reveal(bool reduced)
+    {
+        ++_visibilityId;
+        var visual = ScaleVisual();
+        var reveal = _compositor.CreateVector3KeyFrameAnimation();
+        reveal.InsertKeyFrame(0f, Retracted);
+        reveal.InsertKeyFrame(1f, Vector3.One, reduced
+            ? _compositor.CreateLinearEasingFunction()
+            : _compositor.CreateCubicBezierEasingFunction(new Vector2(.3f, 1.2f), new Vector2(.5f, 1f)));
+        reveal.Duration = TimeSpan.FromMilliseconds(reduced ? 150 : 450);
+        visual.StartAnimation("Scale", reveal);
+    }
+
+    /// <summary>Escala en el compositor con el centro arriba, en el eje del notch.</summary>
+    private Visual ScaleVisual()
+    {
+        var visual = ElementCompositionPreview.GetElementVisual(this);
+        visual.CenterPoint = new Vector3((float)ActualWidth / 2, 0, 0);
+        return visual;
+    }
+
+    /// <summary>
+    /// Pantalla completa con micro/cámara en uso: desaparece la forma y su contenido y queda solo el punto rojo.
+    /// </summary>
+    public void SetDotOnly(bool dotOnly)
+    {
+        foreach (var part in _shapeParts) part.Opacity = dotOnly ? 0 : 1;
+        _content.Opacity = dotOnly ? 0 : 1;
     }
 
     private const float LiveDotSize = 5f;

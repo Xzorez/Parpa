@@ -262,7 +262,7 @@
     "hide_full":      { "es": "Ocultar en pantalla completa", "en": "Hide in full screen" },
     "hide_full_d":    { "es": "Se aparta en juegos, vídeos y presentaciones.", "en": "Steps aside for games, videos and presentations." },
     "mic_always":     { "es": "Micro y cámara siempre visibles", "en": "Always show mic & camera" },
-    "mic_always_d":   { "es": "El punto rojo se ve aunque el notch esté oculto.", "en": "The red dot stays visible even when the notch is hidden." },
+    "mic_always_d":   { "es": "En pantalla completa, el punto rojo se ve 3 s y desaparece.", "en": "In full screen, the red dot shows for 3 s and then goes away." },
     "theme":          { "es": "Tema", "en": "Theme" },
     "theme_dark":     { "es": "OSCURO", "en": "DARK" },
     "theme_light":    { "es": "CLARO", "en": "LIGHT" },

@@ -90,8 +90,18 @@ public sealed class FullscreenWatcher
         GetClassName(hwnd, cls, cls.Capacity);
         if (ShellClasses.Contains(cls.ToString())) return true;
 
-        _found = rect.Left <= _bounds.Left && rect.Top <= _bounds.Top && rect.Right >= _bounds.Right && rect.Bottom >= _bounds.Bottom;
+        _found = rect.Left <= _bounds.Left && rect.Top <= _bounds.Top && rect.Right >= _bounds.Right && rect.Bottom >= _bounds.Bottom;        // Una ventana pequeña encima (notificación, menú, overlay de Discord, aviso del navegador) no quita la
+        // pantalla completa: se sigue mirando hacia abajo. Antes, cada una hacía reaparecer el notch un momento.
+        if (!_found && IsSmall(rect)) return true;
         return false;
+    }
+
+    /// <summary>Ocupa menos de la mitad del monitor.</summary>
+    private bool IsSmall(Win32.RECT rect)
+    {
+        var w = Math.Min(rect.Right, _bounds.Right) - Math.Max(rect.Left, _bounds.Left);
+        var h = Math.Min(rect.Bottom, _bounds.Bottom) - Math.Max(rect.Top, _bounds.Top);
+        return (double)w * h < 0.5 * _bounds.Width * _bounds.Height;
     }
 
     private delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr lParam);
