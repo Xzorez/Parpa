@@ -42,6 +42,10 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     private readonly FocusService _focus;
     private readonly MemoryTrim _trim;
     private readonly PrivacyIndicatorService _privacy = new();
+    private static readonly TimeSpan PrivacyBriefTime = TimeSpan.FromSeconds(3);
+    private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _privacyBrief;
+    private PrivacyState _privacyAnnounced;
+    private bool _privacyBriefOn;
     private readonly IdleView _idle = new();
     private readonly CompactView _compact = new();
     private readonly OsdView _osd = new();
@@ -136,9 +140,18 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         _ = _notices.StartAsync();
         WireWindows();
 
-        // Micro / cámara en uso: actividad "micro" con punto vivo, por delante de foco y música.
-        _privacy.Changed += _ => ShowPrivacy();
-        Loc.LanguageChanged += ShowPrivacy;
+        // Micro / cámara en uso: aviso breve "MICRO · APP" y después solo el punto rojo en la esquina.
+        _privacyBrief = DispatcherQueue.CreateTimer();
+        _privacyBrief.IsRepeating = false;
+        _privacyBrief.Interval = PrivacyBriefTime;
+        _privacyBrief.Tick += (_, _) =>
+        {
+            _privacyBriefOn = false;
+            _vm.SetActivity(NotchViewModel.ActivityPrivacy, null);
+            UpdateLiveDot();
+        };
+        _privacy.Changed += _ => OnPrivacyChanged();
+        Loc.LanguageChanged += () => { if (_privacyBriefOn) ShowPrivacyActivity(); };
         _privacy.Start();
 
         // Ahorro de batería (lowPower): sin cargador, animaciones reducidas y menos refresco.
@@ -181,18 +194,46 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         };
     }
 
-    private void ShowPrivacy()
+    /// <summary>
+    /// Al empezar a usarse el micro o la cámara (o cambiar de app) se anuncia 3 s como actividad;
+    /// mientras siga en uso queda solo el punto rojo en la esquina, sin ocupar el notch.
+    /// </summary>
+    private void OnPrivacyChanged()
     {
         var state = _privacy.State;
-        _vm.SetActivity(NotchViewModel.ActivityPrivacy, !state.Active ? null : new NotchActivity(
+        if (!state.Active)
+        {
+            _privacyBrief.Stop();
+            _privacyBriefOn = false;
+            _vm.SetActivity(NotchViewModel.ActivityPrivacy, null);
+        }
+        else if (state != _privacyAnnounced)
+        {
+            _privacyBriefOn = true;
+            ShowPrivacyActivity();
+            _privacyBrief.Stop();
+            _privacyBrief.Start();
+        }
+        _privacyAnnounced = state;
+        ApplyFullscreen();
+        UpdateLiveDot();
+    }
+
+    private void ShowPrivacyActivity()
+    {
+        var state = _privacy.State;
+        _vm.SetActivity(NotchViewModel.ActivityPrivacy, new NotchActivity(
             SizeToken: "mic",
             Glyph: state.Mic ? "micro" : "ojo",
             Label: Loc.Get(state.Mic && state.Camera ? "compact_mic_cam" : state.Mic ? "compact_mic" : "compact_camera"),
             Sub: state.App.ToUpperInvariant(),
             IsPlaying: false,
             Live: true));
-        ApplyFullscreen();
     }
+
+    /// <summary>Punto de la esquina: con micro/cámara en uso, salvo durante el aviso (que ya lleva el suyo).</summary>
+    private void UpdateLiveDot() =>
+        Shape.SetLiveDot(_privacy.State.Active && !_privacyBriefOn, Tokens.Current.Accent(_s.Accent), ReducedMotion);
 
     /// <summary>
     /// Pantalla completa + <c>hideFull</c>: el notch se aparta y los avisos esperan. Si además se están usando
@@ -532,6 +573,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         _idle.Apply(_s, ReducedMotion);
         _open.Apply(_s);
         ApplyFullscreen(); // hideFull o micAlways pueden haber cambiado
+        UpdateLiveDot();   // color de acento
         _vm.Refresh();
     }
 

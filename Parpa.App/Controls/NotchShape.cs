@@ -190,7 +190,57 @@ public sealed partial class NotchShape : Grid
 
         root.Children.InsertAtTop(CreateEar(left: true));
         root.Children.InsertAtTop(CreateEar(left: false));
+        root.Children.InsertAtTop(CreateLiveDot());
         return root;
+    }
+
+    private const float LiveDotSize = 5f;
+    private const float LiveDotInset = 8f; // centro a 8 px del borde derecho y de arriba
+    private ShapeVisual? _liveDot;
+    private CompositionColorBrush? _liveDotBrush;
+    private bool _liveDotOn;
+
+    /// <summary>
+    /// Punto rojo de privacidad (micro/cámara en uso) en la esquina superior derecha del cuerpo:
+    /// sigue el ancho mientras la forma se anima y no tapa el contenido de ningún estado.
+    /// </summary>
+    private ShapeVisual CreateLiveDot()
+    {
+        _liveDotBrush = _compositor.CreateColorBrush(Color.FromArgb(0, 0, 0, 0));
+        _liveDot = _compositor.CreateShapeVisual();
+        _liveDot.Size = new Vector2(LiveDotSize);
+        var circle = _compositor.CreateEllipseGeometry();
+        circle.Center = circle.Radius = new Vector2(LiveDotSize / 2);
+        var sprite = _compositor.CreateSpriteShape(circle);
+        sprite.FillBrush = _liveDotBrush;
+        _liveDot.Shapes.Add(sprite);
+        _liveDot.Opacity = 0;
+        // Invariante: con Windows en español "10.5" saldría "10,5" y la expresión no se podría leer.
+        Bind(_liveDot, "Offset", FormattableString.Invariant($"Vector3(props.CX + props.W * 0.5 - {LiveDotInset + LiveDotSize / 2}, {LiveDotInset - LiveDotSize / 2}, 0)"));
+        return _liveDot;
+    }
+
+    /// <summary>Enciende o apaga el punto de privacidad; parpadea 1 ↔ 0,25 cada 0,5 s (quieto con animaciones reducidas).</summary>
+    public void SetLiveDot(bool on, Color color, bool reduced)
+    {
+        if (_liveDot is null || _liveDotBrush is null) return;
+        _liveDotBrush.Color = color;
+        if (on == _liveDotOn) return;
+        _liveDotOn = on;
+        _liveDot.StopAnimation("Opacity");
+        if (!on || reduced)
+        {
+            _liveDot.Opacity = on ? 1 : 0;
+            return;
+        }
+        var step = _compositor.CreateStepEasingFunction();
+        var blink = _compositor.CreateScalarKeyFrameAnimation();
+        blink.InsertKeyFrame(0f, 1f);
+        blink.InsertKeyFrame(0.5f, 0.25f, step);
+        blink.InsertKeyFrame(1f, 1f, step);
+        blink.Duration = TimeSpan.FromSeconds(1);
+        blink.IterationBehavior = AnimationIterationBehavior.Forever;
+        _liveDot.StartAnimation("Opacity", blink);
     }
 
     /// <summary>Desplazamiento y opacidad de cada paso de la sombra (≈ 0 1px 0 rgba(0,0,0,.06), suavizada).</summary>
