@@ -5,19 +5,25 @@
 
   // ---- Textos en inglés (el HTML trae los de español) ----
   const EN = {
-    nav_features: 'Features',
-    nav_privacy: 'Privacy',
+    nav_features: 'FEATURES',
+    nav_privacy: 'PRIVACY',
+    nav_specs: 'SPECS',
+    nav_download: 'DOWNLOAD',
     hero_eyebrow: 'FREE · OPEN SOURCE · WINDOWS 10 & 11',
     hero_title: 'Your Windows, with a notch that blinks.',
     hero_lead: 'Music, notifications, files and notes in an island at the top of the screen. It opens when you hover it and hides when you don’t need it.',
-    hero_download: 'Download for Windows',
-    hero_code: 'View the code',
+    hero_download: 'DOWNLOAD FOR WINDOWS',
+    hero_code: 'VIEW THE CODE ↗',
+    demo_state: 'STATE',
     demo_now: 'NOW',
     demo_message: 'Coming to dinner on Friday? I booked for 9 pm.',
     demo_later: 'LATER',
     demo_open: 'OPEN',
     demo_volume: 'VOLUME',
     demo_speakers: 'SPEAKERS',
+    tick_size: '43 MB',
+    tick_license: 'MIT LICENSE',
+    tick_admin: 'NO ADMIN RIGHTS',
     features_eyebrow: 'WHAT IT DOES',
     features_title: 'Everything you check often, in one place.',
     f1_t: 'What’s playing',
@@ -35,25 +41,40 @@
     privacy_eyebrow: 'PRIVACY',
     privacy_title: 'Everything stays on your PC.',
     privacy_lead: 'Parpa reads your notifications and clipboard to show them at the top. That’s why it has no accounts, sends nothing to any server and its code is open for anyone to read.',
-    p1_t: 'No account',
+    p1_t: 'ACCOUNTS',
     p1_d: 'Install and use. No sign-up, no email.',
-    p2_t: 'No servers',
+    p2_t: 'SERVERS',
     p2_d: 'Notifications, clipboard and notes are stored only on your PC.',
-    p3_t: 'No tracking',
+    p3_t: 'TRACKING',
     p3_d: 'No ads, no analytics. Parpa never goes online on its own.',
-    p4_t: 'Open source',
+    p4_t: 'OPEN SOURCE',
     p4_d: 'Anyone can check what it does. MIT license.',
-    download_title: 'Install it in a minute',
-    download_exe: 'Download installer (.exe)',
-    download_all: 'All versions',
-    download_terminal: 'or from the terminal:',
+    privacy_link: 'READ THE PRIVACY POLICY ↗',
+    specs_eyebrow: 'SPECS',
+    specs_title: 'Small on the outside. Light on the inside.',
+    s_os: 'SYSTEM',
+    s_os_v: 'Windows 10 (2004+) and Windows 11',
+    s_arch: 'ARCHITECTURE',
+    s_installer: 'INSTALLER',
+    s_installer_v: '43 MB · per user, no admin rights',
+    s_lang: 'LANGUAGES',
+    s_startup: 'STARTUP',
+    s_startup_v: 'With Windows (can be turned off)',
+    s_shortcut: 'SHORTCUT',
+    s_data: 'DATA',
+    s_license: 'LICENSE',
+    download_eyebrow: 'DOWNLOAD',
+    download_title: 'Install it in a minute.',
+    download_exe: 'DOWNLOAD INSTALLER (.EXE)',
+    download_all: 'ALL VERSIONS',
+    download_terminal: 'OR FROM THE TERMINAL',
+    download_note: 'If Windows warns about an “unknown publisher”, click More info › Run anyway. The code is on GitHub for anyone to review.',
     copy: 'COPY',
     copied: 'COPIED',
-    download_req: 'WINDOWS 10 (2004+) & 11 · 64-BIT · ENGLISH & SPANISH',
-    footer_license: 'Open source under the MIT license.',
-    footer_privacy: 'Privacy',
-    footer_contribute: 'Contribute',
-    footer_bug: 'Report a bug',
+    footer_license: 'OPEN SOURCE UNDER THE MIT LICENSE',
+    footer_privacy: 'PRIVACY',
+    footer_contribute: 'CONTRIBUTE',
+    footer_bug: 'REPORT A BUG',
     title: 'Parpa · a notch for Windows',
     description: 'Music, notifications, files and notes in an island at the top of the screen. Free and open source for Windows 10 and 11.',
   };
@@ -72,9 +93,10 @@
     document.title = t('title');
     document.querySelector('meta[name=description]').content = t('description');
     const button = document.getElementById('lang');
-    button.textContent = lang === 'en' ? 'ES' : 'EN';
+    button.textContent = lang === 'en' ? '[ES]' : '[EN]';
     button.setAttribute('aria-label', lang === 'en' ? 'Español' : 'English');
     renderDots();
+    show();
   }
   document.getElementById('lang').addEventListener('click', () => {
     lang = lang === 'en' ? 'es' : 'en';
@@ -98,9 +120,9 @@
       return dot;
     }));
   }
-  document.querySelectorAll('[data-glyph]').forEach(grid => fill(grid, G[grid.dataset.glyph]));
-  const eyes = document.getElementById('eyes');
-  fill(eyes, ['XX...XX', 'XX...XX', 'XX...XX']);
+  // En la demo los puntos apagados no se ven; en las tarjetas se dibujan en gris, como los glifos de la app.
+  document.querySelectorAll('[data-glyph]').forEach(grid => fill(grid, G[grid.dataset.glyph], grid.classList.contains('g7l') ? '#1d1d20' : 'transparent'));
+  fill(document.getElementById('eyes'), ['XX...XX', 'XX...XX', 'XX...XX']);
 
   // ---- Demo: Reposo → Música → Aviso → Volumen ----
   const S = [
@@ -111,7 +133,9 @@
   ];
   const notch = document.getElementById('notch');
   const body = document.getElementById('notch-body');
+  const screen = notch.parentElement;
   const states = [...body.querySelectorAll('[data-state]')];
+  const stateName = document.getElementById('state-name');
   const mascot = document.getElementById('mascot');
   const mascotDots = Array.from({ length: 65 }, () => mascot.appendChild(document.createElement('i')));
   const eq = [...document.querySelectorAll('#eq i')];
@@ -144,6 +168,7 @@
     body.style.borderRadius = `0 0 ${s.r}px ${s.r}px`;
     states.forEach(el => { el.hidden = el.dataset.state !== s.k; });
     dots.querySelectorAll('.dot').forEach((d, k) => d.classList.toggle('on', k === i));
+    stateName.textContent = s[lang].toUpperCase();
   }
 
   function frame() {
@@ -156,9 +181,9 @@
     eq.forEach((bar, k) => { bar.style.height = (3 + 9 * Math.abs(Math.sin(tick * (0.9 + k * 0.37) + k))).toFixed(1) + 'px'; });
   }
 
+  // El notch escala con la pantalla de la demo (el aviso, de 420 px, siempre cabe).
   function scale() {
-    const width = Math.min(960, window.innerWidth - 48) - 28;
-    notch.style.setProperty('--scale', Math.max(0.7, Math.min(1.9, width / 520)).toFixed(2));
+    notch.style.setProperty('--scale', Math.max(0.7, Math.min(1.6, screen.clientWidth / 520)).toFixed(2));
   }
 
   setInterval(() => {
@@ -166,7 +191,7 @@
     if (!reduced && tick % 13 === 0) { i = (i + 1) % S.length; show(); }
     frame();
   }, 200);
-  window.addEventListener('resize', scale);
+  new ResizeObserver(scale).observe(screen);
 
   // ---- Copiar "winget install Parpa" ----
   const copy = document.getElementById('copy');
@@ -178,17 +203,18 @@
     setTimeout(() => { copy.classList.remove('done'); copyState.textContent = t('copy'); }, 1500);
   });
 
-  // ---- Instalador de la última versión (si no hay, se queda en la página de versiones) ----
+  // ---- Última versión: número y enlace al instalador (si no hay, se queda en la página de versiones) ----
   fetch(`https://api.github.com/repos/${REPO}/releases/latest`)
     .then(r => (r.ok ? r.json() : null))
     .then(release => {
-      const asset = release?.assets?.find(a => /^Parpa-Setup-.*-x64\.exe$/.test(a.name));
+      if (!release) return;
+      document.getElementById('version').textContent = release.tag_name.replace(/^v/, '');
+      const asset = release.assets?.find(a => /^Parpa-Setup-.*-x64\.exe$/.test(a.name));
       if (asset) document.getElementById('installer').href = asset.browser_download_url;
     })
     .catch(() => { /* sin conexión con GitHub: enlace a Releases */ });
 
   scale();
   applyLang();
-  show();
   frame();
 })();

@@ -8,126 +8,185 @@
 <meta property="og:title" content="Parpa · un notch para Windows">
 <meta property="og:description" content="Música, avisos, archivos y notas en una isla arriba de la pantalla.">
 <meta property="og:image" content="assets/app-256.png">
-<meta name="theme-color" content="#e8e6e1">
+<meta name="theme-color" content="#0b0b0c">
 <link rel="icon" href="assets/app.ico" sizes="any">
 <link rel="icon" href="assets/app-32.png" type="image/png">
-<link rel="preload" href="assets/fonts/Geist-Variable.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="assets/fonts/Doto-Variable.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="assets/fonts/GeistMono-Variable.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="page">
 
-  <header class="wrap">
+<header class="top">
+  <div class="wrap top-row">
     <a class="brand" href="#" aria-label="Parpa"><span class="logo"><i></i><i></i></span><span class="wordmark">PARPA</span></a>
-    <span class="spacer"></span>
     <nav>
-      <a class="anchor" href="#funciones" data-i18n="nav_features">Funciones</a>
-      <a class="anchor" href="#privacidad" data-i18n="nav_privacy">Privacidad</a>
-      <button class="lang" type="button" id="lang" aria-label="English">EN</button>
-      <a class="pill" href="https://github.com/Xzorez/Parpa">GitHub ↗</a>
+      <a class="anchor" href="#funciones" data-i18n="nav_features">FUNCIONES</a>
+      <a class="anchor" href="#privacidad" data-i18n="nav_privacy">PRIVACIDAD</a>
+      <a class="anchor" href="#ficha" data-i18n="nav_specs">FICHA</a>
+      <button class="lang" type="button" id="lang" aria-label="English">[EN]</button>
+      <a class="pill" href="#descargar" data-i18n="nav_download">DESCARGAR</a>
     </nav>
-  </header>
+  </div>
+</header>
 
-  <section class="wrap hero">
-    <div class="hero-text">
-      <span class="eyebrow" data-i18n="hero_eyebrow">GRATIS · CÓDIGO ABIERTO · WINDOWS 10 Y 11</span>
-      <h1 data-i18n="hero_title">Tu Windows, con un notch que parpadea.</h1>
-      <p class="lead" data-i18n="hero_lead">Música, avisos, archivos y notas en una isla arriba de la pantalla. Se abre cuando pasas el ratón y se esconde cuando no la necesitas.</p>
-      <div class="buttons">
-        <a class="btn btn-dark" href="#descargar" data-i18n="hero_download">Descargar para Windows</a>
-        <a class="btn btn-line" href="https://github.com/Xzorez/Parpa" data-i18n="hero_code">Ver el código</a>
+<main>
+  <!-- Portada -->
+  <section class="hero dotgrid">
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <span class="tag"><span class="live"></span><span data-i18n="hero_eyebrow">GRATIS · CÓDIGO ABIERTO · WINDOWS 10 Y 11</span></span>
+        <h1 data-i18n="hero_title">Tu Windows, con un notch que parpadea.</h1>
+        <p class="lead" data-i18n="hero_lead">Música, avisos, archivos y notas en una isla arriba de la pantalla. Se abre cuando pasas el ratón y se esconde cuando no la necesitas.</p>
+        <div class="buttons">
+          <a class="btn btn-light" href="#descargar" data-i18n="hero_download">DESCARGAR PARA WINDOWS</a>
+          <a class="btn btn-line" href="https://github.com/Xzorez/Parpa" data-i18n="hero_code">VER EL CÓDIGO ↗</a>
+        </div>
       </div>
-    </div>
 
-    <div class="frame" aria-hidden="true">
-      <div class="screen">
-        <div class="notch" id="notch">
-          <div class="ear ear-l"></div>
-          <div class="ear ear-r"></div>
-          <div class="body" id="notch-body">
-            <div class="state st-idle" data-state="idle"><div class="grid g13" id="mascot"></div></div>
-            <div class="state st-music" data-state="music" hidden>
-              <div class="grid g7s" data-glyph="musica"></div>
-              <span class="label flex1">LUZ DE NEÓN</span>
-              <div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="demo">
+        <div class="frame" aria-hidden="true">
+          <div class="screen">
+            <div class="notch" id="notch">
+              <div class="ear ear-l"></div>
+              <div class="ear ear-r"></div>
+              <div class="body" id="notch-body">
+                <div class="state st-idle" data-state="idle"><div class="grid g13" id="mascot"></div></div>
+                <div class="state st-music" data-state="music" hidden>
+                  <div class="grid g7s" data-glyph="musica"></div>
+                  <span class="label flex1">LUZ DE NEÓN</span>
+                  <div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i></div>
+                </div>
+                <div class="state st-peek" data-state="peek" hidden>
+                  <div class="peek-head"><div class="grid g7s" data-glyph="mensaje"></div><span class="label muted flex1">WHATSAPP · ANA</span><span class="peek-when" data-i18n="demo_now">AHORA</span></div>
+                  <span class="peek-text" data-i18n="demo_message">¿Vienes a la cena del viernes? Reservé a las 21:00.</span>
+                  <div class="peek-actions"><span class="chip" data-i18n="demo_later">MÁS TARDE</span><span class="chip chip-on" data-i18n="demo_open">ABRIR</span></div>
+                </div>
+                <div class="state st-osd" data-state="osd" hidden>
+                  <div class="grid g7s" data-glyph="sonido"></div>
+                  <div class="osd-text"><span class="label" data-i18n="demo_volume">VOLUMEN</span><span class="osd-sub" data-i18n="demo_speakers">ALTAVOCES</span></div>
+                  <div class="bars" id="bars"></div>
+                  <span class="osd-value">70%</span>
+                </div>
+              </div>
             </div>
-            <div class="state st-peek" data-state="peek" hidden>
-              <div class="peek-head"><div class="grid g7s" data-glyph="mensaje"></div><span class="label muted flex1">WHATSAPP · ANA</span><span class="peek-when" data-i18n="demo_now">AHORA</span></div>
-              <span class="peek-text" data-i18n="demo_message">¿Vienes a la cena del viernes? Reservé a las 21:00.</span>
-              <div class="peek-actions"><span class="chip" data-i18n="demo_later">MÁS TARDE</span><span class="chip chip-on" data-i18n="demo_open">ABRIR</span></div>
-            </div>
-            <div class="state st-osd" data-state="osd" hidden>
-              <div class="grid g7s" data-glyph="sonido"></div>
-              <div class="osd-text"><span class="label" data-i18n="demo_volume">VOLUMEN</span><span class="osd-sub" data-i18n="demo_speakers">ALTAVOCES</span></div>
-              <div class="bars" id="bars"></div>
-              <span class="osd-value">70%</span>
-            </div>
+            <div class="taskbar"><i></i><i></i><i></i><i></i></div>
           </div>
         </div>
-        <div class="taskbar"><i></i><i></i><i></i><i></i></div>
+        <div class="demo-bar">
+          <span class="mono-s"><span data-i18n="demo_state">ESTADO</span> · <span id="state-name">REPOSO</span></span>
+          <div class="dots" id="dots"></div>
+        </div>
       </div>
     </div>
-    <div class="dots" id="dots"></div>
+
+    <div class="wrap ticker">
+      <span>V<span id="version">1.0.0</span></span>
+      <span data-i18n="tick_size">43 MB</span>
+      <span>X64 · ARM64</span>
+      <span>ES · EN</span>
+      <span data-i18n="tick_license">LICENCIA MIT</span>
+      <span data-i18n="tick_admin">SIN ADMINISTRADOR</span>
+    </div>
   </section>
 
-  <section class="features" id="funciones">
+  <!-- Funciones -->
+  <section class="section" id="funciones">
     <div class="wrap">
-      <div class="intro">
+      <div class="section-head">
+        <span class="index">[ 01 ]</span>
         <span class="eyebrow" data-i18n="features_eyebrow">QUÉ HACE</span>
-        <h2 class="h2" data-i18n="features_title">Todo lo que miras a menudo, en un solo sitio.</h2>
       </div>
-      <div class="cards">
-        <div class="card"><div class="card-icon"><div class="grid g7" data-glyph="musica"></div></div><span class="card-title" data-i18n="f1_t">Lo que suena</span><span class="card-text" data-i18n="f1_d">Canción, carátula y controles de Spotify o cualquier reproductor, sin cambiar de ventana.</span></div>
-        <div class="card"><div class="card-icon"><div class="grid g7" data-glyph="mensaje"></div></div><span class="card-title" data-i18n="f2_t">Avisos a la vista</span><span class="card-text" data-i18n="f2_d">WhatsApp, Discord o llamadas arriba, con botones para abrirlos o dejarlos para más tarde. Y un modo No molestar.</span></div>
-        <div class="card"><div class="card-icon"><div class="grid g7" data-glyph="bandeja"></div></div><span class="card-title" data-i18n="f3_t">Bandeja de archivos</span><span class="card-text" data-i18n="f3_d">Arrastra archivos al notch y suéltalos luego donde quieras. Comprime, convierte o copia la ruta.</span></div>
-        <div class="card"><div class="card-icon"><div class="grid g7" data-glyph="sonido"></div></div><span class="card-title" data-i18n="f4_t">Volumen y batería</span><span class="card-text" data-i18n="f4_d">Indicadores limpios de volumen, brillo, batería, Wi‑Fi y auriculares en lugar de los de Windows.</span></div>
-        <div class="card"><div class="card-icon"><div class="grid g7" data-glyph="copias"></div></div><span class="card-title" data-i18n="f5_t">Portapapeles</span><span class="card-text" data-i18n="f5_d">Lo último que copiaste siempre a mano. Las contraseñas no se guardan.</span></div>
-        <div class="card"><div class="card-icon"><div class="grid g7" data-glyph="tareas"></div></div><span class="card-title" data-i18n="f6_t">Tareas, notas y foco</span><span class="card-text" data-i18n="f6_d">Apunta algo rápido, marca tareas y arranca un pomodoro desde arriba.</span></div>
+      <h2 data-i18n="features_title">Todo lo que miras a menudo, en un solo sitio.</h2>
+      <div class="cells">
+        <article class="cell"><div class="cell-top"><span class="num">01</span><div class="grid g7l" data-glyph="musica"></div></div><h3 data-i18n="f1_t">Lo que suena</h3><p data-i18n="f1_d">Canción, carátula y controles de Spotify o cualquier reproductor, sin cambiar de ventana.</p></article>
+        <article class="cell"><div class="cell-top"><span class="num">02</span><div class="grid g7l" data-glyph="mensaje"></div></div><h3 data-i18n="f2_t">Avisos a la vista</h3><p data-i18n="f2_d">WhatsApp, Discord o llamadas arriba, con botones para abrirlos o dejarlos para más tarde. Y un modo No molestar.</p></article>
+        <article class="cell"><div class="cell-top"><span class="num">03</span><div class="grid g7l" data-glyph="bandeja"></div></div><h3 data-i18n="f3_t">Bandeja de archivos</h3><p data-i18n="f3_d">Arrastra archivos al notch y suéltalos luego donde quieras. Comprime, convierte o copia la ruta.</p></article>
+        <article class="cell"><div class="cell-top"><span class="num">04</span><div class="grid g7l" data-glyph="sonido"></div></div><h3 data-i18n="f4_t">Volumen y batería</h3><p data-i18n="f4_d">Indicadores limpios de volumen, brillo, batería, Wi‑Fi y auriculares en lugar de los de Windows.</p></article>
+        <article class="cell"><div class="cell-top"><span class="num">05</span><div class="grid g7l" data-glyph="copias"></div></div><h3 data-i18n="f5_t">Portapapeles</h3><p data-i18n="f5_d">Lo último que copiaste siempre a mano. Las contraseñas no se guardan.</p></article>
+        <article class="cell"><div class="cell-top"><span class="num">06</span><div class="grid g7l" data-glyph="tareas"></div></div><h3 data-i18n="f6_t">Tareas, notas y foco</h3><p data-i18n="f6_d">Apunta algo rápido, marca tareas y arranca un pomodoro desde arriba.</p></article>
       </div>
     </div>
   </section>
 
-  <section class="wrap privacy" id="privacidad">
-    <div class="intro">
-      <span class="eyebrow" data-i18n="privacy_eyebrow">PRIVACIDAD</span>
-      <h2 class="h2" data-i18n="privacy_title">Todo se queda en tu PC.</h2>
-      <p data-i18n="privacy_lead">Parpa lee tus avisos y tu portapapeles para enseñártelos arriba. Por eso no tiene cuentas, no envía nada a ningún servidor y su código está a la vista de cualquiera.</p>
-    </div>
-    <div>
-      <div class="point"><span class="point-n">01</span><div class="point-text"><span class="point-title" data-i18n="p1_t">Sin cuenta</span><span class="point-desc" data-i18n="p1_d">Instalar y usar. No hay registro ni correo.</span></div></div>
-      <div class="point"><span class="point-n">02</span><div class="point-text"><span class="point-title" data-i18n="p2_t">Sin servidores</span><span class="point-desc" data-i18n="p2_d">Avisos, portapapeles y notas se guardan solo en tu PC.</span></div></div>
-      <div class="point"><span class="point-n">03</span><div class="point-text"><span class="point-title" data-i18n="p3_t">Sin rastreo</span><span class="point-desc" data-i18n="p3_d">Ni anuncios ni estadísticas. Parpa no se conecta a internet por su cuenta.</span></div></div>
-      <div class="point"><span class="point-n">04</span><div class="point-text"><span class="point-title" data-i18n="p4_t">Código abierto</span><span class="point-desc" data-i18n="p4_d">Cualquiera puede revisar lo que hace. Licencia MIT.</span></div></div>
-    </div>
-  </section>
-
-  <section class="wrap download" id="descargar">
-    <div class="download-card">
-      <div class="app-icon"><div class="grid" id="eyes"></div></div>
-      <h2 data-i18n="download_title">Instálalo en un minuto</h2>
-      <div class="buttons">
-        <a class="btn btn-dark" id="installer" href="https://github.com/Xzorez/Parpa/releases/latest" data-i18n="download_exe">Descargar instalador (.exe)</a>
-        <a class="btn btn-line" href="https://github.com/Xzorez/Parpa/releases" data-i18n="download_all">Todas las versiones</a>
-      </div>
-      <div class="terminal">
-        <span data-i18n="download_terminal">o desde la terminal:</span>
-        <button class="copy" type="button" id="copy"><span>winget install Parpa</span><span class="copy-state" data-i18n="copy">COPIAR</span></button>
-      </div>
-      <span class="requirements" data-i18n="download_req">WINDOWS 10 (2004+) Y 11 · 64 BITS · ESPAÑOL E INGLÉS</span>
-    </div>
-  </section>
-
-  <footer>
+  <!-- Privacidad -->
+  <section class="section section-alt dotgrid" id="privacidad">
     <div class="wrap">
-      <span class="wordmark">PARPA</span>
-      <span data-i18n="footer_license">Código abierto con licencia MIT.</span>
-      <span class="spacer"></span>
-      <a href="https://github.com/Xzorez/Parpa">GitHub</a>
-      <a href="https://github.com/Xzorez/Parpa/blob/main/PRIVACY.md" data-i18n="footer_privacy">Privacidad</a>      <a href="https://github.com/Xzorez/Parpa/pulls" data-i18n="footer_contribute">Contribuir</a>
-      <a href="https://github.com/Xzorez/Parpa/issues/new" data-i18n="footer_bug">Reportar un fallo</a>
+      <div class="section-head">
+        <span class="index">[ 02 ]</span>
+        <span class="eyebrow" data-i18n="privacy_eyebrow">PRIVACIDAD</span>
+      </div>
+      <h2 data-i18n="privacy_title">Todo se queda en tu PC.</h2>
+      <p class="section-lead" data-i18n="privacy_lead">Parpa lee tus avisos y tu portapapeles para enseñártelos arriba. Por eso no tiene cuentas, no envía nada a ningún servidor y su código está a la vista de cualquiera.</p>
+      <div class="zeros">
+        <div class="zero"><span class="big">0</span><span class="zero-title" data-i18n="p1_t">CUENTAS</span><span class="zero-desc" data-i18n="p1_d">Instalar y usar. No hay registro ni correo.</span></div>
+        <div class="zero"><span class="big">0</span><span class="zero-title" data-i18n="p2_t">SERVIDORES</span><span class="zero-desc" data-i18n="p2_d">Avisos, portapapeles y notas se guardan solo en tu PC.</span></div>
+        <div class="zero"><span class="big">0</span><span class="zero-title" data-i18n="p3_t">RASTREO</span><span class="zero-desc" data-i18n="p3_d">Ni anuncios ni estadísticas. Parpa no se conecta a internet por su cuenta.</span></div>
+        <div class="zero"><span class="big">100<small>%</small></span><span class="zero-title" data-i18n="p4_t">CÓDIGO ABIERTO</span><span class="zero-desc" data-i18n="p4_d">Cualquiera puede revisar lo que hace. Licencia MIT.</span></div>
+      </div>
+      <a class="text-link" href="https://github.com/Xzorez/Parpa/blob/main/PRIVACY.md" data-i18n="privacy_link">LEER LA POLÍTICA DE PRIVACIDAD ↗</a>
     </div>
-  </footer>
-</div>
+  </section>
+
+  <!-- Ficha técnica -->
+  <section class="section" id="ficha">
+    <div class="wrap specs-grid">
+      <div>
+        <div class="section-head">
+          <span class="index">[ 03 ]</span>
+          <span class="eyebrow" data-i18n="specs_eyebrow">FICHA TÉCNICA</span>
+        </div>
+        <h2 data-i18n="specs_title">Pequeño por fuera. Ligero por dentro.</h2>
+      </div>
+      <dl class="specs">
+        <div><dt data-i18n="s_os">SISTEMA</dt><dd data-i18n="s_os_v">Windows 10 (2004+) y Windows 11</dd></div>
+        <div><dt data-i18n="s_arch">ARQUITECTURA</dt><dd>x64 · ARM64</dd></div>
+        <div><dt data-i18n="s_installer">INSTALADOR</dt><dd data-i18n="s_installer_v">43 MB · por usuario, sin permisos de administrador</dd></div>
+        <div><dt data-i18n="s_lang">IDIOMAS</dt><dd>Español · English</dd></div>
+        <div><dt data-i18n="s_startup">INICIO</dt><dd data-i18n="s_startup_v">Con Windows (se puede desactivar)</dd></div>
+        <div><dt data-i18n="s_shortcut">ATAJO</dt><dd><kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>N</kbd></dd></div>
+        <div><dt data-i18n="s_data">DATOS</dt><dd>%APPDATA%\Parpa</dd></div>
+        <div><dt data-i18n="s_license">LICENCIA</dt><dd>MIT</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- Descarga -->
+  <section class="section" id="descargar">
+    <div class="wrap">
+      <div class="download">
+        <div class="download-head">
+          <span class="index">[ 04 ]</span>
+          <span class="eyebrow" data-i18n="download_eyebrow">DESCARGAR</span>
+        </div>
+        <div class="app-icon"><div class="grid" id="eyes"></div></div>
+        <h2 data-i18n="download_title">Instálalo en un minuto.</h2>
+        <div class="buttons">
+          <a class="btn btn-dark" id="installer" href="https://github.com/Xzorez/Parpa/releases/latest" data-i18n="download_exe">DESCARGAR INSTALADOR (.EXE)</a>
+          <a class="btn btn-line-dark" href="https://github.com/Xzorez/Parpa/releases" data-i18n="download_all">TODAS LAS VERSIONES</a>
+        </div>
+        <div class="terminal">
+          <span class="mono-s" data-i18n="download_terminal">O DESDE LA TERMINAL</span>
+          <button class="copy" type="button" id="copy"><span class="prompt">&gt;</span><span>winget install Parpa</span><span class="copy-state" data-i18n="copy">COPIAR</span></button>
+        </div>
+        <p class="note" data-i18n="download_note">Si Windows avisa de «editor desconocido», pulsa Más información › Ejecutar de todas formas. El código está en GitHub para que lo revise quien quiera.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-row">
+    <span class="wordmark">PARPA</span>
+    <span class="mono-s" data-i18n="footer_license">CÓDIGO ABIERTO CON LICENCIA MIT</span>
+    <span class="spacer"></span>
+    <a href="https://github.com/Xzorez/Parpa">GITHUB</a>
+    <a href="https://github.com/Xzorez/Parpa/blob/main/PRIVACY.md" data-i18n="footer_privacy">PRIVACIDAD</a>
+    <a href="https://github.com/Xzorez/Parpa/pulls" data-i18n="footer_contribute">CONTRIBUIR</a>
+    <a href="https://github.com/Xzorez/Parpa/issues/new" data-i18n="footer_bug">REPORTAR UN FALLO</a>
+  </div>
+</footer>
+
 <script src="app.js"></script>
 </body>
 </html>
