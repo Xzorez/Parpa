@@ -31,6 +31,9 @@ public sealed class NoticeCenter : IDisposable
     /// <summary>Vuelve a comprobar el permiso (tras pulsar ACTIVAR).</summary>
     public Task<bool> RetryAsync() => _notifications.RetryAsync();
 
+    /// <summary>Notch apartado por pantalla completa: los avisos se leen con menos frecuencia (ver NotificationService).</summary>
+    public void SetRelaxed(bool relaxed) => _notifications.SetRelaxed(relaxed);
+
     public Task StartAsync()
     {
         _notifications.Arrived += OnArrived;

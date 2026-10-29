@@ -48,6 +48,7 @@ public sealed class NotificationService : IDisposable
     private IntPtr _bannerHook;
     private HashSet<uint> _seen = new();
     private DateTime _burstUntil;
+    private bool _relaxed;
     private bool _polling;
     private bool _pollAgain;
 
@@ -63,7 +64,7 @@ public sealed class NotificationService : IDisposable
         _fallbackTimer.Tick += (_, _) =>
         {
             var burst = DateTime.UtcNow < _burstUntil;
-            var fast = burst || !WindowsShowsBanners();
+            var fast = burst || (!_relaxed && !WindowsShowsBanners());
             _fallbackTimer.Interval = fast ? BurstInterval : FallbackInterval;
             _ = PollAsync(announce: true, burst ? "ráfaga" : fast ? "sin banners" : "respaldo");
         };
@@ -113,6 +114,20 @@ public sealed class NotificationService : IDisposable
         if (_listener.GetAccessStatus() != UserNotificationListenerAccessStatus.Allowed) return false;
         await StartAsync();
         return Access == UserNotificationListenerAccess.Allowed;
+    }
+
+    /// <summary>
+    /// Notch apartado por pantalla completa: los avisos esperan en la cola igualmente, así que basta la consulta
+    /// de respaldo (cada 5 s) en vez de cada segundo (CPU durante un juego). Al volver se lee la lista al momento.
+    /// </summary>
+    public void SetRelaxed(bool relaxed)
+    {
+        if (_relaxed == relaxed) return;
+        _relaxed = relaxed;
+        if (relaxed || !_fallbackTimer.IsRunning) return;
+        _ = PollAsync(announce: true, "vuelta");
+        _fallbackTimer.Interval = WindowsShowsBanners() ? FallbackInterval : BurstInterval;
+        _fallbackTimer.Start();
     }
 
     /// <summary>Llega por la cola de mensajes del hilo de la UI (gancho fuera de proceso).</summary>

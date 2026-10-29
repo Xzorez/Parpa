@@ -32,6 +32,7 @@ public sealed partial class DotMatrix : Grid
     private CompositionColorBrush? _onBrush;
     private CompositionColorBrush? _offBrush;
     private CompositionSpriteShape[] _dots = [];
+    private bool[] _lit = [];
     private bool[]? _cells;
 
     public DotMatrix()
@@ -105,6 +106,7 @@ public sealed partial class DotMatrix : Grid
         _visual.Shapes.Clear();
 
         _dots = new CompositionSpriteShape[Count >= 0 ? Math.Min(Count, Columns * Rows) : Columns * Rows];
+        _lit = new bool[_dots.Length];
         for (var i = 0; i < _dots.Length; i++)
         {
             var geometry = compositor.CreateEllipseGeometry();
@@ -112,6 +114,7 @@ public sealed partial class DotMatrix : Grid
             geometry.Radius = new Vector2(size / 2);
             var dot = compositor.CreateSpriteShape(geometry);
             dot.Offset = new Vector2(i % Columns * step, i / Columns * step);
+            dot.FillBrush = _offBrush;
             _visual.Shapes.Add(dot);
             _dots[i] = dot;
         }
@@ -119,11 +122,20 @@ public sealed partial class DotMatrix : Grid
         ApplyCells();
     }
 
+    /// <summary>
+    /// Solo cambia el pincel de los puntos que cambian: el ecualizador y la mascota redibujan varias veces por segundo
+    /// y cada asignación cruza a Composition (CPU y objetos que esperan al GC).
+    /// </summary>
     private void ApplyCells()
     {
         if (_dots.Length == 0 || _onBrush is null) return;
         var cells = _cells ?? (Glyph is { Length: > 0 } name ? Glyphs.Get(name) : null);
         for (var i = 0; i < _dots.Length; i++)
-            _dots[i].FillBrush = cells is not null && i < cells.Length && cells[i] ? _onBrush : _offBrush;
+        {
+            var lit = cells is not null && i < cells.Length && cells[i];
+            if (lit == _lit[i]) continue;
+            _lit[i] = lit;
+            _dots[i].FillBrush = lit ? _onBrush : _offBrush;
+        }
     }
 }

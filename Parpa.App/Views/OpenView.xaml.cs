@@ -13,8 +13,8 @@ namespace Parpa.Views;
 public sealed partial class OpenView : UserControl
 {
     private readonly NotchServices _app;
-    private readonly Dictionary<NotchPage, FrameworkElement> _pages;
-    private readonly LauncherView _launcher;
+    private readonly Dictionary<NotchPage, FrameworkElement> _pages = new();
+    private LauncherView? _launcher;
     private FrameworkElement? _current;
     private bool _menuHover;
 
@@ -24,33 +24,62 @@ public sealed partial class OpenView : UserControl
         InitializeComponent();
         Motion.SmoothBackground(MenuButton);
         Motion.PressFeedback(MenuButton);
-        var tasks = new TasksView(app);
-        tasks.HeaderChanged += UpdateHeaderRight;
-        Shelf = new ShelfView(app);
-        _pages = new Dictionary<NotchPage, FrameworkElement>
-        {
-            [NotchPage.Home] = new HomeView(app),
-            [NotchPage.Clip] = new ClipView(app),
-            [NotchPage.Shelf] = Shelf,
-            [NotchPage.Todo] = tasks,
-            [NotchPage.Notes] = new NotesView(app),
-            [NotchPage.Quick] = new QuickView(app),
-        };
-        _launcher = new LauncherView(app);
-        foreach (var view in _pages.Values.Append(_launcher))
-        {
-            view.Visibility = Visibility.Collapsed;
-            Body.Children.Add(view);
-        }
-        Loc.LanguageChanged += () => Show(_app.Vm.Page, _app.Vm.IsLauncher);
+        // Solo con el notch abierto: cerrado, Show arrancaría los temporizadores de una ventana que no se ve.
+        Loc.LanguageChanged += () => { if (!_hidden) Show(_app.Vm.Page, _app.Vm.IsLauncher); };
     }
 
-    public ShelfView Shelf { get; }
+    public ShelfView Shelf => (ShelfView)Page(NotchPage.Shelf);
+
+    /// <summary>
+    /// Cada ventana se crea la primera vez que se abre (objetivo &lt; 100 MB: el árbol XAML de una ventana
+    /// que nunca se visita no ocupa memoria). Después se conserva, oculta, para volver a ella al instante.
+    /// Descartarlas al cerrar el notch no ayuda: el montón nativo de XAML no devuelve esa memoria y, al
+    /// recrearlas, los privados acaban ~8 MB más altos.
+    /// </summary>
+    private FrameworkElement Page(NotchPage page)
+    {
+        if (_pages.TryGetValue(page, out var view)) return view;
+        view = page.Id switch
+        {
+            "clip" => new ClipView(_app),
+            "shelf" => new ShelfView(_app),
+            "todo" => CreateTasks(),
+            "notes" => new NotesView(_app),
+            "quick" => new QuickView(_app),
+            _ => _pages.GetValueOrDefault(NotchPage.Home) ?? new HomeView(_app),
+        };
+        _pages[page] = view;
+        if (view.Parent is null) Add(view);
+        return view;
+    }
+
+    private TasksView CreateTasks()
+    {
+        var tasks = new TasksView(_app);
+        tasks.HeaderChanged += UpdateHeaderRight;
+        return tasks;
+    }
+
+    private LauncherView Launcher()
+    {
+        if (_launcher is null)
+        {
+            _launcher = new LauncherView(_app);
+            Add(_launcher);
+        }
+        return _launcher;
+    }
+
+    private void Add(FrameworkElement view)
+    {
+        view.Visibility = Visibility.Collapsed;
+        Body.Children.Add(view);
+    }
 
     /// <summary>Muestra una ventana (o el menú) y avisa a la anterior para que pare.</summary>
     public void Show(NotchPage page, bool launcher)
     {
-        FrameworkElement next = launcher ? _launcher : _pages.GetValueOrDefault(page) ?? _pages[NotchPage.Home];
+        FrameworkElement next = launcher ? Launcher() : Page(page);
         var switched = next != _current;
         var arriving = switched || _hidden;
         if (switched)
@@ -90,7 +119,7 @@ public sealed partial class OpenView : UserControl
 
     private void UpdateHeaderRight()
     {
-        var right = _current is INotchPageView view && _current != _launcher ? view.HeaderRight : null;
+        var right = _current is INotchPageView view and not LauncherView ? view.HeaderRight : null;
         HeaderRight.Visibility = right is null ? Visibility.Collapsed : Visibility.Visible;
         Clock.Visibility = right is null ? Visibility.Visible : Visibility.Collapsed;
         if (right is { } r)
@@ -103,7 +132,7 @@ public sealed partial class OpenView : UserControl
     /// <summary>En el menú el botón queda marcado (#1d1d20) y su glifo en primario.</summary>
     private void UpdateMenuButton()
     {
-        var active = _current == _launcher;
+        var active = _current is LauncherView;
         MenuButton.Background = active ? Res("GlyphOffBrush") : _menuHover ? Res("BorderAltBrush") : new SolidColorBrush(Microsoft.UI.Colors.Transparent);
         MenuGlyph.OnColor = (Color)Application.Current.Resources[active ? "PrimaryColor" : "SecondaryColor"];
     }

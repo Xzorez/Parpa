@@ -33,6 +33,8 @@ public sealed class MediaService
     private readonly List<GlobalSystemMediaTransportControlsSession> _sessions = new();
     private GlobalSystemMediaTransportControlsSessionManager? _manager;
     private GlobalSystemMediaTransportControlsSession? _cardSession;
+    private GlobalSystemMediaTransportControlsSession? _propsSession;
+    private GlobalSystemMediaTransportControlsSessionMediaProperties? _props;
     private int _refreshId;
 
     /// <summary>Sesión que está sonando; <c>null</c> si no suena nada.</summary>
@@ -98,9 +100,10 @@ public sealed class MediaService
         {
             session.PlaybackInfoChanged -= OnSessionChanged;
             session.MediaPropertiesChanged -= OnSessionChanged;
-            session.TimelinePropertiesChanged -= OnSessionChanged;
+            session.TimelinePropertiesChanged -= OnTimelineChanged;
         }
         _sessions.Clear();
+        _propsSession = null;
         try
         {
             _sessions.AddRange(_manager?.GetSessions() ?? []);
@@ -113,12 +116,24 @@ public sealed class MediaService
         {
             session.PlaybackInfoChanged += OnSessionChanged;
             session.MediaPropertiesChanged += OnSessionChanged;
-            session.TimelinePropertiesChanged += OnSessionChanged;
+            session.TimelinePropertiesChanged += OnTimelineChanged;
         }
         _ = RefreshAsync();
     }
 
+    /// <summary>Canción o estado nuevos: las propiedades (título, carátula) se vuelven a leer.</summary>
     private void OnSessionChanged(GlobalSystemMediaTransportControlsSession sender, object args) =>
+        _dispatcher.TryEnqueue(() =>
+        {
+            _propsSession = null;
+            _ = RefreshAsync();
+        });
+
+    /// <summary>
+    /// Solo la posición (llega cada pocos segundos mientras suena): se reutilizan las propiedades leídas.
+    /// Volver a pedirlas cada vez dejaba vivos, hasta el siguiente GC, objetos nativos con la carátula (~0,5 MB cada uno).
+    /// </summary>
+    private void OnTimelineChanged(GlobalSystemMediaTransportControlsSession sender, object args) =>
         _dispatcher.TryEnqueue(() => _ = RefreshAsync());
 
     private static bool IsPlaying(GlobalSystemMediaTransportControlsSession session)
@@ -149,7 +164,13 @@ public sealed class MediaService
         {
             try
             {
-                var props = await card.TryGetMediaPropertiesAsync();
+                var props = _props;
+                if (card != _propsSession)
+                {
+                    props = await card.TryGetMediaPropertiesAsync();
+                    if (id != _refreshId) return;
+                    (_propsSession, _props) = (card, props);
+                }
                 var timeline = card.GetTimelineProperties();
                 cardInfo = new CardInfo(
                     props?.Title ?? string.Empty,

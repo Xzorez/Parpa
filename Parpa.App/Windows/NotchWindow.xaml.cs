@@ -40,6 +40,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     private readonly TasksService _tasks = new();
     private readonly NotesService _notes = new();
     private readonly FocusService _focus;
+    private readonly MemoryTrim _trim;
     private readonly IdleView _idle = new();
     private readonly CompactView _compact = new();
     private readonly OsdView _osd = new();
@@ -92,6 +93,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         _focus = new FocusService(_s);
         _open = new OpenView(new NotchServices(_vm, _s, this, _system, _notices, _clipboard, _shelf, _tasks, _notes, _focus));
         _vm.Changed += OnStateChanged;
+        _trim = new MemoryTrim(() => !_vm.IsOpen);
 
         OnThemeChanged();
         Theme.Changed += OnThemeChanged;
@@ -107,7 +109,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         Shape.TransitionCompleted += () => UpdateRegion(_geometry, null);
         _idle.Apply(_s, ReducedMotion);
 
-        _clock.MinuteChanged += () => { _idle.Apply(_s, ReducedMotion); _open.Apply(_s); };
+        _clock.MinuteChanged += () => { _idle.Apply(_s, ReducedMotion); _open.Apply(_s); _trim.Collect(); };
 
         _hotkey = new HotkeyService(_hwnd);
         _hotkey.Pressed += _vm.OnHotkey;
@@ -132,6 +134,9 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         _ = _notices.StartAsync();
         WireWindows();
 
+        // Tras arrancar y cada vez que se cierra el notch: GC y recorte del working set.
+        _trim.Schedule();
+
         // Pantalla completa en el monitor del notch + hideFull: se aparta (sin tapar ni capturar clics) y los avisos esperan.
         _fullscreen = new FullscreenWatcher(_hwnd, () => _monitorBounds);
         _fullscreen.Changed += fullscreen =>
@@ -139,6 +144,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
             _hiddenForFullscreen = fullscreen && _s.HideFull;
             Log.Info($"Pantalla completa: {fullscreen} → notch {(_hiddenForFullscreen ? "oculto" : "visible")}");
             _vm.SetSuppressed(_hiddenForFullscreen);
+            _notices.SetRelaxed(_hiddenForFullscreen);
             SoundService.Suppressed = _hiddenForFullscreen;
             if (_hiddenForFullscreen) Win32.ShowWindow(_hwnd, Win32.SW_HIDE);
             else ShowWithoutActivation();
@@ -401,6 +407,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         {
             _open.Hide();
             EndTextInput();
+            _trim.Schedule();
         }
         if (_vm.IsOpen) _outside.Start();
         else _outside.Stop();

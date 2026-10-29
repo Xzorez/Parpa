@@ -183,4 +183,10 @@ public static partial class Win32
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
     public static extern IntPtr GetModuleHandle(string? name);
+
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr GetCurrentProcess();
+
+    [DllImport("kernel32.dll", EntryPoint = "K32EmptyWorkingSet")]
+    public static extern bool EmptyWorkingSet(IntPtr process);
 }
