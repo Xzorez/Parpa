@@ -4,7 +4,7 @@
 
 *Your Windows, with a notch that blinks. Music, notifications, files and notes in an island at the top of the screen.* → [English](#english)
 
-Gratis · código abierto (MIT) · Windows 10 (2004+) y 11 · 64 bits · español e inglés.
+Gratis · código abierto (MIT) · Windows 10 (2004+) y 11 · 64 bits · español e inglés · [web](https://xzorez.github.io/Parpa/).
 
 ## Instalar
 

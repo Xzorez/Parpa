@@ -348,7 +348,17 @@
     "imported":       { "es": "✓ AJUSTES IMPORTADOS", "en": "✓ SETTINGS IMPORTED" },
     "import_failed":  { "es": "NO SE PUDO IMPORTAR", "en": "COULDN’T IMPORT" },
     "version":        { "es": "Versión", "en": "Version" },
-    "version_d":      { "es": "Parpa {v} · código abierto (MIT)", "en": "Parpa {v} · open source (MIT)" }
+    "version_d":      { "es": "Parpa {v} · código abierto (MIT)", "en": "Parpa {v} · open source (MIT)" },
+    "updates":        { "es": "Actualizaciones", "en": "Updates" },
+    "updates_ok_d":   { "es": "Estás al día · versión {v}", "en": "You’re up to date · version {v}" },
+    "updates_new_d":  { "es": "Hay una versión nueva: {v}", "en": "A new version is available: {v}" },
+    "updates_error_d":{ "es": "No se pudo comprobar. Revisa la conexión.", "en": "Couldn’t check. Check your connection." },
+    "updates_check":  { "es": "BUSCAR", "en": "CHECK" },
+    "updates_checking": { "es": "BUSCANDO…", "en": "CHECKING…" },
+    "updates_download": { "es": "DESCARGAR", "en": "DOWNLOAD" },
+    "updates_ok":     { "es": "✓ ESTÁS AL DÍA", "en": "✓ YOU’RE UP TO DATE" },
+    "updates_new":    { "es": "✓ VERSIÓN {v} DISPONIBLE", "en": "✓ VERSION {v} AVAILABLE" },
+    "updates_error":  { "es": "NO SE PUDO COMPROBAR", "en": "COULDN’T CHECK" }
   },
   "time": {
     "min":   { "es": "{n} MIN", "en": "{n} MIN" },

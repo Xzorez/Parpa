@@ -18,7 +18,7 @@ $id = 'Parpa.Parpa'
 $url = "https://github.com/$Repo"
 # Mismo AppId que installer\Parpa.iss: así winget reconoce la instalación para actualizar.
 $productCode = '{69656D3B-8A28-462D-9D42-35AD2663F018}_is1'
-$manifestVersion = '1.6.0'
+$manifestVersion = '1.12.0'
 New-Item -ItemType Directory -Force $OutDir | Out-Null
 
 function Write-Manifest([string] $name, [string] $text) {

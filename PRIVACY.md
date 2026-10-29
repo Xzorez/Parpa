@@ -19,7 +19,7 @@ Qué lee Parpa y para qué:
 - Los gestores de contraseñas (1Password, Bitwarden…) se excluyen del portapapeles por defecto, y Parpa ignora lo que Windows marca como privado.
 - Los errores se apuntan en `%APPDATA%\Parpa\parpa.log`, que nunca sale del equipo.
 - Al desinstalar, Parpa te pregunta si quieres borrar también esa carpeta.
-- Parpa solo se conecta a internet si tú lo pides (por ejemplo, al abrir un enlace).
+- Parpa solo se conecta a internet si tú lo pides: al abrir un enlace o al pulsar BUSCAR en Ajustes › Sistema › Actualizaciones, que pregunta a GitHub cuál es la última versión publicada.
 
 ## English
 
@@ -40,4 +40,4 @@ What Parpa reads and why:
 - Password managers (1Password, Bitwarden…) are excluded from the clipboard by default, and Parpa skips anything Windows marks as private.
 - Errors are written to `%APPDATA%\Parpa\parpa.log`, which never leaves your computer.
 - When you uninstall, Parpa asks whether to delete that folder too.
-- Parpa only goes online when you ask it to (for example, when you open a link).
+- Parpa only goes online when you ask it to: when you open a link, or when you press CHECK in Settings › System › Updates, which asks GitHub for the latest published version.

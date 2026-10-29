@@ -13,6 +13,8 @@
    git push origin main --tags
    ```
 
+   Repositorio: <https://github.com/Xzorez/Parpa>.
+
 El flujo **Publicar versión** (`.github/workflows/release.yml`) crea, para x64 y arm64:
 
 - `Parpa-Setup-<versión>-<arch>.exe` (Inno Setup, por usuario, sin administrador),
@@ -60,6 +62,10 @@ Sin firma, Windows SmartScreen avisa de "editor desconocido" al instalar. SignPa
    - Variables `SIGNPATH_ORGANIZATION_ID`, `SIGNPATH_PROJECT_SLUG` y `SIGNPATH_SIGNING_POLICY_SLUG` (p. ej. `release-signing`).
 
 Con `SIGNPATH_ORGANIZATION_ID` definida, el flujo firma automáticamente; sin ella, publica sin firmar.
+
+Cada versión pide cuatro firmas (app e instalador, x64 y arm64) y cada una se **aprueba a mano** en SignPath: el flujo espera hasta una hora por cada una.
+
+SignPath Foundation rechazó la primera solicitud (octubre de 2026) por falta de reputación pública: piden estrellas, forks, artículos o menciones. Cuando Parpa las tenga, se puede volver a pedir. Antes hay que recuperar la política de firma que exigen (commit `fdf1c16`: sección `#firma` de la web, README y primera línea de las notas de cada release). Mientras no esté aprobado, esa política no se publica.
 
 ## 3. winget
 
