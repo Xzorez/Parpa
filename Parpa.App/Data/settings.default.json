@@ -52,6 +52,8 @@
     "actions": {
       "IMÁGENES · COMPRIMIR": true,
       "IMÁGENES · A PNG": true,
+      "IMÁGENES · EXTRAER TEXTO": true,
+      "IMÁGENES · REDIMENSIONAR": true,
       "PDF · UNIR": false,
       "CARPETAS · ZIP": true,
       "TODOS · COPIAR RUTA": true
@@ -88,6 +90,11 @@
     [
       "notes",
       "Notas",
+      true
+    ],
+    [
+      "audio",
+      "Audio",
       true
     ],
     [

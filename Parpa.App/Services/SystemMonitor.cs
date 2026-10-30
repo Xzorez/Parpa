@@ -24,6 +24,8 @@ public sealed class SystemMonitor : IDisposable
 
     public MediaService Media => _media;
 
+    public AudioService Audio => _audio;
+
     public void Start()
     {
         _media.Changed += OnMediaChanged;

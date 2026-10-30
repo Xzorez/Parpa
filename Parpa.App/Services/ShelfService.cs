@@ -3,6 +3,7 @@ using System.IO.Compression;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using Windows.Graphics.Imaging;
+using Windows.Media.Ocr;
 using Windows.Storage;
 using Windows.Storage.Streams;
 
@@ -26,12 +27,16 @@ public sealed record ShelfItem(string Path, DateTime Added)
 }
 
 /// <summary>Acciones rápidas de la Bandeja (cada una se activa en Ajustes › Ventanas › Acciones rápidas).</summary>
-public enum ShelfAction { CopyPath, OpenFolder, Compress, ToPng, MergePdf, Zip, Remove }
+public enum ShelfAction { CopyPath, OpenFolder, ExtractText, Resize, Compress, ToPng, MergePdf, Zip, Remove }
 
 /// <summary>Bandeja de archivos (%APPDATA%\Parpa\shelf.json): se guardan hasta que se sacan.</summary>
 public sealed class ShelfService
 {
     private const double JpegQuality = 0.7;
+    private const double ResizeQuality = 0.85;
+
+    /// <summary>Lado mayor de las imágenes redimensionadas (Full HD).</summary>
+    public const int ResizeMax = 1920;
 
     private readonly ParpaSettings _s;
     private readonly ClipboardService _clipboard;
@@ -81,6 +86,8 @@ public sealed class ShelfService
         var actions = new List<ShelfAction>();
         if (On("TODOS · COPIAR RUTA")) actions.Add(ShelfAction.CopyPath);
         actions.Add(ShelfAction.OpenFolder);
+        if (item.IsImage && On("IMÁGENES · EXTRAER TEXTO")) actions.Add(ShelfAction.ExtractText);
+        if (item.IsImage && On("IMÁGENES · REDIMENSIONAR")) actions.Add(ShelfAction.Resize);
         if (item.IsImage && On("IMÁGENES · COMPRIMIR")) actions.Add(ShelfAction.Compress);
         if (item.IsImage && item.Extension != "png" && On("IMÁGENES · A PNG")) actions.Add(ShelfAction.ToPng);
         if (item.IsPdf && On("PDF · UNIR")) actions.Add(ShelfAction.MergePdf);
@@ -93,6 +100,8 @@ public sealed class ShelfService
     {
         ShelfAction.CopyPath => "shelf_act_copy_path",
         ShelfAction.OpenFolder => "peek_show_folder",
+        ShelfAction.ExtractText => "shelf_act_ocr",
+        ShelfAction.Resize => "shelf_act_resize",
         ShelfAction.Compress => "shelf_act_compress",
         ShelfAction.ToPng => "shelf_act_png",
         ShelfAction.MergePdf => "shelf_act_merge_pdf",
@@ -105,6 +114,8 @@ public sealed class ShelfService
         ShelfAction.ToPng => "shelf_verb_png",
         ShelfAction.MergePdf => "shelf_verb_merge",
         ShelfAction.Zip => "shelf_verb_zip",
+        ShelfAction.ExtractText => "shelf_verb_ocr",
+        ShelfAction.Resize => "shelf_verb_resize",
         _ => "shelf_verb_compress",
     };
 
@@ -124,6 +135,11 @@ public sealed class ShelfService
                 return string.Empty;
             case ShelfAction.MergePdf when _store.Items.Count(i => i.IsPdf) < 2:
                 return Loc.Get("shelf_need_two_pdf");
+            case ShelfAction.ExtractText:
+                return (await CopyTextAsync(item.Path)).Message;
+            case ShelfAction.Resize:
+                // Como UNIR PDF: todas las imágenes de la bandeja a la vez, empezando por la elegida.
+                return await ResizeAndAddAsync(new[] { item }.Concat(_store.Items.Where(i => i.IsImage && i != item)).Select(i => i.Path));
         }
 
         var output = action switch
@@ -167,6 +183,110 @@ public sealed class ShelfService
             throw;
         }
         return target;
+    }
+
+    // ---- Texto de una imagen (OCR de Windows, sin conexión) ----
+
+    /// <summary>Lee el texto de la imagen, lo copia y lo deja el primero del Portapapeles de Parpa.</summary>
+    public async Task<(bool Copied, string Message)> CopyTextAsync(string path)
+    {
+        var text = await ExtractTextAsync(path);
+        if (string.IsNullOrWhiteSpace(text)) return (false, Loc.Get("shelf_no_text"));
+        _clipboard.Copy(text);
+        _clipboard.Add(text, announce: false);
+        var words = text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Length;
+        return (true, Loc.Format("shelf_done_text", ("n", words)));
+    }
+
+    /// <summary>
+    /// Texto de una imagen con el reconocedor de Windows en los idiomas del usuario (Windows.Media.Ocr):
+    /// todo se hace en el PC. Las líneas se conservan; <c>null</c> si no hay reconocedor para esos idiomas.
+    /// </summary>
+    public static async Task<string?> ExtractTextAsync(string path)
+    {
+        var engine = OcrEngine.TryCreateFromUserProfileLanguages();
+        if (engine is null)
+        {
+            Log.Info("OCR: sin reconocedor para los idiomas del usuario");
+            return null;
+        }
+        using var bitmap = await DecodeAsync(path);
+        using var scaled = await FitAsync(bitmap, (int)OcrEngine.MaxImageDimension);
+        var result = await engine.RecognizeAsync(scaled);
+        return string.Join(Environment.NewLine, result.Lines.Select(l => l.Text)).Trim();
+    }
+
+    // ---- Redimensionar ----
+
+    /// <summary>Redimensiona las imágenes, las añade a la bandeja y devuelve el mensaje para el usuario.</summary>
+    public async Task<string> ResizeAndAddAsync(IEnumerable<string> paths)
+    {
+        var outputs = new List<string>();
+        foreach (var path in paths)
+            if (await ResizeAsync(path, ResizeMax) is { } output) outputs.Add(output);
+        if (outputs.Count == 0) return Loc.Format("shelf_resize_small", ("px", ResizeMax));
+        Add(outputs);
+        return Loc.Format("shelf_done_resized", ("n", outputs.Count), ("px", ResizeMax));
+    }
+
+    /// <summary>
+    /// Copia con el lado mayor a <paramref name="max"/> px junto al original ("foto-1920.jpg"). Los PNG siguen
+    /// siendo PNG; el resto pasa a JPEG. <c>null</c> si ya era igual o más pequeña.
+    /// </summary>
+    private static async Task<string?> ResizeAsync(string source, int max)
+    {
+        using var bitmap = await DecodeAsync(source);
+        if (Math.Max(bitmap.PixelWidth, bitmap.PixelHeight) <= max) return null;
+        var png = Path.GetExtension(source).Equals(".png", StringComparison.OrdinalIgnoreCase);
+        var target = UniquePath(Path.Combine(Path.GetDirectoryName(source)!, $"{Path.GetFileNameWithoutExtension(source)}-{max}{(png ? ".png" : ".jpg")}"));
+
+        await File.WriteAllBytesAsync(target, []);
+        var outFile = await StorageFile.GetFileFromPathAsync(target);
+        try
+        {
+            using var outStream = await outFile.OpenAsync(FileAccessMode.ReadWrite);
+            await EncodeAsync(bitmap, outStream, png ? BitmapEncoder.PngEncoderId : BitmapEncoder.JpegEncoderId, max, png ? null : ResizeQuality);
+        }
+        catch
+        {
+            File.Delete(target);
+            throw;
+        }
+        return target;
+    }
+
+    /// <summary>Imagen ya girada según su EXIF (las fotos del móvil vienen de lado).</summary>
+    private static async Task<SoftwareBitmap> DecodeAsync(string path)
+    {
+        var file = await StorageFile.GetFileFromPathAsync(path);
+        using var stream = await file.OpenReadAsync();
+        var decoder = await BitmapDecoder.CreateAsync(stream);
+        return await decoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
+            new BitmapTransform(), ExifOrientationMode.RespectExifOrientation, ColorManagementMode.ColorManageToSRgb);
+    }
+
+    /// <summary>La misma imagen reducida (en memoria) para que su lado mayor no pase de <paramref name="max"/>.</summary>
+    private static async Task<SoftwareBitmap> FitAsync(SoftwareBitmap bitmap, int max)
+    {
+        if (Math.Max(bitmap.PixelWidth, bitmap.PixelHeight) <= max) return SoftwareBitmap.Copy(bitmap);
+        using var memory = new InMemoryRandomAccessStream();
+        await EncodeAsync(bitmap, memory, BitmapEncoder.BmpEncoderId, max, null);
+        memory.Seek(0);
+        var decoder = await BitmapDecoder.CreateAsync(memory);
+        return await decoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
+    }
+
+    private static async Task EncodeAsync(SoftwareBitmap bitmap, IRandomAccessStream stream, Guid encoderId, int max, double? quality)
+    {
+        var encoder = quality is { } q
+            ? await BitmapEncoder.CreateAsync(encoderId, stream, new BitmapPropertySet { ["ImageQuality"] = new BitmapTypedValue(q, Windows.Foundation.PropertyType.Single) })
+            : await BitmapEncoder.CreateAsync(encoderId, stream);
+        encoder.SetSoftwareBitmap(bitmap);
+        var scale = Math.Min(1, max / (double)Math.Max(bitmap.PixelWidth, bitmap.PixelHeight));
+        encoder.BitmapTransform.ScaledWidth = (uint)Math.Max(1, Math.Round(bitmap.PixelWidth * scale));
+        encoder.BitmapTransform.ScaledHeight = (uint)Math.Max(1, Math.Round(bitmap.PixelHeight * scale));
+        encoder.BitmapTransform.InterpolationMode = BitmapInterpolationMode.Fant;
+        await encoder.FlushAsync();
     }
 
     /// <summary>Une el PDF elegido con el resto de PDF de la bandeja, en ese orden.</summary>

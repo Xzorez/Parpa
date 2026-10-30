@@ -48,7 +48,23 @@ public sealed class SettingsService
         S = merged["s"].Deserialize<ParpaSettings>(DataFiles.JsonOptions) ?? new ParpaSettings();
         S.HomeCards.Remove("FOCO"); // tarjeta retirada en 1.0.4
         Wins = merged["wins"]?.AsArray() ?? new JsonArray();
+        AddMissingWins();
         if (!userExists) Save();
+    }
+
+    /// <summary>
+    /// Las ventanas que se añaden en una versión nueva (p. ej. Audio en 1.0.5) no están en el <c>wins</c> guardado:
+    /// se añaden visibles, antes de Ajustes rápidos.
+    /// </summary>
+    private void AddMissingWins()
+    {
+        var known = Wins.OfType<JsonArray>().Select(w => w[0]?.GetValue<string>()).ToHashSet();
+        foreach (var entry in DataFiles.ReadData("settings.default.json")["wins"]!.AsArray().OfType<JsonArray>())
+        {
+            if (known.Contains(entry[0]?.GetValue<string>())) continue;
+            var quick = Wins.OfType<JsonArray>().ToList().FindIndex(w => w[0]?.GetValue<string>() == "quick");
+            Wins.Insert(quick < 0 ? Wins.Count : quick, entry.DeepClone());
+        }
     }
 
     /// <summary>Cambia ajustes y los aplica al instante (todas las vistas escuchan <see cref="Changed"/>).</summary>
@@ -142,7 +158,7 @@ public sealed class ParpaSettings
     [JsonPropertyName("content")] public string Content { get; set; } = "full";
     [JsonPropertyName("notifDur")] public double NotifDur { get; set; } = 4.5;
     [JsonPropertyName("quickReply")] public bool QuickReply { get; set; } = true;
-    /// <summary>Sin uso: Windows no expone la letra de lo que suena (Inicio queda siempre a 176 px). Se conserva por compatibilidad del esquema.</summary>
+    /// <summary>Sin uso: Windows no expone la letra de lo que suena (Inicio tiene siempre la misma altura). Se conserva por compatibilidad del esquema.</summary>
     [JsonPropertyName("lyrics")] public bool Lyrics { get; set; } = true;
     /// <summary>Tarjeta "No puedo leer tus avisos" ocultada por el usuario en Inicio.</summary>
     [JsonPropertyName("notifCardHidden")] public bool NotifCardHidden { get; set; }
@@ -150,6 +166,8 @@ public sealed class ParpaSettings
     [JsonPropertyName("clipExclude")] public Dictionary<string, bool> ClipExclude { get; set; } = new() { ["1Password"] = true, ["Bitwarden"] = true, ["KeePassXC"] = false };
     /// <summary>La bandeja empieza vacía cada vez que se abre Parpa.</summary>
     [JsonPropertyName("shelfClear")] public bool ShelfClear { get; set; }
+    /// <summary>Las capturas que guarda Windows (Win+Mayús+S, Impr Pant) aparecen en la bandeja.</summary>
+    [JsonPropertyName("shelfScreenshots")] public bool ShelfScreenshots { get; set; } = true;
     /// <summary>Bienvenida completada (no se vuelve a mostrar al arrancar).</summary>
     [JsonPropertyName("welcomeDone")] public bool WelcomeDone { get; set; }
     /// <summary>Avisos en pausa hasta esta hora (menú de bandeja: "Pausar avisos 1 hora").</summary>

@@ -16,7 +16,8 @@ public sealed class MediaService
     public sealed record NowPlaying(string Title, string Artist);
 
     /// <summary>Tarjeta MÚSICA: posición y duración para la barra de progreso.</summary>
-    public sealed record CardInfo(string Title, string Artist, string App, bool IsPlaying,
+    /// <param name="Source">Id de la app en Windows ("Spotify.exe", "Brave"…), para buscar su volumen.</param>
+    public sealed record CardInfo(string Title, string Artist, string App, string Source, bool IsPlaying,
         TimeSpan Position, TimeSpan Duration, DateTime PositionAt, IRandomAccessStreamReference? Thumbnail)
     {
         /// <summary>Posición estimada ahora (avanza sola mientras suena).</summary>
@@ -176,6 +177,7 @@ public sealed class MediaService
                     props?.Title ?? string.Empty,
                     props?.Artist ?? string.Empty,
                     AppName(card.SourceAppUserModelId),
+                    card.SourceAppUserModelId,
                     card == playing,
                     timeline.Position,
                     timeline.EndTime - timeline.StartTime,

@@ -37,6 +37,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     private readonly FullscreenWatcher _fullscreenWatcher;
     private readonly ClipboardService _clipboard;
     private readonly ShelfService _shelf;
+    private readonly ScreenshotWatcher _screenshots = new();
     private readonly TasksService _tasks = new();
     private readonly NotesService _notes = new();
     private readonly MemoryTrim _trim;
@@ -70,6 +71,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     private IntPtr _previousForeground;
     private DropKind? _dragKind;
     private string? _dragText;
+    private IReadOnlyList<string> _dragPaths = [];
     private readonly MinimalView _minimal = new();
     private bool _wasOpen;
     private bool _focusedOnOpen;
@@ -195,6 +197,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         {
             _hotkey.Dispose();
             _outside.Dispose();
+            _screenshots.Dispose();
             _system.Dispose();
             _notices.Dispose();
             _privacy.Dispose();
@@ -298,6 +301,32 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
                 IsCall: false,
                 OnPrimary: () => _vm.ShowPage(NotchPage.Clip),
                 Key: "copied"));
+        };
+
+        // Captura nueva (Win+Mayús+S, Impr Pant) → a la bandeja, con un aviso breve (VER la abre con ella elegida).
+        _screenshots.Start();
+        _screenshots.Taken += path =>
+        {
+            if (!_s.ShelfScreenshots) return;
+            var index = _shelf.Add([path]);
+            if (index >= _shelf.Items.Count) return; // ya estaba
+            _open.Shelf.Select(index);
+            if (_vm.IsOpen) return;
+            _vm.EnqueuePeek(new NotchPeek(
+                Glyph: "bandeja",
+                Head: $"{Loc.Get("windows_shelf")} · {Loc.Get("peek_screenshot")}",
+                When: string.Empty,
+                Body: Path.GetFileName(path),
+                PrimaryLabel: Loc.Get("peek_view"),
+                SecondaryLabel: Loc.Get("peek_ok"),
+                Priority: NotchPeek.PriorityInfo,
+                IsCall: false,
+                OnPrimary: () =>
+                {
+                    _open.Shelf.Select(index);
+                    _vm.ShowPage(NotchPage.Shelf);
+                },
+                Key: "screenshot"));
         };
 
         // Tarea a su hora: HECHO / POSPONER (10 min). No molestar la silencia.
@@ -465,8 +494,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         switch (_vm.State)
         {
             case NotchState.Drop:
-                _drop.Show(_vm.Drop!.Value);
-                view = _drop;
+                view = _drop; // sus zonas ya se prepararon al entrar el arrastre
                 break;
             case NotchState.Open:
                 _open.Height = _geometry.Height;
@@ -655,16 +683,23 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         else _vm.RequestClose();
     }
 
-    // ---- Arrastrar y soltar: archivo → Bandeja, texto → nota, enlace → Portapapeles ----
+    // ---- Arrastrar y soltar ----
+    // Archivo → Bandeja; una imagen → también EXTRAER TEXTO; varias → también REDIMENSIONAR;
+    // texto → nota o tarea; enlace → nota con su título o al Portapapeles. La zona bajo el ratón decide.
 
     private async void Root_DragEnter(object sender, DragEventArgs e)
     {
         var deferral = e.GetDeferral();
         try
         {
-            (_dragKind, _dragText) = await ClassifyAsync(e.DataView);
+            (_dragKind, _dragText, _dragPaths) = await ClassifyAsync(e.DataView);
             e.AcceptedOperation = _dragKind is null ? DataPackageOperation.None : DataPackageOperation.Copy;
-            if (_dragKind is { } kind) _vm.DragEntered(kind);
+            if (_dragKind is { } kind)
+            {
+                _drop.Show(DropActions(kind, _dragPaths));
+                _drop.Hover(e.GetPosition(_drop).X);
+                _vm.DragEntered(kind);
+            }
         }
         finally
         {
@@ -672,10 +707,25 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         }
     }
 
+    private IReadOnlyList<DropAction> DropActions(DropKind kind, IReadOnlyList<string> paths)
+    {
+        bool On(string key) => _s.Actions.GetValueOrDefault(key, true);
+        bool IsImage(string path) => new ShelfItem(path, default).IsImage;
+        return kind switch
+        {
+            DropKind.Text => [DropAction.Note, DropAction.Task],
+            DropKind.Link => [DropAction.LinkWithTitle, DropAction.LinkToClipboard],
+            _ when paths.Count == 1 && IsImage(paths[0]) && On("IMÁGENES · EXTRAER TEXTO") => [DropAction.Shelf, DropAction.ExtractText],
+            _ when paths.Count > 1 && paths.All(IsImage) && On("IMÁGENES · REDIMENSIONAR") => [DropAction.Shelf, DropAction.Resize],
+            _ => [DropAction.Shelf],
+        };
+    }
+
     private void Root_DragOver(object sender, DragEventArgs e)
     {
         e.AcceptedOperation = _dragKind is null ? DataPackageOperation.None : DataPackageOperation.Copy;
         e.DragUIOverride.IsCaptionVisible = false; // la etiqueta ya la dibuja el notch
+        if (_dragKind is not null) _drop.Hover(e.GetPosition(_drop).X);
     }
 
     private void Root_DragLeave(object sender, DragEventArgs e)
@@ -688,63 +738,128 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     {
         var kind = _dragKind;
         var text = _dragText;
+        var action = _drop.SelectedAction;
         _dragKind = null;
-        var deferral = e.GetDeferral();
+        DragOperationDeferral? deferral = e.GetDeferral();
         try
         {
-            switch (kind)
-            {
-                case DropKind.File:
-                    var items = await e.DataView.GetStorageItemsAsync();
-                    var first = _shelf.Add(items.Select(i => i.Path).Where(p => !string.IsNullOrEmpty(p)));
-                    _open.Shelf.Select(first);
-                    SoundService.Play("confirm");
-                    _vm.DragEnded(NotchPage.Shelf);
-                    break;
-                case DropKind.Text when text is not null:
-                    _notes.Add(text);
-                    _vm.DragEnded(NotchPage.Notes);
-                    break;
-                case DropKind.Link when text is not null:
-                    _clipboard.Add(text, announce: false);
-                    _vm.DragEnded(NotchPage.Clip);
-                    break;
-                default:
-                    _vm.DragEnded(null);
-                    break;
-            }
+            var paths = kind == DropKind.File
+                ? (await e.DataView.GetStorageItemsAsync()).Select(i => i.Path).Where(p => !string.IsNullOrEmpty(p)).ToList()
+                : [];
             e.AcceptedOperation = DataPackageOperation.Copy;
+            deferral.Complete(); // lo que tarda (leer texto, redimensionar, bajar un título) no retiene al Explorador
+            deferral = null;
+            await RunDropAsync(action, paths, text);
         }
         catch (Exception ex)
         {
-            Log.Error("Soltar: no se pudo leer lo soltado", ex);
+            Log.Error($"Soltar: {action} falló", ex);
             _vm.DragEnded(null);
+            DropNotice(Loc.Get("drop_failed"));
         }
         finally
         {
-            deferral.Complete();
+            deferral?.Complete();
         }
     }
 
+    private async Task RunDropAsync(DropAction? action, List<string> paths, string? text)
+    {
+        switch (action)
+        {
+            case DropAction.Shelf when paths.Count > 0:
+                _open.Shelf.Select(_shelf.Add(paths));
+                SoundService.Play("confirm");
+                _vm.DragEnded(NotchPage.Shelf);
+                break;
+            case DropAction.ExtractText when paths.Count > 0:
+                _drop.ShowWorking();
+                var (copied, message) = await _shelf.CopyTextAsync(paths[0]);
+                _vm.DragEnded(copied ? NotchPage.Clip : null);
+                if (copied) SoundService.Play("confirm");
+                else DropNotice(message);
+                break;
+            case DropAction.Resize when paths.Count > 0:
+                _drop.ShowWorking();
+                var before = _shelf.Items.Count;
+                var result = await _shelf.ResizeAndAddAsync(paths);
+                if (_shelf.Items.Count > before)
+                {
+                    _open.Shelf.Select(before);
+                    SoundService.Play("confirm");
+                    _vm.DragEnded(NotchPage.Shelf);
+                }
+                else
+                {
+                    _vm.DragEnded(null);
+                    DropNotice(result);
+                }
+                break;
+            case DropAction.Note when text is not null:
+                _notes.Add(text);
+                _vm.DragEnded(NotchPage.Notes);
+                break;
+            case DropAction.Task when text is not null:
+                // Una tarea es una línea: la primera, recortada.
+                var line = text.Split('\n', 2)[0].Trim();
+                _tasks.Add(line.Length > 160 ? line[..159] + "…" : line);
+                SoundService.Play("confirm");
+                _vm.DragEnded(NotchPage.Todo);
+                break;
+            case DropAction.LinkWithTitle when text is not null:
+                _drop.ShowWorking();
+                _notes.Add($"{await LinkTitleService.FetchAsync(text)}\n{text}");
+                _vm.DragEnded(NotchPage.Notes);
+                break;
+            case DropAction.LinkToClipboard when text is not null:
+                _clipboard.Add(text, announce: false);
+                _vm.DragEnded(NotchPage.Clip);
+                break;
+            default:
+                _vm.DragEnded(null);
+                break;
+        }
+    }
+
+    /// <summary>Lo soltado no dio resultado (sin texto, ya era pequeña…): indicador breve con el motivo.</summary>
+    private void DropNotice(string message)
+    {
+        SoundService.Play("decline");
+        _vm.ShowIndicator(new NotchIndicator("bandeja", message, string.Empty, 0, "—", Alert: true));
+    }
+
     /// <summary>Qué se arrastra: archivos, enlace (web o texto que es una URL) o texto.</summary>
-    private static async Task<(DropKind?, string?)> ClassifyAsync(DataPackageView data)
+    private static async Task<(DropKind?, string?, IReadOnlyList<string>)> ClassifyAsync(DataPackageView data)
     {
         try
         {
-            if (data.Contains(StandardDataFormats.StorageItems)) return (DropKind.File, null);
-            if (data.Contains(StandardDataFormats.WebLink)) return (DropKind.Link, (await data.GetWebLinkAsync()).ToString());
+            if (data.Contains(StandardDataFormats.StorageItems))
+            {
+                // Las rutas sirven para ofrecer acciones de imagen; si el origen no las da hasta soltar, solo Bandeja.
+                IReadOnlyList<string> paths = [];
+                try
+                {
+                    paths = (await data.GetStorageItemsAsync()).Select(i => i.Path).Where(p => !string.IsNullOrEmpty(p)).ToList();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Soltar: rutas no disponibles al arrastrar", ex);
+                }
+                return (DropKind.File, null, paths);
+            }
+            if (data.Contains(StandardDataFormats.WebLink)) return (DropKind.Link, (await data.GetWebLinkAsync()).ToString(), []);
             if (data.Contains(StandardDataFormats.Text))
             {
                 var text = (await data.GetTextAsync()).Trim();
-                if (text.Length == 0) return (null, null);
+                if (text.Length == 0) return (null, null, []);
                 var isLink = Uri.TryCreate(text, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https" && !text.Contains(' ');
-                return (isLink ? DropKind.Link : DropKind.Text, text);
+                return (isLink ? DropKind.Link : DropKind.Text, text, []);
             }
         }
         catch (Exception ex)
         {
             Log.Error("Soltar: formato no legible", ex);
         }
-        return (null, null);
+        return (null, null, []);
     }
 }

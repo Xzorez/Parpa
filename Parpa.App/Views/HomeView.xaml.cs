@@ -19,6 +19,8 @@ public sealed partial class HomeView : UserControl, INotchPageView
     private readonly SystemStats _stats = new();
     private readonly DispatcherQueueTimer _progressTimer;
     private readonly List<(TextBlock Label, DotMatrix Dots, TextBlock Value)> _systemRows = new();
+    private readonly BarSlider _musicVolume = new(20, 4, 4, 9, spacing: 2);
+    private AppVolume? _musicApp;
     private object? _artworkFor;
     private bool _shown;
 
@@ -30,7 +32,20 @@ public sealed partial class HomeView : UserControl, INotchPageView
 
         _progressTimer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         _progressTimer.Interval = TimeSpan.FromSeconds(1);
-        _progressTimer.Tick += (_, _) => DrawProgress();
+        _progressTimer.Tick += (_, _) =>
+        {
+            DrawProgress();
+            RenderMusicVolume(); // se puede cambiar desde la propia app o desde Audio
+        };
+
+        Grid.SetColumn(_musicVolume, 1);
+        MusicVolume.Children.Add(_musicVolume);
+        _musicVolume.ValueChanged += percent =>
+        {
+            if (_musicApp is null) return;
+            _app.System.Audio.SetAppVolume(_musicApp, percent);
+            MusicVolumeValue.Text = $"{percent}%";
+        };
 
         foreach (var key in SystemKeys)
         {
@@ -145,6 +160,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
         PlayPauseButton.Text = card.IsPlaying ? "▮▮" : "▶";
         _ = LoadArtworkAsync(card);
         DrawProgress();
+        RenderMusicVolume();
         if (card.IsPlaying) _progressTimer.Start();
         else _progressTimer.Stop();
     }
@@ -194,6 +210,20 @@ public sealed partial class HomeView : UserControl, INotchPageView
 
     private static string FormatTime(TimeSpan time) =>
         time.TotalHours >= 1 ? time.ToString(@"h\:mm\:ss") : $"{(int)time.TotalMinutes}:{time.Seconds:00}";
+
+    /// <summary>Volumen de la app que suena (si suena por la salida actual; si no, la fila no sale).</summary>
+    private void RenderMusicVolume()
+    {
+        if (_musicVolume.IsDragging) return;
+        var card = _app.System.Media.Card;
+        _musicApp = card is null ? null : _app.System.Audio.AppFor(card.Source);
+        MusicVolume.Visibility = _musicApp is null ? Visibility.Collapsed : Visibility.Visible;
+        if (_musicApp is not { } app) return;
+        _musicVolume.Show(app.Muted ? 0 : app.Volume);
+        MusicVolumeValue.Text = app.Muted ? Loc.Get("audio_muted") : $"{app.Volume}%";
+    }
+
+    private void MusicVolume_PointerWheelChanged(object sender, PointerRoutedEventArgs e) => _musicVolume.Wheel(e);
 
     private void PreviousButton_Tapped(object sender, TappedRoutedEventArgs e)
     {

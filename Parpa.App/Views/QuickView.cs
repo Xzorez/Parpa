@@ -12,11 +12,9 @@ namespace Parpa.Views;
 /// </summary>
 public sealed partial class QuickView : Grid, INotchPageView
 {
-    private const int VolumeBars = 14;
-
     private readonly NotchServices _app;
     private readonly Grid _tiles = new() { ColumnSpacing = 6, RowSpacing = 6 };
-    private readonly StackPanel _bars = new() { Orientation = Orientation.Horizontal, Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
+    private readonly BarSlider _bars = new(20, 5, 5, 14); // una barra = 5 %
     private readonly TextBlock _volumeValue = new();
     private readonly TextBlock _soundsLabel = new();
     private readonly TextBlock _allSettings = new();
@@ -96,19 +94,8 @@ public sealed partial class QuickView : Grid, INotchPageView
         Grid.SetColumn(allSettings, 1);
         bottom.Children.Add(allSettings);
 
-        for (var i = 0; i < VolumeBars; i++)
-        {
-            var index = i;
-            var bar = new Border { Width = 5, CornerRadius = new CornerRadius(3), VerticalAlignment = VerticalAlignment.Center, Background = Theme.Brush("border") };
-            bar.Tapped += (_, e) =>
-            {
-                e.Handled = true;
-                // Cada barra fija el volumen en pasos de 5 %.
-                Update(s => s.Vol = (int)(Math.Round((index + 1) / (double)VolumeBars * 100 / 5) * 5));
-                SoundService.Play("tick");
-            };
-            _bars.Children.Add(bar);
-        }
+        _bars.ValueChanged += percent => Update(s => s.Vol = percent);
+        sounds.PointerWheelChanged += (_, e) => _bars.Wheel(e);
 
         SettingsService.Current.Changed += () => { if (_shown) _ = RenderAsync(); };
     }
@@ -139,16 +126,9 @@ public sealed partial class QuickView : Grid, INotchPageView
 
     private async Task RenderAsync()
     {
-        // Volumen de sonidos: barra i llena si (i + 0,5) / 14 ≤ vol; altura 5 → 14 px.
-        var fraction = _app.Settings.Vol / 100.0;
-        for (var i = 0; i < VolumeBars; i++)
-        {
-            var bar = (Border)_bars.Children[i];
-            var filled = (i + 0.5) / VolumeBars <= fraction + 0.001;
-            Motion.AnimateSize(bar, null, filled ? 5 + Math.Round(i / (double)VolumeBars * 9) : 5, TimeSpan.FromMilliseconds(150));
-            bar.Background = Theme.Brush(filled ? "primary" : "border");
-        }
+        _bars.Show(_app.Settings.Vol);
         _volumeValue.Text = $"{_app.Settings.Vol}%";
+        if (_bars.IsDragging) return; // arrastrando el volumen: los mosaicos no cambian
 
         var states = await Task.WhenAll(_tileDefs.Select(t => t.Read()));
         _tiles.Children.Clear();

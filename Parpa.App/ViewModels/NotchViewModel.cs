@@ -23,10 +23,11 @@ public sealed record NotchPage(string Id, string TitleKey, string Glyph, string 
     public static readonly NotchPage Shelf = new("shelf", "windows_shelf", "bandeja", "shelf");
     public static readonly NotchPage Todo = new("todo", "windows_todo", "tareas", "tasks");
     public static readonly NotchPage Notes = new("notes", "windows_notes", "notas", "notes");
+    public static readonly NotchPage Audio = new("audio", "windows_audio", "sonido", "audio");
     public static readonly NotchPage Quick = new("quick", "windows_quick", "general", "quick");
 
     /// <summary>Ventanas con vista propia.</summary>
-    public static readonly IReadOnlyList<NotchPage> Implemented = [Home, Clip, Shelf, Todo, Notes, Quick];
+    public static readonly IReadOnlyList<NotchPage> Implemented = [Home, Clip, Shelf, Todo, Notes, Audio, Quick];
 }
 
 /// <summary>

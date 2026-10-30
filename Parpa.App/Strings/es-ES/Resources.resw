@@ -13,6 +13,7 @@
   <data name="windows_shelf" xml:space="preserve"><value>BANDEJA</value></data>
   <data name="windows_todo" xml:space="preserve"><value>TAREAS</value></data>
   <data name="windows_notes" xml:space="preserve"><value>NOTAS</value></data>
+  <data name="windows_audio" xml:space="preserve"><value>AUDIO</value></data>
   <data name="windows_quick" xml:space="preserve"><value>AJUSTES</value></data>
   <data name="windows_menu" xml:space="preserve"><value>MENÚ</value></data>
   <data name="compact_idle" xml:space="preserve"><value>REPOSO</value></data>
@@ -64,6 +65,7 @@
   <data name="peek_download_done" xml:space="preserve"><value>DESCARGA COMPLETA</value></data>
   <data name="peek_task_due" xml:space="preserve"><value>TAREA PARA AHORA</value></data>
   <data name="peek_copied" xml:space="preserve"><value>COPIADO</value></data>
+  <data name="peek_screenshot" xml:space="preserve"><value>CAPTURA AÑADIDA</value></data>
   <data name="peek_dnd_blocked" xml:space="preserve"><value>☾ NO MOLESTAR ACTIVO</value></data>
   <data name="peek_app_blocked" xml:space="preserve"><value>✕ AVISOS DE ESTA APP DESACTIVADOS</value></data>
   <data name="peek_ignore" xml:space="preserve"><value>IGNORAR</value></data>
@@ -85,8 +87,25 @@
   <data name="osd_dnd_on" xml:space="preserve"><value>NO MOLESTAR</value></data>
   <data name="osd_dnd_until" xml:space="preserve"><value>HASTA LAS {time}</value></data>
   <data name="drop_file" xml:space="preserve"><value>SUELTA PARA AÑADIR A LA BANDEJA</value></data>
-  <data name="drop_text" xml:space="preserve"><value>SUELTA PARA CREAR UNA NOTA</value></data>
-  <data name="drop_link" xml:space="preserve"><value>SUELTA PARA GUARDAR EL ENLACE</value></data>
+  <data name="drop_shelf" xml:space="preserve"><value>A LA BANDEJA</value></data>
+  <data name="drop_ocr" xml:space="preserve"><value>EXTRAER TEXTO</value></data>
+  <data name="drop_resize" xml:space="preserve"><value>REDIMENSIONAR</value></data>
+  <data name="drop_note" xml:space="preserve"><value>CREAR NOTA</value></data>
+  <data name="drop_task" xml:space="preserve"><value>CREAR TAREA</value></data>
+  <data name="drop_link_title" xml:space="preserve"><value>GUARDAR CON TÍTULO</value></data>
+  <data name="drop_link_clip" xml:space="preserve"><value>AL PORTAPAPELES</value></data>
+  <data name="drop_working" xml:space="preserve"><value>UN MOMENTO…</value></data>
+  <data name="drop_failed" xml:space="preserve"><value>NO SE PUDO</value></data>
+  <data name="audio_output" xml:space="preserve"><value>SALIDA</value></data>
+  <data name="audio_no_output" xml:space="preserve"><value>SIN SALIDA DE AUDIO</value></data>
+  <data name="audio_mic" xml:space="preserve"><value>Micrófono</value></data>
+  <data name="audio_mic_on" xml:space="preserve"><value>ACTIVO</value></data>
+  <data name="audio_mic_off" xml:space="preserve"><value>SILENCIADO</value></data>
+  <data name="audio_volume" xml:space="preserve"><value>VOLUMEN</value></data>
+  <data name="audio_no_apps" xml:space="preserve"><value>NINGUNA APP ESTÁ USANDO EL SONIDO</value></data>
+  <data name="audio_muted" xml:space="preserve"><value>MUDO</value></data>
+  <data name="audio_mute" xml:space="preserve"><value>Toca para silenciar</value></data>
+  <data name="audio_unmute" xml:space="preserve"><value>Toca para activar el sonido</value></data>
   <data name="shelf_empty_1" xml:space="preserve"><value>ARRASTRA ARCHIVOS HASTA EL NOTCH</value></data>
   <data name="shelf_empty_2" xml:space="preserve"><value>SE GUARDAN AQUÍ HASTA QUE LOS SAQUES</value></data>
   <data name="shelf_pick_hint" xml:space="preserve"><value>O TOCA UNO PARA VER ACCIONES</value></data>
@@ -98,10 +117,18 @@
   <data name="shelf_act_merge_pdf" xml:space="preserve"><value>UNIR PDF</value></data>
   <data name="shelf_act_zip" xml:space="preserve"><value>ZIP</value></data>
   <data name="shelf_act_copy_path" xml:space="preserve"><value>COPIAR RUTA</value></data>
+  <data name="shelf_act_ocr" xml:space="preserve"><value>EXTRAER TEXTO</value></data>
+  <data name="shelf_act_resize" xml:space="preserve"><value>REDIMENSIONAR</value></data>
   <data name="shelf_act_remove" xml:space="preserve"><value>QUITAR</value></data>
   <data name="shelf_done_path" xml:space="preserve"><value>✓ RUTA COPIADA</value></data>
   <data name="shelf_done_created" xml:space="preserve"><value>✓ {file} CREADO</value></data>
   <data name="shelf_done_folder" xml:space="preserve"><value>✓ ABRIENDO CARPETA…</value></data>
+  <data name="shelf_done_text" xml:space="preserve"><value>✓ TEXTO COPIADO · {n} PALABRAS</value></data>
+  <data name="shelf_no_text" xml:space="preserve"><value>NO HAY TEXTO EN LA IMAGEN</value></data>
+  <data name="shelf_done_resized" xml:space="preserve"><value>✓ {n} IMÁGENES A {px} PX</value></data>
+  <data name="shelf_resize_small" xml:space="preserve"><value>YA MIDEN {px} PX O MENOS</value></data>
+  <data name="shelf_verb_ocr" xml:space="preserve"><value>leer</value></data>
+  <data name="shelf_verb_resize" xml:space="preserve"><value>redimensionar</value></data>
   <data name="shelf_verb_compress" xml:space="preserve"><value>comprimir</value></data>
   <data name="shelf_verb_png" xml:space="preserve"><value>convertir</value></data>
   <data name="shelf_verb_merge" xml:space="preserve"><value>unir</value></data>
@@ -263,6 +290,7 @@
   <data name="settings_clip_exclude" xml:space="preserve"><value>No guardar desde</value></data>
   <data name="settings_shelf_path" xml:space="preserve"><value>Carpeta de la bandeja</value></data>
   <data name="settings_shelf_clear" xml:space="preserve"><value>Vaciar al reiniciar</value></data>
+  <data name="settings_shelf_screenshots" xml:space="preserve"><value>Capturas a la bandeja</value></data>
   <data name="settings_shelf_actions" xml:space="preserve"><value>Acciones rápidas</value></data>
   <data name="settings_sounds" xml:space="preserve"><value>Sonidos</value></data>
   <data name="settings_volume" xml:space="preserve"><value>Volumen</value></data>
@@ -303,6 +331,7 @@
   <data name="settings_clip_limit_d" xml:space="preserve"><value>Elementos que se guardan.</value></data>
   <data name="settings_clip_exclude_d" xml:space="preserve"><value>Nunca guarda lo que copies desde aquí.</value></data>
   <data name="settings_shelf_clear_d" xml:space="preserve"><value>La bandeja empieza vacía cada vez que se abre Parpa.</value></data>
+  <data name="settings_shelf_screenshots_d" xml:space="preserve"><value>Cada captura que guarda Windows (Win+Mayús+S, Impr Pant) aparece en la bandeja.</value></data>
   <data name="settings_shelf_actions_d" xml:space="preserve"><value>Aparecen al tocar un archivo según su tipo.</value></data>
   <data name="settings_pomo_d" xml:space="preserve"><value>Duración de cada sesión de foco.</value></data>
   <data name="settings_export" xml:space="preserve"><value>Exportar ajustes</value></data>

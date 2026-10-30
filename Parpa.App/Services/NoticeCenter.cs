@@ -43,6 +43,8 @@ public sealed class NoticeCenter : IDisposable
     private void OnArrived(AppNotice notice)
     {
         if (notice.App.Equals(Loc.Get("app_name"), StringComparison.OrdinalIgnoreCase)) return;
+        // "Recorte copiado en el portapapeles": con las capturas en la bandeja ya avisa Parpa (CAPTURA AÑADIDA).
+        if (_s.ShelfScreenshots && notice.AppUserModelId.StartsWith("Microsoft.ScreenSketch", StringComparison.OrdinalIgnoreCase)) return;
 
         var isCall = CallHints.Any(h => $"{notice.Title} {notice.Body}".Contains(h, StringComparison.OrdinalIgnoreCase));
         if (!IsAppAllowed(notice.App))

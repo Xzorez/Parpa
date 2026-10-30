@@ -381,6 +381,7 @@ public sealed class SettingsWindow : Window
                 yield return new Row(L("settings_clip_exclude"), L("settings_clip_exclude_d"), () => Chips(s.ClipExclude, k => k, (k, v) => Set(x => x.ClipExclude[k] = v)));
                 yield return new Head(L("windows_shelf"));
                 yield return new Row(L("settings_shelf_clear"), L("settings_shelf_clear_d"), () => Toggle(s.ShelfClear, v => Set(x => x.ShelfClear = v)));
+                yield return new Row(L("settings_shelf_screenshots"), L("settings_shelf_screenshots_d"), () => Toggle(s.ShelfScreenshots, v => Set(x => x.ShelfScreenshots = v)));
                 yield return new Row(L("settings_shelf_actions"), L("settings_shelf_actions_d"), () => Chips(s.Actions, k => k, (k, v) => Set(x => x.Actions[k] = v)));
                 break;
 

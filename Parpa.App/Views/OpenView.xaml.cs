@@ -45,6 +45,7 @@ public sealed partial class OpenView : UserControl
             "shelf" => new ShelfView(_app),
             "todo" => CreateTasks(),
             "notes" => new NotesView(_app),
+            "audio" => new AudioView(_app),
             "quick" => new QuickView(_app),
             _ => _pages.GetValueOrDefault(NotchPage.Home) ?? new HomeView(_app),
         };

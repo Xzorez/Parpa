@@ -102,6 +102,19 @@ public static partial class Win32
     [DllImport("user32.dll", SetLastError = true)]
     public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint flags);
 
+    public const int SM_SWAPBUTTON = 23;
+    public const int VK_LBUTTON = 0x01;
+    public const int VK_RBUTTON = 0x02;
+
+    [DllImport("user32.dll")]
+    public static extern bool GetCursorPos(out POINT point);
+
+    [DllImport("user32.dll")]
+    public static extern int GetSystemMetrics(int index);
+
+    [DllImport("user32.dll")]
+    public static extern short GetAsyncKeyState(int key);
+
     [DllImport("user32.dll")]
     public static extern IntPtr GetForegroundWindow();
 

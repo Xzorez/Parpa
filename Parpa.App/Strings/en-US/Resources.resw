@@ -13,6 +13,7 @@
   <data name="windows_shelf" xml:space="preserve"><value>SHELF</value></data>
   <data name="windows_todo" xml:space="preserve"><value>TASKS</value></data>
   <data name="windows_notes" xml:space="preserve"><value>NOTES</value></data>
+  <data name="windows_audio" xml:space="preserve"><value>AUDIO</value></data>
   <data name="windows_quick" xml:space="preserve"><value>SETTINGS</value></data>
   <data name="windows_menu" xml:space="preserve"><value>MENU</value></data>
   <data name="compact_idle" xml:space="preserve"><value>IDLE</value></data>
@@ -64,6 +65,7 @@
   <data name="peek_download_done" xml:space="preserve"><value>DOWNLOAD COMPLETE</value></data>
   <data name="peek_task_due" xml:space="preserve"><value>TASK DUE NOW</value></data>
   <data name="peek_copied" xml:space="preserve"><value>COPIED</value></data>
+  <data name="peek_screenshot" xml:space="preserve"><value>SCREENSHOT ADDED</value></data>
   <data name="peek_dnd_blocked" xml:space="preserve"><value>☾ DO NOT DISTURB IS ON</value></data>
   <data name="peek_app_blocked" xml:space="preserve"><value>✕ ALERTS OFF FOR THIS APP</value></data>
   <data name="peek_ignore" xml:space="preserve"><value>IGNORE</value></data>
@@ -85,8 +87,25 @@
   <data name="osd_dnd_on" xml:space="preserve"><value>DO NOT DISTURB</value></data>
   <data name="osd_dnd_until" xml:space="preserve"><value>UNTIL {time}</value></data>
   <data name="drop_file" xml:space="preserve"><value>DROP TO ADD TO SHELF</value></data>
-  <data name="drop_text" xml:space="preserve"><value>DROP TO CREATE A NOTE</value></data>
-  <data name="drop_link" xml:space="preserve"><value>DROP TO SAVE THE LINK</value></data>
+  <data name="drop_shelf" xml:space="preserve"><value>TO SHELF</value></data>
+  <data name="drop_ocr" xml:space="preserve"><value>EXTRACT TEXT</value></data>
+  <data name="drop_resize" xml:space="preserve"><value>RESIZE</value></data>
+  <data name="drop_note" xml:space="preserve"><value>NEW NOTE</value></data>
+  <data name="drop_task" xml:space="preserve"><value>NEW TASK</value></data>
+  <data name="drop_link_title" xml:space="preserve"><value>SAVE WITH TITLE</value></data>
+  <data name="drop_link_clip" xml:space="preserve"><value>TO CLIPBOARD</value></data>
+  <data name="drop_working" xml:space="preserve"><value>ONE MOMENT…</value></data>
+  <data name="drop_failed" xml:space="preserve"><value>COULDN’T DO IT</value></data>
+  <data name="audio_output" xml:space="preserve"><value>OUTPUT</value></data>
+  <data name="audio_no_output" xml:space="preserve"><value>NO AUDIO OUTPUT</value></data>
+  <data name="audio_mic" xml:space="preserve"><value>Microphone</value></data>
+  <data name="audio_mic_on" xml:space="preserve"><value>ON</value></data>
+  <data name="audio_mic_off" xml:space="preserve"><value>MUTED</value></data>
+  <data name="audio_volume" xml:space="preserve"><value>VOLUME</value></data>
+  <data name="audio_no_apps" xml:space="preserve"><value>NO APP IS USING SOUND</value></data>
+  <data name="audio_muted" xml:space="preserve"><value>MUTED</value></data>
+  <data name="audio_mute" xml:space="preserve"><value>Tap to mute</value></data>
+  <data name="audio_unmute" xml:space="preserve"><value>Tap to unmute</value></data>
   <data name="shelf_empty_1" xml:space="preserve"><value>DRAG FILES UP TO THE NOTCH</value></data>
   <data name="shelf_empty_2" xml:space="preserve"><value>THEY STAY HERE UNTIL YOU TAKE THEM OUT</value></data>
   <data name="shelf_pick_hint" xml:space="preserve"><value>OR TAP ONE FOR ACTIONS</value></data>
@@ -98,10 +117,18 @@
   <data name="shelf_act_merge_pdf" xml:space="preserve"><value>MERGE PDF</value></data>
   <data name="shelf_act_zip" xml:space="preserve"><value>ZIP</value></data>
   <data name="shelf_act_copy_path" xml:space="preserve"><value>COPY PATH</value></data>
+  <data name="shelf_act_ocr" xml:space="preserve"><value>EXTRACT TEXT</value></data>
+  <data name="shelf_act_resize" xml:space="preserve"><value>RESIZE</value></data>
   <data name="shelf_act_remove" xml:space="preserve"><value>REMOVE</value></data>
   <data name="shelf_done_path" xml:space="preserve"><value>✓ PATH COPIED</value></data>
   <data name="shelf_done_created" xml:space="preserve"><value>✓ {file} CREATED</value></data>
   <data name="shelf_done_folder" xml:space="preserve"><value>✓ OPENING FOLDER…</value></data>
+  <data name="shelf_done_text" xml:space="preserve"><value>✓ TEXT COPIED · {n} WORDS</value></data>
+  <data name="shelf_no_text" xml:space="preserve"><value>NO TEXT IN THE IMAGE</value></data>
+  <data name="shelf_done_resized" xml:space="preserve"><value>✓ {n} IMAGES AT {px} PX</value></data>
+  <data name="shelf_resize_small" xml:space="preserve"><value>ALREADY {px} PX OR SMALLER</value></data>
+  <data name="shelf_verb_ocr" xml:space="preserve"><value>read</value></data>
+  <data name="shelf_verb_resize" xml:space="preserve"><value>resize</value></data>
   <data name="shelf_verb_compress" xml:space="preserve"><value>compress</value></data>
   <data name="shelf_verb_png" xml:space="preserve"><value>convert</value></data>
   <data name="shelf_verb_merge" xml:space="preserve"><value>merge</value></data>
@@ -263,6 +290,7 @@
   <data name="settings_clip_exclude" xml:space="preserve"><value>Never save from</value></data>
   <data name="settings_shelf_path" xml:space="preserve"><value>Shelf folder</value></data>
   <data name="settings_shelf_clear" xml:space="preserve"><value>Clear on restart</value></data>
+  <data name="settings_shelf_screenshots" xml:space="preserve"><value>Screenshots to the shelf</value></data>
   <data name="settings_shelf_actions" xml:space="preserve"><value>Quick actions</value></data>
   <data name="settings_sounds" xml:space="preserve"><value>Sounds</value></data>
   <data name="settings_volume" xml:space="preserve"><value>Volume</value></data>
@@ -303,6 +331,7 @@
   <data name="settings_clip_limit_d" xml:space="preserve"><value>Items kept.</value></data>
   <data name="settings_clip_exclude_d" xml:space="preserve"><value>Never keeps what you copy from these.</value></data>
   <data name="settings_shelf_clear_d" xml:space="preserve"><value>The shelf starts empty every time Parpa opens.</value></data>
+  <data name="settings_shelf_screenshots_d" xml:space="preserve"><value>Every screenshot Windows saves (Win+Shift+S, Print Screen) shows up in the shelf.</value></data>
   <data name="settings_shelf_actions_d" xml:space="preserve"><value>Shown when you tap a file, by type.</value></data>
   <data name="settings_pomo_d" xml:space="preserve"><value>Length of each focus session.</value></data>
   <data name="settings_export" xml:space="preserve"><value>Export settings</value></data>

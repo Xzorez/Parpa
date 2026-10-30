@@ -25,6 +25,7 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid ColumnSpacing="10">
                             <Grid.ColumnDefinitions>
@@ -84,6 +85,28 @@
                             <TextBlock
                                 x:Name="MusicDuration"
                                 HorizontalAlignment="Right"
+                                FontFamily="{StaticResource FontMono}"
+                                FontSize="10"
+                                Foreground="{StaticResource SecondaryBrush}" />
+                        </Grid>
+                        <!-- Volumen de la app que suena (Spotify, el navegador…): VOL + barras + valor. -->
+                        <Grid
+                            x:Name="MusicVolume"
+                            Grid.Row="3"
+                            Background="Transparent"
+                            ColumnSpacing="6"
+                            PointerWheelChanged="MusicVolume_PointerWheelChanged"
+                            Visibility="Collapsed">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="MusicVolumeLabel" VerticalAlignment="Center" Style="{StaticResource RowMeta}" Text="VOL" />
+                            <TextBlock
+                                x:Name="MusicVolumeValue"
+                                Grid.Column="2"
+                                VerticalAlignment="Center"
                                 FontFamily="{StaticResource FontMono}"
                                 FontSize="10"
                                 Foreground="{StaticResource SecondaryBrush}" />
