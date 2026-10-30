@@ -190,12 +190,9 @@ public sealed partial class NotchShape : Grid
 
         root.Children.InsertAtTop(CreateEar(left: true));
         root.Children.InsertAtTop(CreateEar(left: false));
-        _shapeParts.AddRange(root.Children); // sombra, cuerpo y orejas (todo menos el punto)
         root.Children.InsertAtTop(CreateLiveDot());
         return root;
     }
-
-    private readonly List<Visual> _shapeParts = new();
 
     /// <summary>Escala del notch escondido: plano contra el borde superior y algo más estrecho.</summary>
     private static readonly Vector3 Retracted = new(0.6f, 0f, 1f);
@@ -242,15 +239,6 @@ public sealed partial class NotchShape : Grid
         var visual = ElementCompositionPreview.GetElementVisual(this);
         visual.CenterPoint = new Vector3((float)ActualWidth / 2, 0, 0);
         return visual;
-    }
-
-    /// <summary>
-    /// Pantalla completa con micro/cámara en uso: desaparece la forma y su contenido y queda solo el punto rojo.
-    /// </summary>
-    public void SetDotOnly(bool dotOnly)
-    {
-        foreach (var part in _shapeParts) part.Opacity = dotOnly ? 0 : 1;
-        _content.Opacity = dotOnly ? 0 : 1;
     }
 
     private const float LiveDotSize = 5f;

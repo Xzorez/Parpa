@@ -46,6 +46,7 @@ public sealed class SettingsService
         }
 
         S = merged["s"].Deserialize<ParpaSettings>(DataFiles.JsonOptions) ?? new ParpaSettings();
+        S.HomeCards.Remove("FOCO"); // tarjeta retirada en 1.0.4
         Wins = merged["wins"]?.AsArray() ?? new JsonArray();
         if (!userExists) Save();
     }
@@ -85,6 +86,7 @@ public sealed class SettingsService
             Merge(merged, user);
             var imported = merged["s"].Deserialize<ParpaSettings>(DataFiles.JsonOptions);
             if (imported is null) return false;
+            imported.HomeCards.Remove("FOCO");
             foreach (var property in typeof(ParpaSettings).GetProperties().Where(p => p.CanWrite))
                 property.SetValue(S, property.GetValue(imported));
             Wins.Clear();

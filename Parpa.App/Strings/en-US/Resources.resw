@@ -226,7 +226,7 @@
   <data name="settings_hide_full" xml:space="preserve"><value>Hide in full screen</value></data>
   <data name="settings_hide_full_d" xml:space="preserve"><value>Steps aside for games, videos and presentations.</value></data>
   <data name="settings_mic_always" xml:space="preserve"><value>Always show mic &amp; camera</value></data>
-  <data name="settings_mic_always_d" xml:space="preserve"><value>In full screen, the red dot shows for 3 s and then goes away.</value></data>
+  <data name="settings_mic_always_d" xml:space="preserve"><value>In full screen, it lets you know once for 3 s and then disappears completely.</value></data>
   <data name="settings_theme" xml:space="preserve"><value>Theme</value></data>
   <data name="settings_theme_dark" xml:space="preserve"><value>DARK</value></data>
   <data name="settings_theme_light" xml:space="preserve"><value>LIGHT</value></data>
@@ -326,6 +326,11 @@
   <data name="settings_updates_ok" xml:space="preserve"><value>✓ YOU’RE UP TO DATE</value></data>
   <data name="settings_updates_new" xml:space="preserve"><value>✓ VERSION {v} AVAILABLE</value></data>
   <data name="settings_updates_error" xml:space="preserve"><value>COULDN’T CHECK</value></data>
+  <data name="settings_updates_install" xml:space="preserve"><value>UPDATE</value></data>
+  <data name="settings_updates_downloading" xml:space="preserve"><value>DOWNLOADING {p}%</value></data>
+  <data name="settings_updates_restarting" xml:space="preserve"><value>RESTARTING…</value></data>
+  <data name="settings_updates_installing_d" xml:space="preserve"><value>Downloading version {v}. Parpa will close and reopen.</value></data>
+  <data name="settings_updates_install_error" xml:space="preserve"><value>COULDN’T UPDATE</value></data>
   <data name="time_min" xml:space="preserve"><value>{n} MIN</value></data>
   <data name="time_sec" xml:space="preserve"><value>{n} S</value></data>
   <data name="time_ms" xml:space="preserve"><value>{n} MS</value></data>

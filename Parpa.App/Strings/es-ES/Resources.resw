@@ -226,7 +226,7 @@
   <data name="settings_hide_full" xml:space="preserve"><value>Ocultar en pantalla completa</value></data>
   <data name="settings_hide_full_d" xml:space="preserve"><value>Se aparta en juegos, vídeos y presentaciones.</value></data>
   <data name="settings_mic_always" xml:space="preserve"><value>Micro y cámara siempre visibles</value></data>
-  <data name="settings_mic_always_d" xml:space="preserve"><value>En pantalla completa, el punto rojo se ve 3 s y desaparece.</value></data>
+  <data name="settings_mic_always_d" xml:space="preserve"><value>En pantalla completa, avisa una vez 3 s y desaparece del todo.</value></data>
   <data name="settings_theme" xml:space="preserve"><value>Tema</value></data>
   <data name="settings_theme_dark" xml:space="preserve"><value>OSCURO</value></data>
   <data name="settings_theme_light" xml:space="preserve"><value>CLARO</value></data>
@@ -326,6 +326,11 @@
   <data name="settings_updates_ok" xml:space="preserve"><value>✓ ESTÁS AL DÍA</value></data>
   <data name="settings_updates_new" xml:space="preserve"><value>✓ VERSIÓN {v} DISPONIBLE</value></data>
   <data name="settings_updates_error" xml:space="preserve"><value>NO SE PUDO COMPROBAR</value></data>
+  <data name="settings_updates_install" xml:space="preserve"><value>ACTUALIZAR</value></data>
+  <data name="settings_updates_downloading" xml:space="preserve"><value>DESCARGANDO {p} %</value></data>
+  <data name="settings_updates_restarting" xml:space="preserve"><value>REINICIANDO…</value></data>
+  <data name="settings_updates_installing_d" xml:space="preserve"><value>Descargando la versión {v}. Parpa se cerrará y volverá a abrirse.</value></data>
+  <data name="settings_updates_install_error" xml:space="preserve"><value>NO SE PUDO ACTUALIZAR</value></data>
   <data name="time_min" xml:space="preserve"><value>{n} MIN</value></data>
   <data name="time_sec" xml:space="preserve"><value>{n} S</value></data>
   <data name="time_ms" xml:space="preserve"><value>{n} MS</value></data>

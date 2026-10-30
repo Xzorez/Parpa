@@ -111,7 +111,6 @@ public sealed partial class QuickView : Grid, INotchPageView
         }
 
         SettingsService.Current.Changed += () => { if (_shown) _ = RenderAsync(); };
-        app.Focus.Changed += () => { if (_shown) _ = RenderAsync(); };
     }
 
     private static T Res<T>(string key) => (T)Application.Current.Resources[key];

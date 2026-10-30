@@ -97,8 +97,15 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchParpa}"; Flags: nowait postinstall skipifsilent
+; Actualización desde la app (instalación silenciosa con /RELAUNCH): Parpa vuelve a abrirse sola.
+Filename: "{app}\{#AppExe}"; Flags: nowait runasoriginaluser; Check: Relaunch
 
 [Code]
+function Relaunch(): Boolean;
+begin
+  Result := WizardSilent() and (Pos('/RELAUNCH', Uppercase(GetCmdTail())) > 0);
+end;
+
 procedure CloseParpa();
 var
   ResultCode: Integer;

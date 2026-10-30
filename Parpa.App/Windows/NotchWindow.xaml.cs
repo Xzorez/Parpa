@@ -39,7 +39,6 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     private readonly ShelfService _shelf;
     private readonly TasksService _tasks = new();
     private readonly NotesService _notes = new();
-    private readonly FocusService _focus;
     private readonly MemoryTrim _trim;
     private readonly PrivacyIndicatorService _privacy = new();
     private static readonly TimeSpan PrivacyBriefTime = TimeSpan.FromSeconds(3);
@@ -64,10 +63,9 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     private Win32.RECT _monitorBounds;  // monitor donde está el notch, en píxeles físicos
     private bool _fullscreen;
     private bool _hiddenForFullscreen;
-    private bool _dotOnly;
-    private bool _dotPhase;
+    private bool _fullscreenBrief;      // aviso de micro/cámara a la vista sobre la pantalla completa
+    private bool _fullscreenAnnounced;  // ya se avisó una vez en esta pantalla completa
     private bool _windowVisible = true;
-    private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _dotTimer;
     private bool _typing;
     private IntPtr _previousForeground;
     private DropKind? _dragKind;
@@ -100,8 +98,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         _notices = new NoticeCenter(_vm, _s);
         _clipboard = new ClipboardService(_hwnd, _s);
         _shelf = new ShelfService(_s, _clipboard);
-        _focus = new FocusService(_s);
-        _open = new OpenView(new NotchServices(_vm, _s, this, _system, _notices, _clipboard, _shelf, _tasks, _notes, _focus));
+        _open = new OpenView(new NotchServices(_vm, _s, this, _system, _notices, _clipboard, _shelf, _tasks, _notes));
         _vm.Changed += OnStateChanged;
         _trim = new MemoryTrim(() => !_vm.IsOpen);
 
@@ -151,13 +148,14 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         _privacyBrief.Tick += (_, _) =>
         {
             _privacyBriefOn = false;
+            if (_fullscreenBrief)
+            {
+                _fullscreenBrief = false;
+                ApplyFullscreen(); // se vuelve a esconder
+            }
             _vm.SetActivity(NotchViewModel.ActivityPrivacy, null);
             UpdateLiveDot();
         };
-        _dotTimer = DispatcherQueue.CreateTimer();
-        _dotTimer.IsRepeating = false;
-        _dotTimer.Interval = PrivacyBriefTime;
-        _dotTimer.Tick += (_, _) => { _dotPhase = false; ApplyFullscreen(); };
         _privacy.Changed += _ => OnPrivacyChanged();
         Loc.LanguageChanged += () => { if (_privacyBriefOn) ShowPrivacyActivity(); };
         _privacy.Start();
@@ -179,8 +177,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         {
             _fullscreen = fullscreen;
             Log.Info($"Pantalla completa: {fullscreen}");
-            // Al entrar con el micro o la cámara en uso: el punto rojo 3 s para que se sepa, y fuera.
-            if (fullscreen && _privacy.State.Active) StartDotPhase();
+            if (!fullscreen) _fullscreenAnnounced = false;
             ApplyFullscreen();
         };
         _fullscreenWatcher.Start();
@@ -207,6 +204,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     /// <summary>
     /// Al empezar a usarse el micro o la cámara (o cambiar de app) se anuncia 3 s como actividad;
     /// mientras siga en uso queda solo el punto rojo en la esquina, sin ocupar el notch.
+    /// En pantalla completa (con <c>micAlways</c>) se avisa una sola vez y después no queda nada, ni el punto.
     /// </summary>
     private void OnPrivacyChanged()
     {
@@ -215,20 +213,20 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         {
             _privacyBrief.Stop();
             _privacyBriefOn = false;
+            _fullscreenBrief = false;
             _vm.SetActivity(NotchViewModel.ActivityPrivacy, null);
-            _dotPhase = false;
         }
-        else if (state != _privacyAnnounced)
+        else if (state != _privacyAnnounced && (!_hiddenForFullscreen || _s.MicAlways && !_fullscreenAnnounced))
         {
             _privacyBriefOn = true;
+            _fullscreenBrief = _hiddenForFullscreen;
+            _fullscreenAnnounced |= _hiddenForFullscreen;
             ShowPrivacyActivity();
             _privacyBrief.Stop();
             _privacyBrief.Start();
-            if (_hiddenForFullscreen) StartDotPhase(); // en pantalla completa: solo el punto, 3 s
         }
         _privacyAnnounced = state;
         ApplyFullscreen();
-        UpdateLiveDot();
     }
 
     private void ShowPrivacyActivity()
@@ -243,90 +241,45 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
             Live: true));
     }
 
-    /// <summary>
-    /// Punto de la esquina: con micro/cámara en uso, salvo durante el aviso (que ya lleva el suyo);
-    /// en pantalla completa siempre, porque es lo único que se ve.
-    /// </summary>
+    /// <summary>Punto de la esquina: con micro/cámara en uso, salvo durante el aviso (que ya lleva el suyo) y en pantalla completa.</summary>
     private void UpdateLiveDot() =>
-        Shape.SetLiveDot(_privacy.State.Active && (!_privacyBriefOn || _dotOnly), Tokens.Current.Accent(_s.Accent), ReducedMotion);
-
-    /// <summary>Punto rojo 3 s en pantalla completa (con <c>micAlways</c>); después no queda nada.</summary>
-    private void StartDotPhase()
-    {
-        if (!_s.MicAlways || !_s.HideFull) return;
-        _dotPhase = true;
-        _dotTimer.Stop();
-        _dotTimer.Start();
-    }
+        Shape.SetLiveDot(_privacy.State.Active && !_privacyBriefOn && !_hiddenForFullscreen, Tokens.Current.Accent(_s.Accent), ReducedMotion);
 
     /// <summary>
     /// Pantalla completa + <c>hideFull</c>: el notch se esconde hacia el borde y los avisos esperan.
-    /// Con el micro o la cámara en uso (y <c>micAlways</c>) se ve solo el punto rojo 3 s y luego tampoco.
+    /// Solo sale para el aviso único de micro/cámara (3 s, sin abrirse con el ratón) y vuelve a esconderse.
     /// </summary>
     private void ApplyFullscreen()
     {
         _hiddenForFullscreen = _fullscreen && _s.HideFull;
-        if (!_hiddenForFullscreen)
-        {
-            _dotPhase = false;
-            _dotTimer.Stop();
-        }
-        var dotOnly = _hiddenForFullscreen && _dotPhase && _privacy.State.Active;
+        if (!_hiddenForFullscreen) _fullscreenBrief = false;
+        var brief = _hiddenForFullscreen && _fullscreenBrief;
         _vm.SetSuppressed(_hiddenForFullscreen);
-        _vm.SetDotOnly(dotOnly);
+        _vm.SetPassive(brief);
         _notices.SetRelaxed(_hiddenForFullscreen);
         SoundService.Suppressed = _hiddenForFullscreen;
-        SetVisibility(!_hiddenForFullscreen || dotOnly, dotOnly);
+        SetVisibility(!_hiddenForFullscreen || brief);
+        UpdateLiveDot();
     }
 
     /// <summary>
     /// Mostrar u ocultar con animación: al irse se mete en el borde superior y después se oculta la ventana;
-    /// al volver sale del borde con rebote. Pasar a "solo el punto" esconde primero el notch y luego enseña el punto.
+    /// al volver sale del borde con rebote.
     /// </summary>
-    private void SetVisibility(bool visible, bool dotOnly)
+    private void SetVisibility(bool visible)
     {
-        if (!visible)
+        if (visible == _windowVisible) return;
+        _windowVisible = visible;
+        if (visible)
         {
-            if (!_windowVisible) return;
-            _windowVisible = false;
-            Shape.Retract(ReducedMotion, () =>
-            {
-                Win32.ShowWindow(_hwnd, Win32.SW_HIDE);
-                ApplyDotOnly(false);
-            });
-            return;
-        }
-
-        if (!_windowVisible)
-        {
-            _windowVisible = true;
-            ApplyDotOnly(dotOnly);
             Win32.ShowWindow(_hwnd, Win32.SW_SHOWNOACTIVATE);
             Shape.Reveal(ReducedMotion);
         }
-        else if (dotOnly != _dotOnly)
-        {
-            if (dotOnly)
-                Shape.Retract(ReducedMotion, () => { ApplyDotOnly(true); Shape.Reveal(ReducedMotion); });
-            else
-            {
-                ApplyDotOnly(false);
-                Shape.Reveal(ReducedMotion);
-            }
-        }
+        else
+            Shape.Retract(ReducedMotion, () => Win32.ShowWindow(_hwnd, Win32.SW_HIDE));
     }
 
-    /// <summary>Solo el punto: sin forma ni contenido y con la ventana reducida al punto (no tapa ni roba clics).</summary>
-    private void ApplyDotOnly(bool dotOnly)
-    {
-        if (dotOnly == _dotOnly) return;
-        _dotOnly = dotOnly;
-        Shape.SetDotOnly(dotOnly);
-        UpdateLiveDot();
-        UpdateRegion(_geometry, null);
-    }
-
-    /// <summary>Portapapeles, tareas y foco: lo que aparece en el notch cerrado.</summary>
+    /// <summary>Portapapeles y tareas: lo que aparece en el notch cerrado.</summary>
     private void WireWindows()
     {
         _clipboard.Start();
@@ -364,15 +317,6 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
                 OnSecondary: () => _tasks.Snooze(task.Id, SnoozeDelay)));
         };
 
-        // Sesión de foco en marcha o en pausa → actividad "FOCO" con el tiempo en Doto.
-        _focus.Changed += () => _vm.SetActivity(NotchViewModel.ActivityFocus,
-            _focus.State == FocusService.FocusState.Idle ? null : new NotchActivity(
-                SizeToken: "focus",
-                Glyph: "foco",
-                Label: Loc.Get("compact_focus"),
-                Sub: string.Empty,
-                IsPlaying: _focus.State == FocusService.FocusState.Running,
-                RightText: FocusService.Format(_focus.Remaining)));
     }
 
     /// <summary>Muestra la ventana sin quitar el foco a la app activa (salvo que esté apartada por pantalla completa).</summary>
@@ -478,20 +422,6 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     /// </summary>
     private void UpdateRegion(NotchGeometry a, NotchGeometry? b)
     {
-        if (_dotOnly)
-        {
-            // Solo el punto rojo: la ventana se reduce a él (no tapa el vídeo ni le quita clics).
-            var dotX = _logicalWidth / 2 + a.Width / 2 - 10.5;
-            _region = new Win32.RECT
-            {
-                Left = (int)Math.Floor((dotX - 5) * _scale),
-                Top = 0,
-                Right = (int)Math.Ceiling((dotX + 5) * _scale),
-                Bottom = (int)Math.Ceiling(12 * _scale),
-            };
-            Win32.SetWindowRgn(_hwnd, Win32.CreateRectRgn(_region.Left, _region.Top, _region.Right, _region.Bottom), true);
-            return;
-        }
         var width = a.Width;
         var height = a.Height;
         if (b is { } t)

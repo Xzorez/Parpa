@@ -23,8 +23,7 @@ public sealed record NotchServices(
     ClipboardService Clipboard,
     ShelfService Shelf,
     TasksService Tasks,
-    NotesService Notes,
-    FocusService Focus);
+    NotesService Notes);
 
 /// <summary>Una ventana del notch abierto (Inicio, Portapapeles…).</summary>
 public interface INotchPageView

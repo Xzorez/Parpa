@@ -5,11 +5,10 @@
     xmlns:c="using:Parpa.Controls">
 
     <Grid>
-        <!-- Tarjetas: MÚSICA 1.5fr | FOCO 1fr | SISTEMA 1fr | PRÓXIMA TAREA 1fr, gap 8. -->
+        <!-- Tarjetas: MÚSICA 1.5fr | SISTEMA 1fr | PRÓXIMA TAREA 1fr, gap 8. -->
         <Grid x:Name="Cards" ColumnSpacing="8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="MusicColumn" Width="1.5*" />
-                <ColumnDefinition x:Name="FocusColumn" Width="*" />
                 <ColumnDefinition x:Name="SystemColumn" Width="*" />
                 <ColumnDefinition x:Name="TaskColumn" Width="*" />
             </Grid.ColumnDefinitions>
@@ -116,47 +115,10 @@
                 </Grid>
             </Grid>
 
-            <!-- FOCO -->
-            <Border
-                x:Name="FocusCard"
-                Grid.Column="1"
-                Padding="12"
-                Background="{StaticResource CardBrush}"
-                CornerRadius="14"
-                Tapped="FocusCard_Tapped">
-                <Grid>
-                    <Grid VerticalAlignment="Top">
-                        <TextBlock x:Name="FocusLabel" Style="{StaticResource CardLabel}" />
-                        <Ellipse
-                            x:Name="FocusLive"
-                            Width="6"
-                            Height="6"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center" />
-                    </Grid>
-                    <TextBlock
-                        x:Name="FocusTime"
-                        VerticalAlignment="Center"
-                        FontFamily="{StaticResource FontDisplay}"
-                        FontSize="34"
-                        FontWeight="Black"
-                        LineHeight="34"
-                        LineStackingStrategy="BlockLineHeight" />
-                    <c:PillButton x:Name="FocusStart" VerticalAlignment="Bottom" Primary="True" Click="FocusStart_Click" />
-                    <c:DotMatrix
-                        x:Name="FocusDots"
-                        VerticalAlignment="Bottom"
-                        Columns="17"
-                        DotSize="4"
-                        Gap="2"
-                        OffBrush="{StaticResource BorderBrush}" />
-                </Grid>
-            </Border>
-
             <!-- SISTEMA -->
             <Border
                 x:Name="SystemCard"
-                Grid.Column="2"
+                Grid.Column="1"
                 Padding="12"
                 Background="{StaticResource CardBrush}"
                 CornerRadius="14">
@@ -169,7 +131,7 @@
             <!-- PRÓXIMA TAREA -->
             <Border
                 x:Name="TaskCard"
-                Grid.Column="3"
+                Grid.Column="2"
                 Padding="12"
                 Background="{StaticResource CardBrush}"
                 CornerRadius="14">

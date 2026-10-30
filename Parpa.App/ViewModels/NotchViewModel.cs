@@ -64,11 +64,10 @@ public sealed record NotchPeek(
 public sealed class NotchViewModel
 {
     public const string ActivityPrivacy = "privacy";
-    public const string ActivityFocus = "focus";
     public const string ActivityMusic = "music";
 
     /// <summary>Orden de prioridad de las actividades (gana la primera presente). Micro/cámara siempre delante.</summary>
-    private static readonly string[] ActivityOrder = [ActivityPrivacy, ActivityFocus, ActivityMusic];
+    private static readonly string[] ActivityOrder = [ActivityPrivacy, ActivityMusic];
 
     /// <summary>Alto del modo minimal (tokens.json › notch › minimal).</summary>
     private const double MinimalHeight = 24;
@@ -91,7 +90,7 @@ public sealed class NotchViewModel
     private bool _pointerInside;
     private bool _suppressed;
     private bool _holdOpen;
-    private bool _dotOnly;
+    private bool _passive;
     private DateTime _lastWheel;
     private TimeSpan _peekTotal;
     private TimeSpan _peekRemaining;
@@ -322,15 +321,14 @@ public sealed class NotchViewModel
     }
 
     /// <summary>
-    /// Pantalla completa con micro/cámara en uso y <c>micAlways</c>: solo queda el punto rojo (minimal)
-    /// y el notch no se abre con el ratón, para no tapar ni robar clics.
+    /// Aviso de micro/cámara sobre una pantalla completa: se ve unos segundos pero el notch
+    /// no se abre con el ratón ni la rueda, para no tapar el vídeo ni robarle clics.
     /// </summary>
-    public void SetDotOnly(bool dotOnly)
+    public void SetPassive(bool passive)
     {
-        if (_dotOnly == dotOnly) return;
-        _dotOnly = dotOnly;
-        if (dotOnly) Close();
-        Update();
+        if (_passive == passive) return;
+        _passive = passive;
+        if (passive) Close();
     }
 
     /// <summary>Un ajuste cambió (minimal, ventanas visibles…): recalcula el estado.</summary>
@@ -346,7 +344,7 @@ public sealed class NotchViewModel
             : _isOpen ? NotchState.Open
             : Peek is not null ? NotchState.Peek
             : Indicator is not null ? NotchState.Osd
-            : _s.Minimal || _dotOnly ? NotchState.Minimal // sustituye a Actividad y Reposo
+            : _s.Minimal ? NotchState.Minimal // sustituye a Actividad y Reposo
             : Activity is not null ? NotchState.Activity
             : NotchState.Idle;
         Changed?.Invoke();
@@ -378,7 +376,7 @@ public sealed class NotchViewModel
     /// <summary>Rueda sobre el notch: cerrado abre Inicio; abierto cambia de ventana (si <c>wheel</c>).</summary>
     public void OnWheel(int delta)
     {
-        if (!_s.Wheel || _dotOnly || DateTime.UtcNow - _lastWheel < WheelThrottle) return;
+        if (!_s.Wheel || _passive || DateTime.UtcNow - _lastWheel < WheelThrottle) return;
         _lastWheel = DateTime.UtcNow;
         if (!_isOpen)
         {
@@ -438,7 +436,7 @@ public sealed class NotchViewModel
     {
         _pointerInside = true;
         _closeTimer.Stop();
-        if (_dotOnly) return;
+        if (_passive) return;
         if (Peek is not null)
         {
             PausePeek(); // hover pausa el aviso; no abre el notch encima de él
@@ -464,7 +462,7 @@ public sealed class NotchViewModel
     /// <summary>Clic en el notch: abre en la última ventana.</summary>
     public void OnClicked()
     {
-        if (_isOpen || Peek is not null || _dotOnly) return; // en un aviso, los clics van a sus botones
+        if (_isOpen || Peek is not null || _passive) return; // en un aviso, los clics van a sus botones
         Open(_lastPage);
     }
 

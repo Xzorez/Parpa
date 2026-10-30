@@ -262,7 +262,7 @@
     "hide_full":      { "es": "Ocultar en pantalla completa", "en": "Hide in full screen" },
     "hide_full_d":    { "es": "Se aparta en juegos, vídeos y presentaciones.", "en": "Steps aside for games, videos and presentations." },
     "mic_always":     { "es": "Micro y cámara siempre visibles", "en": "Always show mic & camera" },
-    "mic_always_d":   { "es": "En pantalla completa, el punto rojo se ve 3 s y desaparece.", "en": "In full screen, the red dot shows for 3 s and then goes away." },
+    "mic_always_d":   { "es": "En pantalla completa, avisa una vez 3 s y desaparece del todo.", "en": "In full screen, it lets you know once for 3 s and then disappears completely." },
     "theme":          { "es": "Tema", "en": "Theme" },
     "theme_dark":     { "es": "OSCURO", "en": "DARK" },
     "theme_light":    { "es": "CLARO", "en": "LIGHT" },
@@ -361,7 +361,12 @@
     "updates_download": { "es": "DESCARGAR", "en": "DOWNLOAD" },
     "updates_ok":     { "es": "✓ ESTÁS AL DÍA", "en": "✓ YOU’RE UP TO DATE" },
     "updates_new":    { "es": "✓ VERSIÓN {v} DISPONIBLE", "en": "✓ VERSION {v} AVAILABLE" },
-    "updates_error":  { "es": "NO SE PUDO COMPROBAR", "en": "COULDN’T CHECK" }
+    "updates_error":  { "es": "NO SE PUDO COMPROBAR", "en": "COULDN’T CHECK" },
+    "updates_install": { "es": "ACTUALIZAR", "en": "UPDATE" },
+    "updates_downloading": { "es": "DESCARGANDO {p} %", "en": "DOWNLOADING {p}%" },
+    "updates_restarting": { "es": "REINICIANDO…", "en": "RESTARTING…" },
+    "updates_installing_d": { "es": "Descargando la versión {v}. Parpa se cerrará y volverá a abrirse.", "en": "Downloading version {v}. Parpa will close and reopen." },
+    "updates_install_error": { "es": "NO SE PUDO ACTUALIZAR", "en": "COULDN’T UPDATE" }
   },
   "time": {
     "min":   { "es": "{n} MIN", "en": "{n} MIN" },

@@ -14,24 +14,6 @@ public sealed class NetworkService
 
     public bool IsWifi { get; private set; }
 
-    /// <summary>Señal en % (barras × 20) si hay Wi-Fi; 100 con cable; 0 sin conexión.</summary>
-    public int SignalPercent
-    {
-        get
-        {
-            try
-            {
-                var profile = NetworkInformation.GetInternetConnectionProfile();
-                if (profile is null || profile.GetNetworkConnectivityLevel() != NetworkConnectivityLevel.InternetAccess) return 0;
-                return profile.IsWlanConnectionProfile ? (profile.GetSignalBars() ?? 0) * 20 : 100;
-            }
-            catch (Exception)
-            {
-                return 0;
-            }
-        }
-    }
-
     /// <summary><c>true</c> = conexión recuperada, <c>false</c> = perdida.</summary>
     public event Action<bool>? Changed;
 

@@ -13,8 +13,10 @@ namespace Parpa.Views;
 public sealed partial class HomeView : UserControl, INotchPageView
 {
     private const int SystemDots = 12;
+    private static readonly string[] SystemKeys = ["CPU", "GPU", "RAM"];
 
     private readonly NotchServices _app;
+    private readonly SystemStats _stats = new();
     private readonly DispatcherQueueTimer _progressTimer;
     private readonly List<(TextBlock Label, DotMatrix Dots, TextBlock Value)> _systemRows = new();
     private object? _artworkFor;
@@ -24,20 +26,19 @@ public sealed partial class HomeView : UserControl, INotchPageView
     {
         _app = app;
         InitializeComponent();
-        Motion.PressFeedback(FocusCard);
         foreach (var control in new FrameworkElement[] { PreviousButton, PlayPauseButton, NextButton }) Motion.PressFeedback(control);
 
         _progressTimer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         _progressTimer.Interval = TimeSpan.FromSeconds(1);
         _progressTimer.Tick += (_, _) => DrawProgress();
 
-        foreach (var key in new[] { "home_bat", "home_vol", "home_wifi" })
+        foreach (var key in SystemKeys)
         {
             var row = new Grid { ColumnSpacing = 8 };
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(28) });
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            var label = new TextBlock { Style = (Style)Application.Current.Resources["RowMeta"], Text = Loc.Get(key) };
+            var label = new TextBlock { Style = (Style)Application.Current.Resources["RowMeta"], Text = key };
             var dots = new DotMatrix
             {
                 Columns = SystemDots, Rows = 1, DotSize = 3, Gap = 2, VerticalAlignment = VerticalAlignment.Center,
@@ -61,8 +62,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
         Cards.SizeChanged += (_, _) => FitProgress();
 
         app.System.Media.CardChanged += () => { if (_shown) RenderMusic(); };
-        app.System.SystemChanged += () => { if (_shown) RenderSystem(); };
-        app.Focus.Changed += () => { if (_shown) RenderFocus(); };
+        _stats.Changed += () => { if (_shown) RenderSystem(); };
         app.Tasks.Changed += () => { if (_shown) RenderTask(); };
         Loc.LanguageChanged += () => { if (_shown) OnShown(); };
     }
@@ -79,8 +79,8 @@ public sealed partial class HomeView : UserControl, INotchPageView
         ApplyTexts();
         ApplyLayout();
         RenderMusic();
-        RenderFocus();
         RenderSystem();
+        _stats.Start();
         RenderTask();
         _ = RecheckPermissionAsync();
     }
@@ -89,6 +89,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
     {
         _shown = false;
         _progressTimer.Stop();
+        _stats.Stop();
     }
 
     private void ApplyTexts()
@@ -96,8 +97,6 @@ public sealed partial class HomeView : UserControl, INotchPageView
         MusicEmptyLabel.Text = Loc.Get("home_music");
         NoMusicTitle.Text = Loc.Get("empty_errors_no_music");
         NoMusicText.Text = Loc.Get("empty_errors_no_music_2");
-        FocusLabel.Text = Loc.Get("home_focus");
-        FocusStart.Text = Loc.Get("home_start");
         SystemLabel.Text = Loc.Get("home_system");
         TaskLabel.Text = Loc.Get("home_next_task");
         TaskDone.Text = Loc.Get("home_done");
@@ -105,8 +104,6 @@ public sealed partial class HomeView : UserControl, INotchPageView
         DeniedText.Text = Loc.Get("empty_errors_notif_denied_2");
         DeniedEnable.Text = Loc.Get("empty_errors_enable");
         DeniedHint.Text = Loc.Get("empty_errors_notif_path");
-        string[] keys = ["home_bat", "home_vol", "home_wifi"];
-        for (var i = 0; i < _systemRows.Count; i++) _systemRows[i].Label.Text = Loc.Get(keys[i]);
     }
 
     /// <summary>Tarjetas visibles según Ajustes (homeCards) o la tarjeta de permiso denegado.</summary>
@@ -119,7 +116,6 @@ public sealed partial class HomeView : UserControl, INotchPageView
 
         var cards = _app.Settings.HomeCards;
         Show(MusicColumn, MusicCard, cards.GetValueOrDefault("MÚSICA", true), 1.5);
-        Show(FocusColumn, FocusCard, cards.GetValueOrDefault("FOCO", true), 1);
         Show(SystemColumn, SystemCard, cards.GetValueOrDefault("SISTEMA", true), 1);
         Show(TaskColumn, TaskCard, cards.GetValueOrDefault("PRÓXIMA TAREA", false), 1);
     }
@@ -217,46 +213,14 @@ public sealed partial class HomeView : UserControl, INotchPageView
         _ = _app.System.Media.NextAsync();
     }
 
-    // ---- FOCO ----
-
-    private void RenderFocus()
-    {
-        var focus = _app.Focus;
-        var accent = Tokens.Current.Accent(_app.Settings.Accent);
-        var running = focus.State == FocusService.FocusState.Running;
-        var idle = focus.State == FocusService.FocusState.Idle;
-
-        FocusLive.Fill = new SolidColorBrush(accent);
-        FocusLive.Visibility = running ? Visibility.Visible : Visibility.Collapsed;
-        FocusTime.Text = FocusService.Format(focus.Remaining);
-        FocusTime.Foreground = Res<Brush>(idle ? "TertiaryBrush" : "PrimaryBrush");
-
-        // Sin empezar o en pausa: botón EMPEZAR. En marcha: un punto por minuto que queda.
-        FocusStart.Visibility = running ? Visibility.Collapsed : Visibility.Visible;
-        FocusDots.Visibility = running ? Visibility.Visible : Visibility.Collapsed;
-        var minutes = Math.Min(30, (int)focus.Length.TotalMinutes);
-        if (FocusDots.Count != minutes)
-        {
-            FocusDots.Count = minutes;
-            FocusDots.Rows = (int)Math.Ceiling(minutes / (double)FocusDots.Columns);
-        }
-        FocusDots.OnColor = accent;
-        var left = (int)Math.Ceiling(focus.Remaining.TotalMinutes);
-        FocusDots.Cells = Enumerable.Range(0, minutes).Select(i => i < left).ToArray();
-    }
-
-    private void FocusStart_Click(object? sender, EventArgs e) => _app.Focus.Toggle();
-
-    private void FocusCard_Tapped(object sender, TappedRoutedEventArgs e) => _app.Focus.Toggle();
-
     // ---- SISTEMA ----
 
     private void RenderSystem()
     {
-        var (battery, volume, wifi) = _app.System.Snapshot();
-        SetRow(0, battery);
-        SetRow(1, volume);
-        SetRow(2, wifi);
+        var (cpu, gpu, ram) = _stats.Current;
+        SetRow(0, cpu);
+        SetRow(1, gpu);
+        SetRow(2, ram);
     }
 
     private void SetRow(int index, int? percent)

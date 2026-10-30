@@ -41,6 +41,8 @@ public sealed class SettingsWindow : Window
     private bool _checkingUpdates;
     private UpdateService.Result? _update;
     private bool _updateFailed;
+    private bool _installing;
+    private PillButton? _updatesButton;
 
     /// <summary>Fila de ajuste: etiqueta, descripción y control. <see cref="Opacity"/> &lt; 1 si depende de otro ajuste apagado.</summary>
     private sealed record Row(string Label, string Desc, Func<FrameworkElement> Control, double Opacity = 1);
@@ -373,8 +375,6 @@ public sealed class SettingsWindow : Window
                 foreach (var row in OrderRows()) yield return row;
                 yield return new Head(Loc.Upper(L("settings_home_cards")));
                 yield return new Row(L("settings_home_cards"), L("settings_home_cards_d"), () => Chips(s.HomeCards, Loc.Upper, (k, v) => Set(x => x.HomeCards[k] = v)));
-                yield return new Head(L("home_focus"));
-                yield return new Row(L("settings_pomo"), L("settings_pomo_d"), () => Stepper(s.Pomo, 5, 5, 90, v => Set(x => x.Pomo = v)));
                 yield return new Head(L("windows_clip"));
                 yield return new Row(L("settings_clip_limit"), L("settings_clip_limit_d"), () => Ui.Segmented(
                     [(10, "10"), (25, "25"), (50, "50"), (100, "100")], s.ClipLimit, v => Set(x => x.ClipLimit = v)));
@@ -742,19 +742,34 @@ public sealed class SettingsWindow : Window
     // ---- Actualizaciones (solo al pulsar BUSCAR) ----
 
     private string UpdatesDescription() =>
-        _updateFailed ? L("settings_updates_error_d")
+        _installing && _update is { } i ? Loc.Format("settings_updates_installing_d", ("v", i.Latest))
+        : _updateFailed ? L("settings_updates_error_d")
         : _update is { Newer: true } u ? Loc.Format("settings_updates_new_d", ("v", u.Latest))
         : _update is not null ? Loc.Format("settings_updates_ok_d", ("v", TrayService.Version))
         : Loc.Format("settings_version_d", ("v", TrayService.Version));
 
-    /// <summary>BUSCAR → BUSCANDO… → al día, o DESCARGAR si hay una versión nueva (abre su página en GitHub).</summary>
+    /// <summary>
+    /// BUSCAR → BUSCANDO… → al día, o ACTUALIZAR si hay una versión nueva (descarga, comprueba e instala;
+    /// Parpa se cierra y vuelve a abrirse). Si el release no trae instalador para esta arquitectura, DESCARGAR abre su página.
+    /// </summary>
     private FrameworkElement UpdatesButton()
     {
-        var label = _checkingUpdates ? "settings_updates_checking" : _update is { Newer: true } ? "settings_updates_download" : "settings_updates_check";
-        var button = new PillButton { Text = L(label), Primary = true, Padding = new Thickness(12, 7, 12, 7), Opacity = _checkingUpdates ? 0.6 : 1 };
+        var label = _installing ? "settings_updates_downloading"
+            : _checkingUpdates ? "settings_updates_checking"
+            : _update is { CanInstall: true } ? "settings_updates_install"
+            : _update is { Newer: true } ? "settings_updates_download"
+            : "settings_updates_check";
+        var busy = _checkingUpdates || _installing;
+        var button = new PillButton { Text = Loc.Format(label, ("p", "0")), Primary = true, Padding = new Thickness(12, 7, 12, 7), Opacity = busy ? 0.6 : 1 };
+        _updatesButton = button;
         button.Click += async (_, _) =>
         {
-            if (_checkingUpdates) return;
+            if (_checkingUpdates || _installing) return;
+            if (_update is { CanInstall: true } update)
+            {
+                await InstallUpdateAsync(update);
+                return;
+            }
             if (_update is { Newer: true } newer)
             {
                 await Launcher.LaunchUriAsync(new Uri(newer.Url));
@@ -763,6 +778,28 @@ public sealed class SettingsWindow : Window
             await CheckUpdatesAsync();
         };
         return button;
+    }
+
+    private async Task InstallUpdateAsync(UpdateService.Result update)
+    {
+        _installing = true;
+        Render();
+        var progress = new Progress<double>(p =>
+        {
+            if (_updatesButton is { } b) b.Text = Loc.Format("settings_updates_downloading", ("p", ((int)(p * 100)).ToString()));
+        });
+        if (await UpdateService.InstallAsync(update, progress))
+        {
+            // El instalador cierra Parpa por su cuenta; salir antes evita que lo mate a medio guardar.
+            if (_updatesButton is { } b) b.Text = L("settings_updates_restarting");
+            await Task.Delay(300);
+            App.Current.Quit();
+            return;
+        }
+        _installing = false;
+        _updateFailed = false;
+        Render();
+        ShowToast(L("settings_updates_install_error"), success: false);
     }
 
     private async Task CheckUpdatesAsync()
