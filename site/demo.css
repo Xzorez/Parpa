@@ -49,7 +49,6 @@
 .c-row { height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 14px 2px 12px; white-space: nowrap; }
 .c-label { font: 500 10px var(--mono); letter-spacing: .1em; flex: 1; overflow: hidden; text-overflow: ellipsis; }
 .c-sub { color: var(--secondary); }
-.c-time { font: 700 14px var(--dots); }
 .eq { display: flex; gap: 2px; align-items: flex-end; height: 12px; }
 .eq i { width: 3px; border-radius: 1px; background: var(--primary); transition: height .15s; }
 .c-min { height: 24px; display: flex; align-items: center; justify-content: center; }
@@ -99,7 +98,7 @@
 .o-clock { justify-self: end; font: 700 15px var(--dots); color: var(--soft); }
 
 /* Tarjetas de Inicio */
-.cards { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 8px; height: 122px; }
+.cards { display: grid; grid-template-columns: 1.5fr 1fr; gap: 8px; height: 122px; }
 .card { background: var(--card); border-radius: 14px; padding: 11px 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .card-l { font: 500 9px var(--mono); letter-spacing: .12em; color: var(--secondary); }
 .m-top { display: flex; gap: 10px; align-items: center; }
@@ -117,8 +116,6 @@
 .m-empty { margin: auto 0; display: flex; flex-direction: column; gap: 4px; }
 .m-empty span:first-child { font: 600 13px Geist, sans-serif; }
 .m-empty span:last-child { font-size: 11px; line-height: 1.35; color: var(--secondary); }
-.f-time { font: 900 30px var(--dots); color: var(--tertiary); margin-top: 2px; }
-.f-time.run { color: var(--primary); }
 .card .np { align-self: flex-start; margin-top: auto; }
 .s-row { display: grid; grid-template-columns: 34px 1fr 36px; align-items: center; gap: 6px; font: 500 9px var(--mono); letter-spacing: .1em; color: var(--secondary); }
 .s-row b { font-weight: 500; color: var(--primary); text-align: right; }

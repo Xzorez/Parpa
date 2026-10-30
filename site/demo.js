@@ -16,8 +16,8 @@
       tip3: 'Arrastra archivos de tu PC hasta el notch: van a la Bandeja.', tip4: 'Selecciona cualquier texto de esta página y pulsa Ctrl + C: aparecerá en el Portapapeles.',
       footer: 'CÓDIGO ABIERTO CON LICENCIA MIT', footer_home: 'WEB', footer_download: 'DESCARGAR',
       home: 'INICIO', clip: 'PORTAPAPELES', shelf: 'BANDEJA', todo: 'TAREAS', notes: 'NOTAS', quick: 'AJUSTES RÁPIDOS', menu: 'MENÚ',
-      music: 'MÚSICA', focus: 'FOCO', system: 'SISTEMA', start: 'EMPEZAR', pause: 'PAUSA', nothing: 'Nada sonando', nothing_d: 'Dale al play en cualquier app y aparecerá aquí.',
-      bat: 'BAT', vol: 'VOL', wifi: 'WIFI', now: 'AHORA', later: 'MÁS TARDE', open: 'ABRIR', view: 'VER', ok: 'OK', copied: 'COPIADO',
+      music: 'MÚSICA', system: 'SISTEMA', nothing: 'Nada sonando', nothing_d: 'Dale al play en cualquier app y aparecerá aquí.',
+      now: 'AHORA', later: 'MÁS TARDE', open: 'ABRIR', view: 'VER', ok: 'OK', copied: 'COPIADO',
       clip_empty: 'COPIA ALGO CON', clip_empty2: 'Y APARECERÁ AQUÍ', shelf_empty: 'ARRASTRA ARCHIVOS HASTA EL NOTCH', shelf_empty2: 'SE GUARDAN AQUÍ HASTA QUE LOS SAQUES',
       drop: 'SUELTA PARA GUARDAR', drop2: 'EN LA BANDEJA', new_task: '+ NUEVA TAREA', all_done: 'TODO HECHO', note_ph: 'Escribe una nota y pulsa Intro…',
       notes_empty: 'SIN NOTAS TODAVÍA', notes_empty2: 'ESCRIBE ARRIBA O ARRASTRA TEXTO AL NOTCH',
@@ -37,8 +37,8 @@
       tip3: 'Drag files from your PC onto the notch: they go to the Shelf.', tip4: 'Select any text on this page and press Ctrl + C: it shows up in the Clipboard.',
       footer: 'OPEN SOURCE UNDER THE MIT LICENSE', footer_home: 'WEBSITE', footer_download: 'DOWNLOAD',
       home: 'HOME', clip: 'CLIPBOARD', shelf: 'SHELF', todo: 'TASKS', notes: 'NOTES', quick: 'QUICK SETTINGS', menu: 'MENU',
-      music: 'MUSIC', focus: 'FOCUS', system: 'SYSTEM', start: 'START', pause: 'PAUSE', nothing: 'Nothing playing', nothing_d: 'Press play in any app and it shows up here.',
-      bat: 'BAT', vol: 'VOL', wifi: 'WIFI', now: 'NOW', later: 'LATER', open: 'OPEN', view: 'VIEW', ok: 'OK', copied: 'COPIED',
+      music: 'MUSIC', system: 'SYSTEM', nothing: 'Nothing playing', nothing_d: 'Press play in any app and it shows up here.',
+      now: 'NOW', later: 'LATER', open: 'OPEN', view: 'VIEW', ok: 'OK', copied: 'COPIED',
       clip_empty: 'COPY SOMETHING WITH', clip_empty2: 'AND IT SHOWS UP HERE', shelf_empty: 'DRAG FILES ONTO THE NOTCH', shelf_empty2: 'THEY STAY HERE UNTIL YOU TAKE THEM OUT',
       drop: 'DROP TO KEEP', drop2: 'ON THE SHELF', new_task: '+ NEW TASK', all_done: 'ALL DONE', note_ph: 'Write a note and press Enter…',
       notes_empty: 'NO NOTES YET', notes_empty2: 'TYPE ABOVE OR DRAG TEXT ONTO THE NOTCH',
@@ -67,7 +67,6 @@
     inicio: ['..XXX..', '.XXXXX.', 'XXXXXXX', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..'],
     general: ['X..X..X', '.XXXXX.', '.XX.XX.', 'XX...XX', '.XX.XX.', '.XXXXX.', 'X..X..X'],
     menu: ['X..X..X', '.......', '.......', 'X..X..X', '.......', '.......', 'X..X..X'],
-    foco: ['..X.X..', '...X...', '.XXXXX.', 'XXXXXXX', 'XXXXXXX', 'XXXXXXX', '.XXXXX.'],
     luna: ['..XXX..', '.XX....', 'XX.....', 'XX.....', 'XX.....', '.XX....', '..XXX..'],
     cara: ['.......', 'XX...XX', 'XX...XX', '.......', '.X...X.', '..XXX..', '.......'],
     linea: ['.......', '.......', '.......', 'XXXXXXX', '.......', '.......', '.......'],
@@ -81,7 +80,7 @@
   const clock = () => { const d = new Date(); return `${two(d.getHours())}:${two(d.getMinutes())}`; };
 
   // ---- Medidas (tokens.json › notch, radius) ----
-  const SIZE = { idle: [120, 34], music: [290, 34], focus: [160, 34], minimal: [96, 24], osd: [340, 40], peek: [420, 112], drop: [420, 84],
+  const SIZE = { idle: [120, 34], music: [290, 34], minimal: [96, 24], osd: [340, 40], peek: [420, 112], drop: [420, 84],
     menu: [580, 264], home: [580, 176], clip: [580, 214], shelf: [580, 236], todo: [580, 280], notes: [580, 222], quick: [580, 246] };
   const PAGES = ['home', 'clip', 'shelf', 'todo', 'notes', 'quick'];
   const PAGE_GLYPH = { home: 'inicio', clip: 'copias', shelf: 'bandeja', todo: 'tareas', notes: 'notas', quick: 'general', menu: 'menu' };
@@ -95,7 +94,7 @@
   const S = {
     open: false, page: 'home', last: 'home', peek: null, osd: null, drop: false,
     dnd: false, mascot: true, minimal: false, volume: 70, brightness: 60,
-    music: { playing: false, i: 0, pos: 42 }, focus: { running: false, left: 25 * 60 },
+    music: { playing: false, i: 0, pos: 42 }, sys: { CPU: 18, GPU: 7, RAM: 54 },
     clip: [], shelf: [], tasks: [], notes: [], notifyIndex: 0,
   };
   // Tareas de ejemplo en el idioma actual (al cambiarlo se traducen y conservan si están hechas).
@@ -114,7 +113,6 @@
     if (S.peek) return { key: 'peek:' + S.peek.id, size: SIZE.peek, r: 26, html: peekView };
     if (S.osd) return { key: 'osd:' + S.osd.kind, size: SIZE.osd, r: 16, html: osdView };
     if (S.minimal) return { key: 'minimal', size: SIZE.minimal, r: 12, html: () => '<div class="c-min"><i></i></div>' };
-    if (S.focus.running) return { key: 'focus', size: SIZE.focus, r: 16, html: focusView };
     if (S.music.playing) return { key: 'music', size: SIZE.music, r: 16, html: musicView };
     return { key: 'idle', size: SIZE.idle, r: 16, html: idleView };
   }
@@ -152,9 +150,6 @@
   const track = () => TRACKS[S.music.i];
   function musicView() {
     return `<div class="c-row">${gl('musica')}<span class="c-label">${esc(track().title)} <span class="c-sub">${esc(track().artist.toUpperCase())}</span></span><div class="eq" id="eq">${'<i></i>'.repeat(5)}</div></div>`;
-  }
-  function focusView() {
-    return `<div class="c-row">${gl('foco')}<span class="c-label">${t('focus')}</span><span class="c-time" id="ctime">${mmss(S.focus.left)}</span></div>`;
   }
   function peekView() {
     const p = S.peek;
@@ -197,17 +192,16 @@
          <div class="m-prog" id="mprog">${progDots()}</div>
          <div class="m-ctl"><span id="mpos">${mmss(m.pos)}</span><span class="m-btns"><button data-act="prev">◂◂</button><button data-act="play">${m.playing ? '▮▮' : '▸'}</button><button data-act="next">▸▸</button></span><span>${mmss(tr.len)}</span></div>`
       : `<span class="card-l">${t('music')}</span><div class="m-empty"><span>${t('nothing')}</span><span>${t('nothing_d')}</span></div><button class="np np-on" data-act="play">▸ PLAY</button>`;
-    const bar = (v, n = 10) => `<span class="s-bar">${Array.from({ length: n }, (_, k) => `<i class="${k < Math.round(v / 100 * n) ? 'on' : ''}"></i>`).join('')}</span>`;
     return `<div class="open">${head(t('home'))}
       <div class="cards">
         <div class="card">${music}</div>
-        <div class="card"><span class="card-l">${t('focus')}</span><span class="f-time ${S.focus.running ? 'run' : ''}" id="ftime">${mmss(S.focus.left)}</span><button class="np ${S.focus.running ? '' : 'np-on'}" data-act="focus">${t(S.focus.running ? 'pause' : 'start')}</button></div>
-        <div class="card"><span class="card-l">${t('system')}</span>
-          <div class="s-row"><span>${t('bat')}</span>${bar(0)}<b>—</b></div>
-          <div class="s-row"><span>${t('vol')}</span>${bar(S.volume)}<b>${S.volume}%</b></div>
-          <div class="s-row"><span>${t('wifi')}</span>${bar(100)}<b>100%</b></div>
-        </div>
+        <div class="card"><span class="card-l">${t('system')}</span><div id="sys">${sysRows()}</div></div>
       </div></div>`;
+  }
+  // CPU, GPU y RAM: en la app son las de tu PC; aquí, valores de ejemplo que se mueven cada segundo.
+  function sysRows() {
+    const bar = v => `<span class="s-bar">${Array.from({ length: 10 }, (_, k) => `<i class="${k < Math.round(v / 10) ? 'on' : ''}"></i>`).join('')}</span>`;
+    return Object.entries(S.sys).map(([k, v]) => `<div class="s-row"><span>${k}</span>${bar(v)}<b>${v}%</b></div>`).join('');
   }
   function progDots() {
     const n = 28, lit = Math.round(S.music.pos / track().len * n);
@@ -290,10 +284,11 @@
       const prog = document.getElementById('mprog'); if (prog) prog.innerHTML = progDots();
       const pos = document.getElementById('mpos'); if (pos) pos.textContent = mmss(S.music.pos);
     }
-    if (S.focus.running) {
-      S.focus.left = Math.max(0, S.focus.left - 1);
-      if (S.focus.left === 0) { S.focus.running = false; S.focus.left = 25 * 60; dirty = true; }
-      ['ftime', 'ctime'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = mmss(S.focus.left); });
+    const sys = document.getElementById('sys');
+    if (sys) {
+      const walk = (v, lo, hi, step) => Math.min(hi, Math.max(lo, v + Math.round((Math.random() - 0.5) * step)));
+      S.sys = { CPU: walk(S.sys.CPU, 6, 64, 14), GPU: walk(S.sys.GPU, 2, 48, 10), RAM: walk(S.sys.RAM, 48, 62, 2) };
+      sys.innerHTML = sysRows();
     }
     if (dirty) render();
   }, 1000);
@@ -361,7 +356,6 @@
       case 'play': S.music.playing = !S.music.playing; break;
       case 'prev': S.music.pos > 3 ? (S.music.pos = 0) : (S.music.i = (S.music.i + TRACKS.length - 1) % TRACKS.length, S.music.pos = 0); break;
       case 'next': S.music.i = (S.music.i + 1) % TRACKS.length; S.music.pos = 0; break;
-      case 'focus': S.focus.running = !S.focus.running; break;
       case 'copy': navigator.clipboard?.writeText(S.clip[i].text).catch(() => {}); flash(t('flash_copied')); return;
       case 'unshelf': S.shelf.splice(i, 1); flash(t('flash_removed')); break;
       case 'task': S.tasks[i].done = !S.tasks[i].done; break;
