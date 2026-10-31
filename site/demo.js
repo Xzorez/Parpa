@@ -13,9 +13,14 @@
       sim_play: 'PONER MÚSICA', sim_pause: 'PAUSAR MÚSICA', sim_notify: 'RECIBIR UN AVISO', sim_voldown: 'VOLUMEN −', sim_volup: 'VOLUMEN +',
       sim_bright: 'BRILLO', sim_copy: 'COPIAR UN TEXTO', sim_file: 'SOLTAR UN ARCHIVO', sim_toggle: 'WIN + ALT + N',
       tip1: 'Pasa el ratón por el notch para abrirlo; al salir se cierra.', tip2: 'La rueda del ratón cambia de ventana. Esc lo cierra.',
-      tip3: 'Arrastra archivos de tu PC hasta el notch: van a la Bandeja.', tip4: 'Selecciona cualquier texto de esta página y pulsa Ctrl + C: aparecerá en el Portapapeles.',
+      tip3: 'Arrastra archivos, un enlace o un texto de esta página hasta el notch: según en qué mitad lo sueltes, hace una cosa u otra.', tip4: 'Selecciona cualquier texto de esta página y pulsa Ctrl + C: aparecerá en el Portapapeles.',
+      tip5: 'Las barras de volumen se pulsan o se arrastran. En Audio, toca el nombre de una app para silenciarla.',
       footer: 'CÓDIGO ABIERTO CON LICENCIA MIT', footer_home: 'WEB', footer_download: 'DESCARGAR',
-      home: 'INICIO', clip: 'PORTAPAPELES', shelf: 'BANDEJA', todo: 'TAREAS', notes: 'NOTAS', quick: 'AJUSTES RÁPIDOS', menu: 'MENÚ',
+      home: 'INICIO', clip: 'PORTAPAPELES', shelf: 'BANDEJA', todo: 'TAREAS', notes: 'NOTAS', audio: 'AUDIO', quick: 'AJUSTES RÁPIDOS', menu: 'MENÚ',
+      output: 'SALIDA', outputs: ['AURICULARES', 'ALTAVOCES'], mic: 'MICRÓFONO', mic_on: 'ACTIVO', mic_off: 'SILENCIADO', vol: 'VOL', muted: 'MUDO',
+      sim_shot: 'HACER UNA CAPTURA', screenshot: 'CAPTURA AÑADIDA', shot_name: 'Captura de pantalla {time}.png',
+      z_shelf: 'A LA BANDEJA', z_ocr: 'EXTRAER TEXTO', z_resize: 'REDIMENSIONAR', z_note: 'CREAR NOTA', z_task: 'CREAR TAREA', z_title: 'GUARDAR CON TÍTULO', z_clip: 'AL PORTAPAPELES',
+      flash_ocr: 'EN LA APP, SU TEXTO IRÍA AL PORTAPAPELES', flash_resize: 'EN LA APP, {n} IMÁGENES A 1920 PX EN LA BANDEJA', flash_note: '✓ NOTA CREADA', flash_task: '✓ TAREA CREADA',
       music: 'MÚSICA', system: 'SISTEMA', nothing: 'Nada sonando', nothing_d: 'Dale al play en cualquier app y aparecerá aquí.',
       now: 'AHORA', later: 'MÁS TARDE', open: 'ABRIR', view: 'VER', ok: 'OK', copied: 'COPIADO',
       clip_empty: 'COPIA ALGO CON', clip_empty2: 'Y APARECERÁ AQUÍ', shelf_empty: 'ARRASTRA ARCHIVOS HASTA EL NOTCH', shelf_empty2: 'SE GUARDAN AQUÍ HASTA QUE LOS SAQUES',
@@ -34,9 +39,14 @@
       sim_play: 'PLAY MUSIC', sim_pause: 'PAUSE MUSIC', sim_notify: 'GET A NOTIFICATION', sim_voldown: 'VOLUME −', sim_volup: 'VOLUME +',
       sim_bright: 'BRIGHTNESS', sim_copy: 'COPY SOME TEXT', sim_file: 'DROP A FILE', sim_toggle: 'WIN + ALT + N',
       tip1: 'Hover the notch to open it; it closes when you leave.', tip2: 'The mouse wheel switches windows. Esc closes it.',
-      tip3: 'Drag files from your PC onto the notch: they go to the Shelf.', tip4: 'Select any text on this page and press Ctrl + C: it shows up in the Clipboard.',
+      tip3: 'Drag files, a link or some text from this page onto the notch: which half you drop it on decides what happens.', tip4: 'Select any text on this page and press Ctrl + C: it shows up in the Clipboard.',
+      tip5: 'Volume bars can be clicked or dragged. In Audio, tap an app’s name to mute it.',
       footer: 'OPEN SOURCE UNDER THE MIT LICENSE', footer_home: 'WEBSITE', footer_download: 'DOWNLOAD',
-      home: 'HOME', clip: 'CLIPBOARD', shelf: 'SHELF', todo: 'TASKS', notes: 'NOTES', quick: 'QUICK SETTINGS', menu: 'MENU',
+      home: 'HOME', clip: 'CLIPBOARD', shelf: 'SHELF', todo: 'TASKS', notes: 'NOTES', audio: 'AUDIO', quick: 'QUICK SETTINGS', menu: 'MENU',
+      output: 'OUTPUT', outputs: ['HEADPHONES', 'SPEAKERS'], mic: 'MICROPHONE', mic_on: 'ON', mic_off: 'MUTED', vol: 'VOL', muted: 'MUTED',
+      sim_shot: 'TAKE A SCREENSHOT', screenshot: 'SCREENSHOT ADDED', shot_name: 'Screenshot {time}.png',
+      z_shelf: 'TO SHELF', z_ocr: 'EXTRACT TEXT', z_resize: 'RESIZE', z_note: 'NEW NOTE', z_task: 'NEW TASK', z_title: 'SAVE WITH TITLE', z_clip: 'TO CLIPBOARD',
+      flash_ocr: 'IN THE APP, ITS TEXT WOULD GO TO THE CLIPBOARD', flash_resize: 'IN THE APP, {n} IMAGES AT 1920 PX ON THE SHELF', flash_note: '✓ NOTE CREATED', flash_task: '✓ TASK CREATED',
       music: 'MUSIC', system: 'SYSTEM', nothing: 'Nothing playing', nothing_d: 'Press play in any app and it shows up here.',
       now: 'NOW', later: 'LATER', open: 'OPEN', view: 'VIEW', ok: 'OK', copied: 'COPIED',
       clip_empty: 'COPY SOMETHING WITH', clip_empty2: 'AND IT SHOWS UP HERE', shelf_empty: 'DRAG FILES ONTO THE NOTCH', shelf_empty2: 'THEY STAY HERE UNTIL YOU TAKE THEM OUT',
@@ -71,6 +81,7 @@
     cara: ['.......', 'XX...XX', 'XX...XX', '.......', '.X...X.', '..XXX..', '.......'],
     linea: ['.......', '.......', '.......', 'XXXXXXX', '.......', '.......', '.......'],
     calendario: ['X.....X', 'XXXXXXX', 'X.....X', 'X.X.X.X', 'X.....X', 'X.X.X.X', 'XXXXXXX'],
+    micro: ['..XXX..', '..XXX..', 'X.XXX.X', 'X.XXX.X', '.X...X.', '..XXX..', '..XXX..'],
   };
   const gl = (name, size = 's', off = 'transparent') =>
     `<span class="gl gl-${size}">${G[name].join('').split('').map(c => `<i style="background:${c === 'X' ? ON : off}"></i>`).join('')}</span>`;
@@ -81,9 +92,9 @@
 
   // ---- Medidas (tokens.json › notch, radius) ----
   const SIZE = { idle: [120, 34], music: [290, 34], minimal: [96, 24], osd: [340, 40], peek: [420, 112], drop: [420, 84],
-    menu: [580, 264], home: [580, 176], clip: [580, 214], shelf: [580, 236], todo: [580, 280], notes: [580, 222], quick: [580, 246] };
-  const PAGES = ['home', 'clip', 'shelf', 'todo', 'notes', 'quick'];
-  const PAGE_GLYPH = { home: 'inicio', clip: 'copias', shelf: 'bandeja', todo: 'tareas', notes: 'notas', quick: 'general', menu: 'menu' };
+    menu: [580, 264], home: [580, 200], clip: [580, 214], shelf: [580, 272], todo: [580, 280], notes: [580, 222], audio: [580, 300], quick: [580, 246] };
+  const PAGES = ['home', 'clip', 'shelf', 'todo', 'notes', 'audio', 'quick'];
+  const PAGE_GLYPH = { home: 'inicio', clip: 'copias', shelf: 'bandeja', todo: 'tareas', notes: 'notas', audio: 'sonido', quick: 'general', menu: 'menu' };
   const TRACKS = [
     { title: 'LUZ DE NEÓN', artist: 'Parpa FM', len: 208, art: 'linear-gradient(135deg,#e5383b,#5b1622)' },
     { title: 'PUNTOS SUSPENSIVOS', artist: 'Matriz', len: 187, art: 'linear-gradient(135deg,#2f7bf5,#14284f)' },
@@ -92,10 +103,12 @@
 
   // ---- Estado ----
   const S = {
-    open: false, page: 'home', last: 'home', peek: null, osd: null, drop: false,
+    open: false, page: 'home', last: 'home', peek: null, osd: null, drop: null,
     dnd: false, mascot: true, minimal: false, volume: 70, brightness: 60,
     music: { playing: false, i: 0, pos: 42 }, sys: { CPU: 18, GPU: 7, RAM: 54 },
     clip: [], shelf: [], tasks: [], notes: [], notifyIndex: 0,
+    // Audio: la primera app es la que suena en la tarjeta MÚSICA.
+    audio: { out: 0, mic: true, apps: [{ name: 'Spotify', v: 80, muted: false }, { name: 'Discord', v: 100, muted: false }, { name: 'Brave', v: 60, muted: false }] },
   };
   // Tareas de ejemplo en el idioma actual (al cambiarlo se traducen y conservan si están hechas).
   function seedTasks() {
@@ -164,8 +177,19 @@
     const bars = Array.from({ length: 16 }, (_, k) => `<i class="${k < lit ? 'on' : ''}" style="height:${4 + k * 0.75}px"></i>`).join('');
     return `<div class="osd">${gl(o.kind === 'volume' ? 'sonido' : 'brillo')}<div class="osd-t"><span class="c-label">${t(o.kind === 'volume' ? 'volume' : 'brightness')}</span><span>${t(o.kind === 'volume' ? 'speakers' : 'screen')}</span></div><div class="osd-bars">${bars}</div><span class="osd-v">${value}%</span></div>`;
   }
+  // Lo que se arrastra decide las zonas (como DropActions en la app); la mitad bajo el ratón, cuál se usa.
+  const ZONE_GLYPH = { shelf: 'bandeja', ocr: 'copias', resize: 'bandeja', note: 'notas', task: 'tareas', title: 'notas', clip: 'copias' };
+  function zones(d) {
+    if (d.kind === 'text') return ['note', 'task'];
+    if (d.kind === 'link') return ['title', 'clip'];
+    if (d.images && d.n === 1) return ['shelf', 'ocr'];
+    if (d.images && d.n > 1) return ['shelf', 'resize'];
+    return ['shelf'];
+  }
   function dropView() {
-    return `<div class="drop">${gl('bandeja', 'l')}<div class="drop-t"><span>${t('drop')}</span><span>${t('drop2')}</span></div></div>`;
+    const zs = zones(S.drop);
+    if (zs.length === 1) return `<div class="drop">${gl('bandeja', 'l')}<div class="drop-t"><span>${t('drop')}</span><span>${t('drop2')}</span></div></div>`;
+    return `<div class="dz">${zs.map((z, k) => `<div class="dz-z ${k === S.drop.sel ? 'on' : ''}">${gl(ZONE_GLYPH[z], 'm')}<span>${t('z_' + z)}</span></div>`).join('')}</div>`;
   }
 
   // ---- Abierto ----
@@ -181,6 +205,7 @@
       case 'shelf': return shelfView();
       case 'todo': return todoView();
       case 'notes': return notesView();
+      case 'audio': return audioView();
       case 'quick': return quickView();
       default: return homeView();
     }
@@ -190,7 +215,8 @@
     const music = m.playing || m.pos > 42 || m.i > 0
       ? `<div class="m-top"><div class="m-art" style="--art:${tr.art}">${gl('musica', 'm')}</div><div class="m-txt"><span class="m-title">${esc(tr.title)}</span><span class="m-src">${esc(tr.artist.toUpperCase())}</span></div></div>
          <div class="m-prog" id="mprog">${progDots()}</div>
-         <div class="m-ctl"><span id="mpos">${mmss(m.pos)}</span><span class="m-btns"><button data-act="prev">◂◂</button><button data-act="play">${m.playing ? '▮▮' : '▸'}</button><button data-act="next">▸▸</button></span><span>${mmss(tr.len)}</span></div>`
+         <div class="m-ctl"><span id="mpos">${mmss(m.pos)}</span><span class="m-btns"><button data-act="prev">◂◂</button><button data-act="play">${m.playing ? '▮▮' : '▸'}</button><button data-act="next">▸▸</button></span><span>${mmss(tr.len)}</span></div>
+         <div class="m-vol" data-wheel><span>${t('vol')}</span>${slider('app:0', 3, 8)}${valueOf('app:0')}</div>`
       : `<span class="card-l">${t('music')}</span><div class="m-empty"><span>${t('nothing')}</span><span>${t('nothing_d')}</span></div><button class="np np-on" data-act="play">▸ PLAY</button>`;
     return `<div class="open">${head(t('home'))}
       <div class="cards">
@@ -237,15 +263,56 @@
       : `<div class="empty" style="height:112px"><span class="empty-t">${t('notes_empty')}</span><span class="empty-s">${t('notes_empty2')}</span></div>`;
     return `<div class="open">${head(t('notes'), `<span class="count">${two(S.notes.length)}</span>`)}<input class="input" data-keep="note" data-act-enter="add-note" placeholder="${t('note_ph')}" maxlength="120">${list}</div>`;
   }
+  const tileGl = (glyph, on) => gl(glyph, 's', 'transparent').replaceAll(ON, on ? '#0b0b0c' : ON);
   function quickView() {
-    const tile = (key, glyph, on) => `<button class="tile ${on ? 'on' : ''}" data-act="tile" data-k="${key}">${gl(glyph, 's', 'transparent').replaceAll(ON, on ? '#0b0b0c' : ON)}<span>${t(key)}</span><span>${t(on ? 'on' : 'off')}</span></button>`;
-    const lit = Math.round(S.volume / 100 * 16);
-    const bars = Array.from({ length: 16 }, (_, k) => `<i class="${k < lit ? 'on' : ''}" data-v="${k}" style="height:${6 + k * 0.75}px"></i>`).join('');
+    const tile = (key, glyph, on) => `<button class="tile ${on ? 'on' : ''}" data-act="tile" data-k="${key}">${tileGl(glyph, on)}<span>${t(key)}</span><span>${t(on ? 'on' : 'off')}</span></button>`;
     return `<div class="open">${head(t('quick'))}<div class="tiles">${tile('dnd', 'luna', S.dnd)}${tile('mascot', 'cara', S.mascot)}${tile('minimal', 'linea', S.minimal)}</div>
-      <div class="volrow"><span class="card-l">${t('volume')}</span><div class="vbars" data-act="vbars">${bars}</div><span class="osd-v">${S.volume}%</span></div></div>`;
+      <div class="volrow" data-wheel><span class="card-l">${t('volume')}</span>${slider('vol', 5, 14)}<span class="osd-v">${valueOf('vol')}</span></div></div>`;
+  }
+  // Audio: salida, micrófono, volumen general y una fila por app (tocar el nombre la silencia).
+  function audioView() {
+    const a = S.audio;
+    const outs = T[lang].outputs.map((o, k) => `<button class="${k === a.out ? 'on' : ''}" data-act="out" data-i="${k}">${o}</button>`).join('');
+    const apps = a.apps.map((p, k) => `<div class="a-row ${p.muted ? 'muted' : ''}" data-wheel><span class="txt" data-act="appmute" data-i="${k}">${esc(p.name)}</span>${slider('app:' + k, 4, 10)}<span class="meta">${valueOf('app:' + k)}</span></div>`).join('');
+    return `<div class="open">${head(t('audio'))}
+      <div class="a-top"><div class="card a-out"><span class="card-l">${t('output')}</span><div class="seg">${outs}</div></div>
+        <button class="tile a-mic ${a.mic ? 'on' : ''}" data-act="mic">${tileGl('micro', a.mic)}<span>${t('mic')}</span><span>${t(a.mic ? 'mic_on' : 'mic_off')}</span></button></div>
+      <div class="volrow" data-wheel><span class="card-l">${t('volume')}</span>${slider('vol', 5, 14)}<span class="osd-v">${valueOf('vol')}</span></div>
+      <div class="a-apps">${apps}</div></div>`;
+  }
+
+  // ---- Barras de volumen: 20 barras (5 % cada una), como BarSlider en la app ----
+  const BARS = 20;
+  const appOf = key => S.audio.apps[Number(key.split(':')[1])];
+  const level = key => key === 'vol' ? S.volume : appOf(key).muted ? 0 : appOf(key).v;
+  const valueOf = key => `<span data-val="${key}">${key !== 'vol' && appOf(key).muted ? t('muted') : level(key) + '%'}</span>`;
+  const barsHtml = (v, min, max) => Array.from({ length: BARS }, (_, k) => {
+    const on = k < Math.round(v / (100 / BARS));
+    return `<i class="${on ? 'on' : ''}" style="height:${on ? min + Math.round(k / (BARS - 1) * (max - min)) : min}px"></i>`;
+  }).join('');
+  const slider = (key, min, max) => `<div class="vbars" data-slider="${key}" data-min="${min}" data-max="${max}">${barsHtml(level(key), min, max)}</div>`;
+  function setLevel(key, v) {
+    v = Math.max(0, Math.min(100, Math.round(v / 5) * 5));
+    if (key === 'vol') S.volume = v;
+    else { const app = appOf(key); app.v = v; app.muted = false; }
+    // Se repintan las barras y el valor sin redibujar la ventana (el arrastre sigue en marcha).
+    ncontent.querySelectorAll(`[data-slider="${key}"]`).forEach(el => { el.innerHTML = barsHtml(v, Number(el.dataset.min), Number(el.dataset.max)); });
+    ncontent.querySelectorAll(`[data-val="${key}"]`).forEach(el => { el.textContent = `${v}%`; });
+    ncontent.querySelector(`[data-slider="${key}"]`)?.closest('.a-row')?.classList.remove('muted');
+  }
+  // x sobre las barras → la barra que hay debajo (a la izquierda de la primera, 0 %). Con el notch escalado, en proporción.
+  function slideTo(el, e) {
+    const r = el.getBoundingClientRect(), scale = r.width / el.offsetWidth, pad = 6 * scale;
+    const x = e.clientX - r.left - pad;
+    setLevel(el.dataset.slider, x < 0 ? 0 : Math.min(BARS, Math.floor(x / (r.width - pad) * BARS) + 1) * (100 / BARS));
   }
   function menuView() {
-    const bubbles = [['clip', 98, 120], ['shelf', 160, 184], ['todo', 290, 214], ['notes', 420, 184], ['quick', 482, 120]];
+    // En arco, como LauncherView: de 180° a 360° (radio 192 × 94 alrededor de la píldora).
+    const pages = PAGES.filter(p => p !== 'home');
+    const bubbles = pages.map((p, k) => {
+      const a = (180 + k * 180 / (pages.length - 1)) * Math.PI / 180;
+      return [p, Math.round(290 + Math.cos(a) * 192), Math.round(120 - Math.sin(a) * 94)];
+    });
     return `<div class="launcher">${head(t('menu'))}
       <button class="l-pill" data-act="page" data-p="home" aria-label="${t('home')}"><div class="mascot" id="lmascot">${'<i></i>'.repeat(65)}</div></button>
       ${bubbles.map(([p, x, y], k) => `<button class="bub" data-act="page" data-p="${p}" style="left:${x}px;top:${y}px;--dl:${40 + k * 30}ms;--fx:${(290 - x) * 0.7}px;--fy:${(132 - y) * 0.7}px" aria-label="${t(p)}">${gl(PAGE_GLYPH[p], 'm')}${p === 'clip' && S.clip.length ? `<span class="badge">${S.clip.length}</span>` : ''}<span class="bub-l">${t(p)}</span></button>`).join('')}
@@ -329,6 +396,9 @@
   });
   wrap.addEventListener('wheel', e => {
     e.preventDefault();
+    // Sobre una fila con barras, la rueda sube o baja 5 % en vez de cambiar de ventana.
+    const bars = S.open && e.target.closest?.('[data-wheel]')?.querySelector('[data-slider]');
+    if (bars) { const key = bars.dataset.slider; setLevel(key, level(key) + (e.deltaY < 0 ? 5 : -5)); return; }
     if (wheelLock) return;
     wheelLock = true; setTimeout(() => { wheelLock = false; }, 250);
     if (!S.open) { if (!S.peek) open('home'); return; }
@@ -360,15 +430,27 @@
       case 'unshelf': S.shelf.splice(i, 1); flash(t('flash_removed')); break;
       case 'task': S.tasks[i].done = !S.tasks[i].done; break;
       case 'tile': S[a.dataset.k] = !S[a.dataset.k]; break;
-      case 'vbars': {
-        const bar = e.target.closest('[data-v]'); if (!bar) return;
-        S.volume = Math.round((Number(bar.dataset.v) + 1) / 16 * 100 / 5) * 5; break;
-      }
+      case 'out': S.audio.out = i; break;
+      case 'mic': S.audio.mic = !S.audio.mic; break;
+      case 'appmute': S.audio.apps[i].muted = !S.audio.apps[i].muted; break;
       case 'peek-primary': S.peek.onPrimary?.(); dismissPeek(); return;
       case 'peek-secondary': dismissPeek(); return;
       default: return;
     }
     render();
+  });
+  // Barras: pulsar fija el valor bajo el ratón y, sin soltar, se arrastra.
+  ncontent.addEventListener('pointerdown', e => {
+    const el = e.target.closest('[data-slider]');
+    if (!el || e.button !== 0) return;
+    e.preventDefault();
+    el.setPointerCapture(e.pointerId);
+    slideTo(el, e);
+    const move = ev => slideTo(el, ev);
+    const up = () => { el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up); };
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', up);
+    el.addEventListener('pointercancel', up);
   });
   ncontent.addEventListener('keydown', e => {
     const input = e.target.closest('[data-act-enter]');
@@ -417,22 +499,75 @@
       const dot = f.name.lastIndexOf('.');
       S.shelf.unshift({ name: f.name, ext: (dot > 0 ? f.name.slice(dot + 1) : 'DIR').slice(0, 4).toUpperCase(), size: fmt(f.size || 0) });
     });
-    S.drop = false;
+    S.drop = null;
     flash(t('flash_shelf'));
     open('shelf');
   }
 
-  // Arrastrar archivos reales (se leen solo nombre y tamaño; no se suben a ningún sitio).
+  // Arrastrar archivos reales, enlaces o texto (de los archivos se leen solo nombre y tamaño; nada se sube a ningún sitio).
   const desk = document.getElementById('desk');
   let dragDepth = 0;
-  const hasFiles = e => [...(e.dataTransfer?.types || [])].includes('Files');
-  desk.addEventListener('dragenter', e => { if (!hasFiles(e)) return; e.preventDefault(); if (dragDepth++ === 0) { desk.classList.add('dragging'); S.drop = true; render(); } });
-  desk.addEventListener('dragover', e => { if (hasFiles(e)) e.preventDefault(); });
-  desk.addEventListener('dragleave', e => { if (!hasFiles(e)) return; if (--dragDepth <= 0) { dragDepth = 0; desk.classList.remove('dragging'); S.drop = false; render(); } });
+  function dragKind(dt) {
+    const types = [...(dt?.types || [])];
+    if (types.includes('Files')) {
+      const files = [...(dt.items || [])].filter(i => i.kind === 'file');
+      return { kind: 'files', n: files.length || 1, images: files.length > 0 && files.every(i => i.type.startsWith('image/')), sel: 0 };
+    }
+    if (types.includes('text/uri-list')) return { kind: 'link', sel: 0 };
+    if (types.includes('text/plain')) return { kind: 'text', sel: 0 };
+    return null;
+  }
+  desk.addEventListener('dragenter', e => {
+    const kind = dragKind(e.dataTransfer);
+    if (!kind) return;
+    e.preventDefault();
+    if (dragDepth++ === 0) { desk.classList.add('dragging'); S.drop = kind; render(); }
+  });
+  desk.addEventListener('dragover', e => {
+    if (!S.drop) return;
+    e.preventDefault();
+    // Solo se cambia la zona encendida: redibujar quitaría el elemento bajo el ratón a mitad del arrastre.
+    const r = nshape.getBoundingClientRect(), sel = zones(S.drop).length > 1 && e.clientX >= r.left + r.width / 2 ? 1 : 0;
+    if (sel === S.drop.sel) return;
+    S.drop.sel = sel;
+    ncontent.querySelectorAll('.dz-z').forEach((z, k) => z.classList.toggle('on', k === sel));
+  });
+  desk.addEventListener('dragleave', () => {
+    if (!S.drop || --dragDepth > 0) return;
+    dragDepth = 0; desk.classList.remove('dragging'); S.drop = null; render();
+  });
   desk.addEventListener('drop', e => {
-    if (!hasFiles(e)) return;
+    const d = S.drop;
+    if (!d) return;
     e.preventDefault(); dragDepth = 0; desk.classList.remove('dragging');
-    addFiles([...e.dataTransfer.files]);
+    const zone = zones(d)[d.sel];
+    const text = e.dataTransfer.getData('text/plain').trim();
+    const url = e.dataTransfer.getData('text/uri-list').split(/\r?\n/).find(l => l && !l.startsWith('#'))?.trim() || text;
+    S.drop = null;
+    switch (zone) {
+      case 'shelf': addFiles([...e.dataTransfer.files]); return;
+      case 'ocr': flash(t('flash_ocr')); break;
+      case 'resize': flash(t('flash_resize', { n: d.n })); break;
+      case 'note':
+        if (!text) break;
+        S.notes.unshift({ text: text.replace(/\s+/g, ' ').slice(0, 300), at: Date.now() });
+        flash(t('flash_note')); open('notes'); return;
+      case 'task': {
+        if (!text) break;
+        const due = new Date(Date.now() + 3600000);
+        S.tasks.push({ text: text.split('\n')[0].slice(0, 160), done: false, time: `${two(due.getHours())}:00` });
+        flash(t('flash_task')); open('todo'); return;
+      }
+      // La app lee el título de la página; aquí (sin conectar con otras webs) se usa el dominio, como hace la app si no lo encuentra.
+      case 'title': {
+        let host = url;
+        try { host = new URL(url).hostname; } catch { /* no es una URL */ }
+        S.notes.unshift({ text: `${host} · ${url}`, at: Date.now() });
+        flash(t('flash_note')); open('notes'); return;
+      }
+      case 'clip': addClip(url); break;
+    }
+    render();
   });
 
   // Ctrl + C de cualquier texto de la página → Portapapeles del notch.
@@ -454,7 +589,14 @@
       }
       case 'voldown': S.volume = Math.max(0, S.volume - 10); showOsd('volume'); break;
       case 'volup': S.volume = Math.min(100, S.volume + 10); showOsd('volume'); break;
-      case 'bright': S.brightness = S.brightness >= 100 ? 20 : Math.min(100, S.brightness + 20); showOsd('brightness'); break;
+      case 'shot': {
+        // Como ScreenshotWatcher: la captura que guarda Windows entra en la bandeja con un aviso.
+        const d = new Date(), name = t('shot_name', { time: `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())} ${two(d.getHours())}${two(d.getMinutes())}${two(d.getSeconds())}` });
+        S.shelf.unshift({ name, ext: 'PNG', size: '214 KB' });
+        showPeek({ glyph: 'bandeja', head: `${t('shelf')} · ${t('screenshot')}`, body: name, primary: t('view'), secondary: t('ok'), onPrimary: () => open('shelf') });
+        if (S.open) render();
+        break;
+      }
       case 'copy': addClip(t('copy_text')); break;
       case 'file': addFiles([{ name: lang === 'es' ? 'Presupuesto 2026.pdf' : 'Budget 2026.pdf', size: 482113 }]); break;
       case 'toggle': S.open ? close() : open(); break;
