@@ -44,6 +44,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     private readonly PrivacyIndicatorService _privacy = new();
     private static readonly TimeSpan PrivacyBriefTime = TimeSpan.FromSeconds(3);
     private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _privacyBrief;
+    private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _topmost;
     private PrivacyState _privacyAnnounced;
     private bool _privacyBriefOn;
     private readonly IdleView _idle = new();
@@ -135,6 +136,10 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
 
         _geometry = _vm.Geometry;
         Reposition();
+        _topmost = DispatcherQueue.CreateTimer();
+        _topmost.Interval = TimeSpan.FromSeconds(2);
+        _topmost.Tick += (_, _) => KeepTopmost();
+        _topmost.Start();
         Shape.Show(_idle, _geometry, motion: null);
         _shownView = _idle;
         _idle.SetAnimating(true);
@@ -195,6 +200,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
 
         Closed += (_, _) =>
         {
+            _topmost.Stop();
             _hotkey.Dispose();
             _outside.Dispose();
             _screenshots.Dispose();
@@ -421,6 +427,17 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
 
         Win32.SetWindowPos(_hwnd, Win32.HWND_TOPMOST, 0, 0, 0, 0,
             Win32.SWP_NOMOVE | Win32.SWP_NOSIZE | Win32.SWP_NOACTIVATE | Win32.SWP_FRAMECHANGED);
+    }
+
+    /// <summary>
+    /// Windows a veces le quita "siempre encima" a la ventana (visto al encender el PC: el notch quedaba debajo de las
+    /// ventanas normales hasta minimizarlas). Se mira cada 2 s y, si falta, se vuelve a poner.
+    /// </summary>
+    private void KeepTopmost()
+    {
+        if ((Win32.GetWindowLongPtr(_hwnd, Win32.GWL_EXSTYLE).ToInt64() & Win32.WS_EX_TOPMOST) != 0) return;
+        Log.Info("Ventana: había perdido «siempre encima»; se vuelve a poner");
+        Win32.SetWindowPos(_hwnd, Win32.HWND_TOPMOST, 0, 0, 0, 0, Win32.SWP_NOMOVE | Win32.SWP_NOSIZE | Win32.SWP_NOACTIVATE);
     }
 
     /// <summary>
