@@ -72,7 +72,7 @@
 
   // ---- Medidas (tokens.json › notch, radius) ----
   const SIZE = { idle: [120, 34], music: [290, 34], minimal: [96, 24], osd: [340, 40], peek: [420, 112], drop: [420, 84],
-    menu: [460, 166], home: [580, 200], clip: [580, 214], shelf: [580, 272], todo: [580, 280], notes: [580, 222], audio: [580, 300], quick: [580, 246] };
+    menu: [460, 166], home: [580, 214], clip: [580, 214], shelf: [580, 272], todo: [580, 280], notes: [580, 222], audio: [580, 300], quick: [580, 246] };
   const PAGES = ['home', 'clip', 'shelf', 'todo', 'notes', 'audio', 'quick'];
   const PAGE_GLYPH = { home: 'inicio', clip: 'copias', shelf: 'bandeja', todo: 'tareas', notes: 'notas', audio: 'sonido', quick: 'general', menu: 'menu' };
   const TRACKS = [
@@ -190,23 +190,24 @@
     }
   }
   function homeView() {
+    // Como HomeView: la música arriba, con la carátula de fondo, y una fila de píldoras (CPU, GPU, RAM y volumen).
     const m = S.music, tr = track();
     const music = m.playing || m.pos > 42 || m.i > 0
-      ? `<div class="m-top"><div class="m-art" style="--art:${tr.art}">${gl('musica', 'm')}</div><div class="m-txt"><span class="m-title">${esc(tr.title)}</span><span class="m-src">${esc(tr.artist)}</span></div></div>
-         <div class="m-prog" id="mprog">${progDots()}</div>
-         <div class="m-ctl"><span id="mpos">${mmss(m.pos)}</span><span class="m-btns"><button data-act="prev" aria-label="prev">${CTL.prev}</button><button data-act="play" aria-label="play">${m.playing ? CTL.pause : CTL.play}</button><button data-act="next" aria-label="next">${CTL.next}</button></span><span>${mmss(tr.len)}</span></div>
-         <div class="m-vol" data-wheel><span>${t('vol')}</span>${slider('app:0', 3, 8)}${valueOf('app:0')}</div>`
-      : `<span class="card-l">${t('music')}</span><div class="m-empty"><span>${t('nothing')}</span><span>${t('nothing_d')}</span></div><button class="np np-on" data-act="play">${CTL.play} Play</button>`;
+      ? `<div class="mc" style="--art:${tr.art}"><div class="mc-bg"></div>
+          <div class="m-art">${gl('musica', 'm')}</div>
+          <div class="mc-body"><div class="mc-top"><div class="m-txt"><span class="m-title">${esc(tr.title)}</span><span class="m-src">${esc(tr.artist)} · Spotify</span></div>
+            <span class="m-btns"><button data-act="prev" aria-label="prev">${CTL.prev}</button><button data-act="play" aria-label="play">${m.playing ? CTL.pause : CTL.play}</button><button data-act="next" aria-label="next">${CTL.next}</button></span></div>
+           <div class="mc-prog"><span id="mpos">${mmss(m.pos)}</span><div class="m-prog" id="mprog">${progDots()}</div><span>${mmss(tr.len)}</span></div></div></div>`
+      : `<div class="mc mc-empty"><div class="m-art">${gl('musica', 'm')}</div><div class="mc-body" style="justify-content:center;gap:4px"><span class="card-l">${t('music')}</span><span class="m-title">${t('nothing')}</span><span class="m-src">${t('nothing_d')}</span></div><button class="np np-on" data-act="play">${CTL.play} Play</button></div>`;
+    const vol = m.playing || m.pos > 42 || m.i > 0 ? `<div class="chip chip-vol" data-wheel>${gl('sonido', 's')}${slider('app:0', 3, 8)}${valueOf('app:0')}</div>` : '';
     return `<div class="open">${head(t('home'))}
-      <div class="cards">
-        <div class="card">${music}</div>
-        <div class="card"><span class="card-l">${t('system')}</span><div id="sys">${sysRows()}</div></div>
-      </div></div>`;
+      ${music}
+      <div class="chips"><div id="sys" style="display:contents">${sysRows()}</div>${vol}</div></div>`;
   }
   // CPU, GPU y RAM: en la app son las de tu PC; aquí, valores de ejemplo que se mueven cada segundo.
   function sysRows() {
-    const bar = v => `<span class="s-bar"><b style="width:${v}%"></b></span>`;
-    return Object.entries(S.sys).map(([k, v]) => `<div class="s-row"><span>${k}</span>${bar(v)}<b>${v}%</b></div>`).join('');
+    const color = { CPU: '#30d158', GPU: '#0a84ff', RAM: '#ff9f0a' };
+    return Object.entries(S.sys).map(([k, v]) => `<div class="chip"><i style="background:${color[k]}"></i><span>${k}</span><b>${v}%</b></div>`).join('');
   }
   function progDots() {
     return `<b style="width:${(S.music.pos / track().len * 100).toFixed(1)}%"></b>`;

@@ -1,4 +1,4 @@
-using Microsoft.UI.Dispatching;
+﻿using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -18,8 +18,9 @@ public sealed partial class HomeView : UserControl, INotchPageView
     private readonly NotchServices _app;
     private readonly SystemStats _stats = new();
     private readonly DispatcherQueueTimer _progressTimer;
-    private readonly List<Ring> _systemRings = new();
-    private readonly BarSlider _musicVolume = new(20, 4, 4, 5, spacing: 2);
+    private readonly List<TextBlock> _systemValues = new();
+    private readonly List<FrameworkElement> _systemChips = new();
+    private readonly BarSlider _musicVolume = new(10, 4, 4, 5, spacing: 2);
     private AppVolume? _musicApp;
     private object? _artworkFor;
     private bool _shown;
@@ -29,7 +30,11 @@ public sealed partial class HomeView : UserControl, INotchPageView
         _app = app;
         InitializeComponent();
         foreach (var control in new FrameworkElement[] { PreviousButton, PlayPauseButton, NextButton }) Motion.PressFeedback(control);
-        ArtworkGlow.OpacityTransition = new ScalarTransition { Duration = TimeSpan.FromMilliseconds(450) };
+        if (!Motion.Reduced)
+        {
+            ArtBackdrop.OpacityTransition = new ScalarTransition { Duration = TimeSpan.FromMilliseconds(450) };
+            ArtShade.OpacityTransition = new ScalarTransition { Duration = TimeSpan.FromMilliseconds(450) };
+        }
 
         _progressTimer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         _progressTimer.Interval = TimeSpan.FromSeconds(1);
@@ -48,21 +53,42 @@ public sealed partial class HomeView : UserControl, INotchPageView
             MusicVolumeValue.Text = $"{percent}%";
         };
 
-        // Anillos de CPU (verde), GPU (azul) y RAM (ámbar), repartidos a lo ancho con su nombre debajo.
+        // Píldoras de CPU (verde), GPU (azul) y RAM (ámbar): punto de color, nombre y porcentaje.
         for (var i = 0; i < SystemKeys.Length; i++)
         {
-            SystemRows.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            var ring = new Ring(48, 5, AccentByName(SystemColors[i]), Theme.Brush("border"));
-            var item = new StackPanel { Spacing = 5, HorizontalAlignment = HorizontalAlignment.Center };
-            item.Children.Add(ring);
-            item.Children.Add(new TextBlock
+            var value = new TextBlock
             {
-                Text = SystemKeys[i], FontFamily = Res<FontFamily>("FontUi"), FontSize = 11,
-                Foreground = Res<Brush>("SecondaryBrush"), HorizontalAlignment = HorizontalAlignment.Center,
+                FontFamily = Res<FontFamily>("FontUi"), FontSize = 12, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                Foreground = Res<Brush>("PrimaryBrush"), VerticalAlignment = VerticalAlignment.Center,
+            };
+            var chip = new Grid
+            {
+                Padding = new Thickness(12, 0, 12, 0),
+                Background = Res<Brush>("CardBrush"),
+                CornerRadius = new CornerRadius(14),
+                ColumnSpacing = 7,
+            };
+            chip.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            chip.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            chip.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            chip.Children.Add(new Microsoft.UI.Xaml.Shapes.Ellipse
+            {
+                Width = 8, Height = 8, VerticalAlignment = VerticalAlignment.Center,
+                Fill = new SolidColorBrush(AccentByName(SystemColors[i])),
             });
-            Grid.SetColumn(item, i);
-            SystemRows.Children.Add(item);
-            _systemRings.Add(ring);
+            var name = new TextBlock
+            {
+                Text = SystemKeys[i], FontFamily = Res<FontFamily>("FontUi"), FontSize = 12, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                Foreground = Res<Brush>("SecondaryBrush"), VerticalAlignment = VerticalAlignment.Center,
+            };
+            Grid.SetColumn(name, 1);
+            Grid.SetColumn(value, 2);
+            chip.Children.Add(name);
+            chip.Children.Add(value);
+            Grid.SetColumn(chip, i);
+            Chips.Children.Add(chip);
+            _systemValues.Add(value);
+            _systemChips.Add(chip);
         }
 
         MusicProgress.SizeChanged += (_, _) => DrawProgress();
@@ -86,7 +112,9 @@ public sealed partial class HomeView : UserControl, INotchPageView
 
     /// <summary>Tarjetas (o la tarjeta de permiso) entran escalonadas.</summary>
     public IEnumerable<UIElement> EntranceItems =>
-        DeniedPanel.Visibility == Visibility.Visible ? DeniedPanel.Children : Cards.Children.Where(c => c.Visibility == Visibility.Visible);
+        DeniedPanel.Visibility == Visibility.Visible
+            ? DeniedPanel.Children
+            : new UIElement[] { MusicCard }.Concat(Chips.Children).Where(c => c.Visibility == Visibility.Visible);
 
     public void OnShown()
     {
@@ -112,9 +140,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
         MusicEmptyLabel.Text = Loc.Get("home_music");
         NoMusicTitle.Text = Loc.Get("empty_errors_no_music");
         NoMusicText.Text = Loc.Get("empty_errors_no_music_2");
-        SystemLabel.Text = Loc.Get("home_system");
-        TaskLabel.Text = Loc.Get("home_next_task");
-        TaskDone.Text = Loc.Get("home_done");
+        ToolTipService.SetToolTip(TaskDone, Loc.Get("home_done"));
         DeniedTitle.Text = Loc.Get("empty_errors_notif_denied");
         DeniedText.Text = Loc.Get("empty_errors_notif_denied_2");
         DeniedEnable.Text = Loc.Get("empty_errors_enable");
@@ -130,15 +156,15 @@ public sealed partial class HomeView : UserControl, INotchPageView
         DeniedMascot.Cells = MascotFrames.Off();
 
         var cards = _app.Settings.HomeCards;
-        Show(MusicColumn, MusicCard, cards.GetValueOrDefault("MÚSICA", true), 1.5);
-        Show(SystemColumn, SystemCard, cards.GetValueOrDefault("SISTEMA", true), 1);
-        Show(TaskColumn, TaskCard, cards.GetValueOrDefault("PRÓXIMA TAREA", false), 1);
-    }
-
-    private static void Show(ColumnDefinition column, FrameworkElement card, bool visible, double stars)
-    {
-        column.Width = visible ? new GridLength(stars, GridUnitType.Star) : new GridLength(0);
-        card.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+        MusicCard.Visibility = cards.GetValueOrDefault("MÚSICA", true) ? Visibility.Visible : Visibility.Collapsed;
+        var system = cards.GetValueOrDefault("SISTEMA", true);
+        foreach (var chip in _systemChips) chip.Visibility = system ? Visibility.Visible : Visibility.Collapsed;
+        foreach (var column in new[] { CpuColumn, GpuColumn, RamColumn })
+            column.Width = system ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
+        var task = cards.GetValueOrDefault("PRÓXIMA TAREA", false);
+        TaskCard.Visibility = task ? Visibility.Visible : Visibility.Collapsed;
+        TaskColumn.Width = task ? new GridLength(2.2, GridUnitType.Star) : new GridLength(0);
+        Chips.Visibility = system || task || MusicVolume.Visibility == Visibility.Visible ? Visibility.Visible : Visibility.Collapsed;
     }
 
     // ---- MÚSICA ----
@@ -151,6 +177,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
         if (card is null)
         {
             _progressTimer.Stop();
+            RenderMusicVolume();
             return;
         }
 
@@ -172,7 +199,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
         if (card.Thumbnail is null)
         {
             Artwork.Source = null;
-            ArtworkGlow.Opacity = 0;
+            HideBackdrop();
             return;
         }
         try
@@ -183,23 +210,29 @@ public sealed partial class HomeView : UserControl, INotchPageView
             using var memory = new Windows.Storage.Streams.InMemoryRandomAccessStream();
             await memory.WriteAsync(System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.AsBuffer(art.Bytes));
             memory.Seek(0);
-            var image = new BitmapImage { DecodePixelWidth = 96 };
+            var image = new BitmapImage { DecodePixelWidth = 152 };
             await image.SetSourceAsync(memory);
+            // Fondo: la misma carátula a 12 px; al estirarla se ve difuminada (sin Win2D ni efectos).
+            memory.Seek(0);
+            var backdrop = new BitmapImage { DecodePixelWidth = 12 };
+            await backdrop.SetSourceAsync(memory);
             if (!ReferenceEquals(_artworkFor, card.Thumbnail)) return;
             Artwork.Source = image;
-            // Resplandor del color de la carátula detrás (como el iPhone): da profundidad a la tarjeta.
-            if (art.Color is { } color)
-            {
-                ArtworkGlow.Background = ArtColor.GlowBrush(color);
-                ArtworkGlow.Opacity = 1;
-            }
-            else ArtworkGlow.Opacity = 0;
+            ArtBackdrop.Source = backdrop;
+            ArtBackdrop.Opacity = 1;
+            ArtShade.Opacity = 1;
         }
         catch (Exception)
         {
             Artwork.Source = null; // carátula no disponible: queda el icono de nota
-            ArtworkGlow.Opacity = 0;
+            HideBackdrop();
         }
+    }
+
+    private void HideBackdrop()
+    {
+        ArtBackdrop.Opacity = 0;
+        ArtShade.Opacity = 0;
     }
 
     private void DrawProgress()
@@ -221,7 +254,13 @@ public sealed partial class HomeView : UserControl, INotchPageView
         if (_musicVolume.IsDragging) return;
         var card = _app.System.Media.Card;
         _musicApp = card is null ? null : _app.System.Audio.AppFor(card.Source);
-        MusicVolume.Visibility = _musicApp is null ? Visibility.Collapsed : Visibility.Visible;
+        var visible = _musicApp is not null && MusicCard.Visibility == Visibility.Visible;
+        if ((MusicVolume.Visibility == Visibility.Visible) != visible)
+        {
+            MusicVolume.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+            VolumeColumn.Width = visible ? new GridLength(1.7, GridUnitType.Star) : new GridLength(0);
+            if (visible) Chips.Visibility = Visibility.Visible;
+        }
         if (_musicApp is not { } app) return;
         _musicVolume.Show(app.Muted ? 0 : app.Volume);
         MusicVolumeValue.Text = app.Muted ? Loc.Get("audio_muted") : $"{app.Volume}%";
@@ -257,7 +296,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
         SetRow(2, ram);
     }
 
-    private void SetRow(int index, int? percent) => _systemRings[index].Set(percent);
+    private void SetRow(int index, int? percent) => _systemValues[index].Text = percent is { } p ? $"{p}%" : "—";
 
     // ---- PRÓXIMA TAREA ----
 
@@ -270,8 +309,9 @@ public sealed partial class HomeView : UserControl, INotchPageView
         TaskDone.Visibility = next is null ? Visibility.Collapsed : Visibility.Visible;
     }
 
-    private void TaskDone_Click(object? sender, EventArgs e)
+    private void TaskDone_Tapped(object sender, TappedRoutedEventArgs e)
     {
+        e.Handled = true;
         if (_app.Tasks.Next is { } next) _app.Tasks.Toggle(next.Id);
     }
 
