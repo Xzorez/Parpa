@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Microsoft.Windows.ApplicationModel.Resources;
 
 namespace Parpa.Services;
@@ -47,4 +47,22 @@ public static class Loc
     /// <summary>Etiquetas mono en MAYÚSCULAS con la cultura activa.</summary>
     /// <remarks>El rediseño estilo isla usa texto tipo frase: ya no se pasa a mayúsculas.</remarks>
     public static string Upper(string text) => text;
+
+    private static readonly HashSet<string> Acronyms = ["PDF", "PNG", "ZIP", "OCR", "CPU", "GPU", "RAM"];
+
+    /// <summary>
+    /// Claves antiguas en MAYÚSCULAS (homeCards, actions de settings.json) → tipo frase para mostrarlas:
+    /// "IMÁGENES · A PNG" → "Imágenes · A PNG". Las claves guardadas no cambian.
+    /// </summary>
+    public static string Sentence(string text)
+    {
+        var parts = text.Split(" · ");
+        for (var i = 0; i < parts.Length; i++)
+        {
+            var words = parts[i].Split(' ').Select(w => Acronyms.Contains(w) ? w : w.ToLowerInvariant()).ToArray();
+            var joined = string.Join(' ', words);
+            parts[i] = joined.Length > 0 ? char.ToUpperInvariant(joined[0]) + joined[1..] : joined;
+        }
+        return string.Join(" · ", parts);
+    }
 }

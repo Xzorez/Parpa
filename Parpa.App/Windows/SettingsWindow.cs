@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Text.Json.Nodes;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
@@ -430,7 +430,7 @@ public sealed class SettingsWindow : Window
                 yield return new Head(Loc.Upper(L("settings_win_order")));
                 foreach (var row in OrderRows()) yield return row;
                 yield return new Head(Loc.Upper(L("settings_home_cards")));
-                yield return new Row(L("settings_home_cards"), L("settings_home_cards_d"), () => Chips(s.HomeCards, Loc.Upper, (k, v) => Set(x => x.HomeCards[k] = v)));
+                yield return new Row(L("settings_home_cards"), L("settings_home_cards_d"), () => Chips(s.HomeCards, HomeCardName, (k, v) => Set(x => x.HomeCards[k] = v)));
                 yield return new Head(L("windows_clip"));
                 yield return new Row(L("settings_clip_limit"), L("settings_clip_limit_d"), () => Ui.Segmented(
                     [(10, "10"), (25, "25"), (50, "50"), (100, "100")], s.ClipLimit, v => Set(x => x.ClipLimit = v)));
@@ -438,7 +438,7 @@ public sealed class SettingsWindow : Window
                 yield return new Head(L("windows_shelf"));
                 yield return new Row(L("settings_shelf_clear"), L("settings_shelf_clear_d"), () => Toggle(s.ShelfClear, v => Set(x => x.ShelfClear = v)));
                 yield return new Row(L("settings_shelf_screenshots"), L("settings_shelf_screenshots_d"), () => Toggle(s.ShelfScreenshots, v => Set(x => x.ShelfScreenshots = v)));
-                yield return new Row(L("settings_shelf_actions"), L("settings_shelf_actions_d"), () => Chips(s.Actions, k => k, (k, v) => Set(x => x.Actions[k] = v)));
+                yield return new Row(L("settings_shelf_actions"), L("settings_shelf_actions_d"), () => Chips(s.Actions, Loc.Sentence, (k, v) => Set(x => x.Actions[k] = v)));
                 break;
 
             case "sound":
@@ -569,6 +569,15 @@ public sealed class SettingsWindow : Window
     }
 
     /// <summary>Chapas: píldoras con borde; las activas en claro.</summary>
+    /// <summary>Nombre de la tarjeta de Inicio en el idioma actual (la clave guardada sigue en mayúsculas).</summary>
+    private static string HomeCardName(string key) => key switch
+    {
+        "MÚSICA" => Loc.Get("home_music"),
+        "SISTEMA" => Loc.Get("home_system"),
+        "PRÓXIMA TAREA" => Loc.Get("home_next_task"),
+        _ => Loc.Sentence(key),
+    };
+
     private static FrameworkElement Chips(Dictionary<string, bool> map, Func<string, string> label, Action<string, bool> set)
     {
         // Filas de hasta 360 px alineadas a la derecha (como flex-wrap del diseño).

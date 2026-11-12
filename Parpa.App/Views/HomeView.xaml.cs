@@ -24,6 +24,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
     private AppVolume? _musicApp;
     private object? _artworkFor;
     private bool _shown;
+    private bool _onArt;
 
     public HomeView(NotchServices app)
     {
@@ -35,6 +36,8 @@ public sealed partial class HomeView : UserControl, INotchPageView
             ArtBackdrop.OpacityTransition = new ScalarTransition { Duration = TimeSpan.FromMilliseconds(450) };
             ArtShade.OpacityTransition = new ScalarTransition { Duration = TimeSpan.FromMilliseconds(450) };
         }
+        TintMusic();
+        Theme.Changed += TintMusic;
 
         _progressTimer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         _progressTimer.Interval = TimeSpan.FromSeconds(1);
@@ -221,6 +224,8 @@ public sealed partial class HomeView : UserControl, INotchPageView
             ArtBackdrop.Source = backdrop;
             ArtBackdrop.Opacity = 1;
             ArtShade.Opacity = 1;
+            _onArt = true;
+            TintMusic();
         }
         catch (Exception)
         {
@@ -233,6 +238,26 @@ public sealed partial class HomeView : UserControl, INotchPageView
     {
         ArtBackdrop.Opacity = 0;
         ArtShade.Opacity = 0;
+        _onArt = false;
+        TintMusic();
+    }
+
+    /// <summary>
+    /// Sobre la carátula (o en tema oscuro) el texto de la tarjeta es blanco; en tema claro sin carátula
+    /// la tarjeta es clara y el texto pasa a los colores de la paleta.
+    /// </summary>
+    private void TintMusic()
+    {
+        var white = _onArt || !Theme.IsLight;
+        Brush primary = white ? new SolidColorBrush(Microsoft.UI.Colors.White) : Theme.Brush("primary");
+        Brush secondary = white ? new SolidColorBrush(Windows.UI.Color.FromArgb(0xB3, 255, 255, 255)) : Theme.Brush("secondary");
+        var ink = white ? Microsoft.UI.Colors.White : Theme.Get("primary");
+        MusicTitle.Foreground = primary;
+        foreach (var control in new[] { PreviousButton, PlayPauseButton, NextButton }) control.Foreground = primary;
+        MusicProgressFill.Background = primary;
+        MusicApp.Foreground = MusicPosition.Foreground = MusicDuration.Foreground = ArtIcon.Foreground = secondary;
+        MusicTrack.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(0x40, ink.R, ink.G, ink.B));
+        ArtTile.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(0x33, ink.R, ink.G, ink.B));
     }
 
     private void DrawProgress()
