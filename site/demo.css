@@ -196,18 +196,6 @@ kbd.k { font: 500 9px var(--mono); padding: 1px 5px; border: 1px solid var(--bor
 .dz-z.on { color: var(--primary); background-image: radial-gradient(circle, var(--tertiary) 1px, transparent 1.4px); }
 .dz-z.on .gl { opacity: 1; }
 
-/* Menú de burbujas */
-.launcher { position: relative; height: 264px; }
-.launcher .o-head { position: absolute; top: 14px; left: 18px; right: 18px; }
-.l-pill { position: absolute; left: 50%; top: 104px; width: 116px; height: 56px; margin-left: -58px; border-radius: 999px; background: var(--card); border: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; animation: pop .36s cubic-bezier(.3, 1.4, .5, 1) both; transition: background .2s; }
-.l-pill:hover { background: #1c1c1f; }
-.bub { position: absolute; width: 54px; height: 54px; margin: -27px 0 0 -27px; border-radius: 50%; border: 0; background: var(--card); display: flex; align-items: center; justify-content: center; cursor: pointer; animation: fly .36s cubic-bezier(.3, 1.4, .5, 1) both; animation-delay: var(--dl); transition: background .2s, transform .2s cubic-bezier(.3, 1.4, .5, 1); }
-.bub:hover { background: #1c1c1f; transform: scale(1.08) translateY(-3px); }
-.bub-l { position: absolute; top: 62px; left: 50%; transform: translateX(-50%); font: 500 9px var(--mono); color: var(--secondary); white-space: nowrap; opacity: 0; transition: opacity .2s; pointer-events: none; }
-.bub:hover .bub-l { opacity: 1; }
-.badge { position: absolute; top: 4px; right: 4px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--primary); color: var(--bg); font: 700 10px var(--dots); display: flex; align-items: center; justify-content: center; }
-@keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes fly { from { transform: translate(var(--fx), var(--fy)) scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
 
 /* Panel de simulación */
 .panel { border: 1px solid var(--border); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 18px; }
@@ -232,7 +220,7 @@ kbd.k { font: 500 9px var(--mono); padding: 1px 5px; border: 1px solid var(--bor
 }
 @media (prefers-reduced-motion: reduce) {
   .n-shape, .n-body { transition-duration: .15s; transition-timing-function: ease; }
-  .n-content.enter, .bub, .l-pill, .hint { animation: none; }
+  .n-content.enter, .dk, .hint { animation: none; }
 }
 
 /* ================= Estilo isla ================= */
@@ -368,17 +356,6 @@ kbd.k { font: 500 11px var(--code); border-radius: 5px; background: var(--card-2
 .dz-z { font: 600 13px var(--ui); border-radius: 18px; background: rgba(72, 72, 74, .2); }
 .dz-z.on { background: rgba(10, 132, 255, .28); color: #fff; }
 
-/* Menú: baldosas de color, como iconos de app */
-.l-pill { border-radius: 28px; }
-.l-pill:hover { background: var(--card-2); }
-.bub { border-radius: 17px; color: #fff; box-shadow: 0 8px 20px rgba(0, 0, 0, .35); }
-.bub:hover { background: var(--bc); box-shadow: 0 0 0 2px var(--primary), 0 8px 20px rgba(0, 0, 0, .35); }
-.bub-l { font: 600 12px var(--ui); color: var(--primary); }
-.badge { font: 700 10px var(--ui); background: var(--accent); color: #fff; }
-.bub[data-p="home"] { --bc: #5e5ce6; } .bub[data-p="clip"] { --bc: #ff9f0a; } .bub[data-p="shelf"] { --bc: #0a84ff; }
-.bub[data-p="todo"] { --bc: #30d158; } .bub[data-p="notes"] { --bc: #ffd60a; color: #000; } .bub[data-p="audio"] { --bc: #ff375f; }
-.bub[data-p="quick"] { --bc: #8e8e93; }
-.bub { background: var(--bc, var(--card)); }
 
 /* Panel de simulación */
 .panel { border-radius: 26px; border: 0; background: var(--card); }
@@ -386,3 +363,22 @@ kbd.k { font: 500 11px var(--code); border-radius: 5px; background: var(--card-2
 .sim:hover { background: var(--border); }
 .sim.on { box-shadow: inset 0 0 0 2px var(--accent); }
 .tips li::before { background: var(--blue); }
+
+/* Menú en forma de Dock (como LauncherView): las baldosas crecen desde abajo y el nombre sale encima */
+.launcher { width: 460px; padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 12px; }
+.dock-area { height: 96px; display: flex; align-items: flex-end; justify-content: center; }
+.dock { display: flex; gap: 8px; padding: 8px; border-radius: 22px; background: var(--card); }
+.dk { position: relative; width: 48px; height: 48px; border: 0; border-radius: 15px; background: var(--bc); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transform-origin: 50% 100%; animation: pop .3s cubic-bezier(.3, 1.4, .5, 1) backwards; animation-delay: var(--dl); transition: transform .22s cubic-bezier(.3, 1.4, .5, 1); }
+.dk .gl { width: 22px; height: 22px; }
+.dk:hover { transform: translateY(-3px) scale(1.22); }
+.dk:hover + .dk, .dk:has(+ .dk:hover) { transform: scale(1.08); }
+.dk-l { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%) scale(.82); font: 600 12px var(--ui); color: var(--primary); white-space: nowrap; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.dk:hover .dk-l { opacity: 1; }
+.dk-home { --bc: #000; box-shadow: inset 0 0 0 1px var(--border); }
+.dk-home .mascot { gap: 6px; height: 10px; }
+.dk-home .mascot b { width: 5px; height: 10px; border-radius: 3px; }
+.dk-home .mascot.blink b { height: 2px; }
+.dk-clip { --bc: #ff9f0a; } .dk-shelf { --bc: #0a84ff; } .dk-todo { --bc: #30d158; } .dk-notes { --bc: #ffd60a; color: #000; }
+.dk-audio { --bc: #ff375f; } .dk-quick { --bc: #8e8e93; }
+.badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; border: 2px solid var(--card); background: var(--accent); color: #fff; font: 700 10px var(--ui); display: flex; align-items: center; justify-content: center; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }

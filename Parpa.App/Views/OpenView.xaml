@@ -5,8 +5,13 @@
     xmlns:c="using:Parpa.Controls"
     Width="580">
 
-    <!-- Abierto: padding 12 18 18, gap 12. Cabecera 28 px en grid 1fr auto 1fr. -->
-    <Grid Padding="18,12,18,18" RowSpacing="12">
+    <!-- Abierto: padding 12 18 18, gap 12. Cabecera 28 px en grid 1fr auto 1fr. El ancho sigue al del notch
+         (el menú es más estrecho que 580); la vista se ancla a la izquierda del notch. -->
+    <Grid
+        x:Name="Root"
+        HorizontalAlignment="Left"
+        Padding="18,12,18,18"
+        RowSpacing="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="28" />
             <RowDefinition Height="*" />

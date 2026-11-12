@@ -72,7 +72,7 @@
 
   // ---- Medidas (tokens.json › notch, radius) ----
   const SIZE = { idle: [120, 34], music: [290, 34], minimal: [96, 24], osd: [340, 40], peek: [420, 112], drop: [420, 84],
-    menu: [580, 264], home: [580, 200], clip: [580, 214], shelf: [580, 272], todo: [580, 280], notes: [580, 222], audio: [580, 300], quick: [580, 246] };
+    menu: [460, 166], home: [580, 200], clip: [580, 214], shelf: [580, 272], todo: [580, 280], notes: [580, 222], audio: [580, 300], quick: [580, 246] };
   const PAGES = ['home', 'clip', 'shelf', 'todo', 'notes', 'audio', 'quick'];
   const PAGE_GLYPH = { home: 'inicio', clip: 'copias', shelf: 'bandeja', todo: 'tareas', notes: 'notas', audio: 'sonido', quick: 'general', menu: 'menu' };
   const TRACKS = [
@@ -288,15 +288,10 @@
     setLevel(el.dataset.slider, x < 0 ? 0 : Math.min(BARS, Math.floor(x / (r.width - pad) * BARS) + 1) * (100 / BARS));
   }
   function menuView() {
-    // En arco, como LauncherView: de 180° a 360° (radio 192 × 94 alrededor de la píldora).
-    const pages = PAGES.filter(p => p !== 'home');
-    const bubbles = pages.map((p, k) => {
-      const a = (180 + k * 180 / (pages.length - 1)) * Math.PI / 180;
-      return [p, Math.round(290 + Math.cos(a) * 192), Math.round(120 - Math.sin(a) * 94)];
-    });
+    // En forma de Dock, como LauncherView: Inicio (la mascota) y una baldosa de color por ventana.
+    const badge = p => p === 'clip' && S.clip.length ? `<span class="badge">${S.clip.length}</span>` : '';
     return `<div class="launcher">${head(t('menu'))}
-      <button class="l-pill" data-act="page" data-p="home" aria-label="${t('home')}"><div class="mascot" id="lmascot"><b></b><b></b></div></button>
-      ${bubbles.map(([p, x, y], k) => `<button class="bub" data-act="page" data-p="${p}" style="left:${x}px;top:${y}px;--dl:${40 + k * 30}ms;--fx:${(290 - x) * 0.7}px;--fy:${(132 - y) * 0.7}px" aria-label="${t(p)}">${gl(PAGE_GLYPH[p], 'm')}${p === 'clip' && S.clip.length ? `<span class="badge">${S.clip.length}</span>` : ''}<span class="bub-l">${t(p)}</span></button>`).join('')}
+      <div class="dock-area"><div class="dock">${PAGES.map((p, k) => `<button class="dk dk-${p}" data-act="page" data-p="${p}" style="--dl:${30 + k * 25}ms" aria-label="${t(p)}">${p === 'home' ? '<div class="mascot" id="lmascot"><b></b><b></b></div>' : gl(PAGE_GLYPH[p], 'm')}${badge(p)}<span class="dk-l">${t(p)}</span></button>`).join('')}</div></div>
     </div>`;
   }
 

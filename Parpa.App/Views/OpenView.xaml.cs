@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
@@ -36,6 +36,9 @@ public sealed partial class OpenView : UserControl
     /// Descartarlas al cerrar el notch no ayuda: el montón nativo de XAML no devuelve esa memoria y, al
     /// recrearlas, los privados acaban ~8 MB más altos.
     /// </summary>
+    /// <summary>Ancho del contenido = ancho del notch (la vista mide 580 y se ancla a la izquierda).</summary>
+    public void SetContentWidth(double width) => Root.Width = Math.Min(width, Width);
+
     private FrameworkElement Page(NotchPage page)
     {
         if (_pages.TryGetValue(page, out var view)) return view;

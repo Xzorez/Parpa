@@ -1,4 +1,4 @@
-using Microsoft.UI.Windowing;
+﻿using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -514,6 +514,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
                 view = _drop; // sus zonas ya se prepararon al entrar el arrastre
                 break;
             case NotchState.Open:
+                _open.SetContentWidth(_geometry.Width);
                 _open.Height = _geometry.Height;
                 _open.Apply(_s);
                 _open.Show(_vm.Page, _vm.IsLauncher);
