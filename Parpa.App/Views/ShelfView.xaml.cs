@@ -85,15 +85,14 @@ public sealed partial class ShelfView : UserControl, INotchPageView
     /// <summary>Tarjeta: icono de puntos 22 px + tipo arriba; nombre y tamaño abajo. Anillo 1,5 px si está elegida.</summary>
     private Border CreateTile(ShelfItem item)
     {
-        var icon = new Grid { Width = 22, Height = 22, Background = Res<Brush>("DividerBrush"), CornerRadius = new CornerRadius(5) };
-        icon.Children.Add(new DotPattern { DotColor = Color.FromArgb(255, 0x4a, 0x4a, 0x50), Spacing = 4, CornerRadius = new CornerRadius(5) });
+        var icon = new Grid { Width = 22, Height = 22, Background = Res<Brush>("DividerBrush"), CornerRadius = new CornerRadius(8) };
+        icon.Children.Add(new DotPattern { DotColor = Color.FromArgb(255, 0x4a, 0x4a, 0x50), Spacing = 4, CornerRadius = new CornerRadius(8) });
 
         var kind = new TextBlock
         {
             Text = item.Kind,
             FontFamily = Res<FontFamily>("FontMono"),
-            FontSize = 9,
-            CharacterSpacing = 80,
+            FontSize = 11,
             Foreground = Res<Brush>("QuaternaryBrush"),
             HorizontalAlignment = HorizontalAlignment.Right,
         };
@@ -108,7 +107,7 @@ public sealed partial class ShelfView : UserControl, INotchPageView
         {
             Text = ShelfService.SizeText(item),
             FontFamily = Res<FontFamily>("FontMono"),
-            FontSize = 9,
+            FontSize = 11,
             Foreground = Res<Brush>("SecondaryBrush"),
         };
         var bottom = new StackPanel { Spacing = 1, VerticalAlignment = VerticalAlignment.Bottom };
@@ -123,7 +122,7 @@ public sealed partial class ShelfView : UserControl, INotchPageView
         {
             Padding = new Thickness(10),
             Background = Res<Brush>("CardBrush"),
-            CornerRadius = new CornerRadius(12),
+            CornerRadius = new CornerRadius(16),
             BorderThickness = new Thickness(1.5),
             BorderBrush = item == _selected ? Res<Brush>("PrimaryBrush") : new SolidColorBrush(Microsoft.UI.Colors.Transparent),
             Child = content,
@@ -192,14 +191,13 @@ public sealed partial class ShelfView : UserControl, INotchPageView
         {
             Padding = new Thickness(8),
             Background = Res<Brush>("GlyphOffBrush"),
-            CornerRadius = new CornerRadius(8),
+            CornerRadius = new CornerRadius(12),
             Child = new TextBlock
             {
                 Text = Loc.Get(ShelfService.LabelKey(action)),
                 FontFamily = Res<FontFamily>("FontMono"),
-                FontSize = 10,
+                FontSize = 12,
                 FontWeight = Microsoft.UI.Text.FontWeights.Medium,
-                CharacterSpacing = 60,
                 Foreground = Res<Brush>("PrimaryBrush"),
                 TextTrimming = TextTrimming.CharacterEllipsis,
             },

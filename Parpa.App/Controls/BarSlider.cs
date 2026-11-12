@@ -8,17 +8,17 @@ using Parpa.Services;
 namespace Parpa.Controls;
 
 /// <summary>
-/// Volumen en barras (Audio, Música, Ajustes rápidos): cada barra vale 100 / n %. Pulsar fija el valor de la barra
-/// que hay bajo el ratón y, sin soltar, se arrastra a izquierda o derecha (a la izquierda de la primera = 0 %);
-/// la rueda sube o baja de 5 en 5. Las llenas crecen de <c>min</c> a <c>max</c> px.
+/// Volumen en barra continua estilo Centro de control (Audio, Música, Ajustes rápidos): pista redondeada con el
+/// relleno claro. Pulsar fija el valor bajo el ratón y, sin soltar, se arrastra; la rueda sube o baja de 5 en 5.
+/// El constructor conserva la firma de las antiguas barras: el ancho mínimo sale de <c>count</c>, <c>barWidth</c> y
+/// <c>spacing</c>, y el grosor es <c>max</c>.
 /// </summary>
 public sealed partial class BarSlider : Grid
 {
     private const int WheelStep = 5;
 
-    private readonly StackPanel _bars;
-    private readonly double _min;
-    private readonly double _max;
+    private readonly Border _track;
+    private readonly Border _fill;
     private readonly DispatcherQueueTimer _follow;
     private double _pressX;
     private int _pressCursorX;
@@ -29,17 +29,30 @@ public sealed partial class BarSlider : Grid
 
     public BarSlider(int count, double barWidth, double min, double max, double spacing = 3)
     {
-        _min = min;
-        _max = max;
-        // Fondo transparente y margen a la izquierda (pulsar ahí = 0 %). No ocupa más alto que la barra más alta.
+        var thickness = max;
         Background = Ui.Clear;
-        Padding = new Thickness(6, 0, 0, 0);
-        Height = max;
-        HorizontalAlignment = HorizontalAlignment.Left;
-        _bars = new StackPanel { Orientation = Orientation.Horizontal, Spacing = spacing, VerticalAlignment = VerticalAlignment.Center };
-        for (var i = 0; i < count; i++)
-            _bars.Children.Add(new Border { Width = barWidth, Height = min, CornerRadius = new CornerRadius(barWidth / 2), VerticalAlignment = VerticalAlignment.Center, Background = Theme.Brush("border") });
-        Children.Add(_bars);
+        Height = thickness;
+        MinWidth = count * barWidth + (count - 1) * spacing;
+        HorizontalAlignment = HorizontalAlignment.Stretch;
+        _track = new Border
+        {
+            Height = thickness,
+            CornerRadius = new CornerRadius(thickness / 2),
+            Background = Theme.Brush("border"),
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        _fill = new Border
+        {
+            Height = thickness,
+            Width = 0,
+            CornerRadius = new CornerRadius(thickness / 2),
+            Background = Theme.Brush("primary"),
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        Children.Add(_track);
+        Children.Add(_fill);
+        SizeChanged += (_, _) => Layout();
 
         // El arrastre sigue al cursor de Windows y no a los eventos de XAML: el notch no se activa al pulsarlo
         // (no quita el foco) y así no depende de que la captura del puntero llegue.
@@ -48,7 +61,7 @@ public sealed partial class BarSlider : Grid
         _follow.Tick += (_, _) => Follow();
 
         PointerPressed += OnPressed;
-        PointerMoved += (_, e) => { if (IsDragging) Pick(e.GetCurrentPoint(_bars).Position.X); };
+        PointerMoved += (_, e) => { if (IsDragging) Pick(e.GetCurrentPoint(this).Position.X); };
         PointerReleased += (_, _) => _follow.Stop();
         PointerWheelChanged += (_, e) => Wheel(e);
         Tapped += (_, e) => e.Handled = true; // que el toque no llegue a la fila de debajo (silenciar…)
@@ -64,15 +77,16 @@ public sealed partial class BarSlider : Grid
         percent = Math.Clamp(percent, 0, 100);
         if (percent == _percent) return;
         _percent = percent;
-        var n = _bars.Children.Count;
-        var filledCount = (int)Math.Round(percent * n / 100.0, MidpointRounding.AwayFromZero);
-        for (var i = 0; i < n; i++)
-        {
-            var bar = (Border)_bars.Children[i];
-            var filled = i < filledCount;
-            Motion.AnimateSize(bar, null, filled ? _min + Math.Round(i / (double)n * (_max - _min)) : _min, TimeSpan.FromMilliseconds(120));
-            bar.Background = Theme.Brush(filled ? "primary" : "border");
-        }
+        Layout();
+    }
+
+    /// <summary>Relleno = valor × ancho; con algo de valor nunca baja del grosor (se ve como una píldora).</summary>
+    private void Layout()
+    {
+        var width = ActualWidth;
+        if (width <= 0) return;
+        var value = Math.Max(0, _percent) / 100.0 * width;
+        _fill.Width = _percent <= 0 ? 0 : Math.Max(Height, value);
     }
 
     /// <summary>Rueda sobre el control o sobre algo más grande que lo contiene (la tarjeta, la fila).</summary>
@@ -85,7 +99,7 @@ public sealed partial class BarSlider : Grid
 
     private void OnPressed(object sender, PointerRoutedEventArgs e)
     {
-        var point = e.GetCurrentPoint(_bars);
+        var point = e.GetCurrentPoint(this);
         if (!point.Properties.IsLeftButtonPressed) return;
         e.Handled = true;
         CapturePointer(e.Pointer);
@@ -109,13 +123,12 @@ public sealed partial class BarSlider : Grid
         Pick(_pressX + (cursor.X - _pressCursorX) / XamlRoot.RasterizationScale);
     }
 
-    /// <summary>x (relativo a las barras) → la barra que hay debajo; a la izquierda de la primera, 0 %.</summary>
+    /// <summary>x (relativo al control) → porcentaje.</summary>
     private void Pick(double x)
     {
-        var n = _bars.Children.Count;
-        var pitch = ((Border)_bars.Children[0]).Width + _bars.Spacing;
-        var index = x < 0 ? -1 : Math.Min(n - 1, (int)(x / pitch));
-        Set((int)Math.Round((index + 1) * 100.0 / n));
+        var width = ActualWidth;
+        if (width <= 0) return;
+        Set((int)Math.Round(Math.Clamp(x / width, 0, 1) * 100));
     }
 
     private void Set(int percent)

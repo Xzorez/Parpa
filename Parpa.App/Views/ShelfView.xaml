@@ -24,24 +24,22 @@
 
             <!-- Nada elegido: zona de puntos con la pista. -->
             <Grid x:Name="PickHint" Grid.Column="1">
-                <c:DotPattern DotBrush="{StaticResource DotPatternBrush}" Spacing="7" CornerRadius="14" />
+                <c:DotPattern DotBrush="{StaticResource DotPatternBrush}" Spacing="7" CornerRadius="20" />
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
                     <TextBlock
                         x:Name="PickTitle"
                         HorizontalAlignment="Center"
-                        CharacterSpacing="100"
-                        FontFamily="{StaticResource FontMono}"
-                        FontSize="10"
-                        FontWeight="Medium"
-                        Foreground="{StaticResource SoftBrush}"
+                        FontFamily="{StaticResource FontUi}"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource PrimaryBrush}"
                         TextAlignment="Center"
                         TextWrapping="Wrap" />
                     <TextBlock
                         x:Name="PickText"
                         HorizontalAlignment="Center"
-                        CharacterSpacing="60"
                         FontFamily="{StaticResource FontMono}"
-                        FontSize="9"
+                        FontSize="11"
                         Foreground="{StaticResource QuaternaryBrush}"
                         TextAlignment="Center"
                         TextWrapping="Wrap" />
@@ -52,23 +50,23 @@
             <StackPanel
                 x:Name="Detail"
                 Grid.Column="1"
-                Padding="12,10"
+                Padding="14,12"
                 Background="{StaticResource CardBrush}"
-                CornerRadius="14"
+                CornerRadius="20"
                 Spacing="6"
                 Visibility="Collapsed">
                 <StackPanel Spacing="2">
                     <TextBlock
                         x:Name="DetailName"
                         FontFamily="{StaticResource FontUi}"
-                        FontSize="12"
-                        FontWeight="Medium"
+                        FontSize="13"
+                        FontWeight="SemiBold"
                         Foreground="{StaticResource PrimaryBrush}"
                         TextTrimming="CharacterEllipsis" />
                     <TextBlock
                         x:Name="DetailPath"
                         FontFamily="{StaticResource FontMono}"
-                        FontSize="9"
+                        FontSize="11"
                         Foreground="{StaticResource QuaternaryBrush}"
                         TextTrimming="CharacterEllipsis" />
                 </StackPanel>
@@ -89,18 +87,16 @@
                         x:Name="Result"
                         Grid.Column="1"
                         VerticalAlignment="Center"
-                        CharacterSpacing="100"
                         FontFamily="{StaticResource FontMono}"
-                        FontSize="9"
+                        FontSize="11"
                         FontWeight="Medium"
                         TextTrimming="CharacterEllipsis" />
                     <TextBlock
                         x:Name="Retry"
                         Grid.Column="2"
                         VerticalAlignment="Center"
-                        CharacterSpacing="60"
                         FontFamily="{StaticResource FontMono}"
-                        FontSize="9"
+                        FontSize="11"
                         FontWeight="Medium"
                         Foreground="{StaticResource PrimaryBrush}"
                         Tapped="Retry_Tapped"
@@ -111,37 +107,34 @@
 
         <!-- Bandeja vacía: puntos #3a3a3f de 7 px, mascota contenta y dos líneas sobre fondo negro. -->
         <Grid x:Name="EmptyPanel" Visibility="Collapsed">
-            <c:DotPattern DotBrush="{StaticResource DotPatternBrush}" Spacing="7" CornerRadius="14" />
+            <c:DotPattern DotBrush="{StaticResource DotPatternBrush}" Spacing="7" CornerRadius="20" />
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
                 <Border
                     Padding="8"
                     HorizontalAlignment="Center"
-                    Background="{StaticResource BgBrush}"
-                    CornerRadius="10">
+                    CornerRadius="14">
                     <c:DotMatrix
                         x:Name="EmptyMascot"
+            Merge="Blobs"
                         Columns="13"
                         Rows="5"
                         DotSize="3"
                         Gap="1.5"
-                        OnBrush="{StaticResource PrimaryBrush}"
-                        OffBrush="{StaticResource MatrixOffBrush}" />
+                        OnBrush="{StaticResource PrimaryBrush}" />
                 </Border>
-                <Border Padding="6,3" HorizontalAlignment="Center" Background="{StaticResource BgBrush}">
+                <Border Padding="6,3" HorizontalAlignment="Center">
                     <TextBlock
                         x:Name="EmptyTitle"
-                        CharacterSpacing="100"
-                        FontFamily="{StaticResource FontMono}"
-                        FontSize="10"
-                        FontWeight="Medium"
-                        Foreground="{StaticResource SoftBrush}" />
+                        FontFamily="{StaticResource FontUi}"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource PrimaryBrush}" />
                 </Border>
-                <Border Padding="6,2" HorizontalAlignment="Center" Background="{StaticResource BgBrush}">
+                <Border Padding="6,2" HorizontalAlignment="Center">
                     <TextBlock
                         x:Name="EmptyText"
-                        CharacterSpacing="60"
                         FontFamily="{StaticResource FontMono}"
-                        FontSize="9"
+                        FontSize="11"
                         Foreground="{StaticResource SecondaryBrush}" />
                 </Border>
             </StackPanel>

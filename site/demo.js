@@ -1,62 +1,61 @@
 // Demo de Parpa en el navegador: la misma máquina de estados que la app (Soltar > Abierto > Aviso >
 // Indicador > Actividad > Reposo), con las medidas y tiempos de data/tokens.json. Nada sale del navegador.
 (() => {
-  const ON = '#f2f2f0', OFF = '#1d1d20';
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ---- Textos ----
   const T = {
     es: {
-      nav_back: '← INICIO', nav_download: 'DESCARGAR', eyebrow: 'PRUÉBALO EN EL NAVEGADOR', title: 'Juega con el notch.',
+      nav_back: '← Inicio', nav_download: 'Descargar', eyebrow: 'Pruébalo en el navegador', title: 'Juega con el notch.',
       lead: 'Es la misma isla que verás arriba de tu pantalla en Windows, con sus medidas y animaciones. Pasa el ratón por encima, abre sus ventanas y usa los botones de abajo para simular lo que pasa en tu PC.',
-      hint: 'PASA EL RATÓN POR EL NOTCH', simulate: 'SIMULAR', local: 'NADA SALE DE TU NAVEGADOR',
-      sim_play: 'PONER MÚSICA', sim_pause: 'PAUSAR MÚSICA', sim_notify: 'RECIBIR UN AVISO', sim_voldown: 'VOLUMEN −', sim_volup: 'VOLUMEN +',
-      sim_bright: 'BRILLO', sim_copy: 'COPIAR UN TEXTO', sim_file: 'SOLTAR UN ARCHIVO', sim_toggle: 'WIN + ALT + N',
+      hint: 'Pasa el ratón por el notch', simulate: 'Simular', local: 'Nada sale de tu navegador',
+      sim_play: 'Poner música', sim_pause: 'Pausar música', sim_notify: 'Recibir un aviso', sim_voldown: 'Volumen −', sim_volup: 'Volumen +',
+      sim_bright: 'Brillo', sim_copy: 'Copiar un texto', sim_file: 'Soltar un archivo', sim_toggle: 'Win + alt + n',
       tip1: 'Pasa el ratón por el notch para abrirlo; al salir se cierra.', tip2: 'La rueda del ratón cambia de ventana. Esc lo cierra.',
       tip3: 'Arrastra archivos, un enlace o un texto de esta página hasta el notch: según en qué mitad lo sueltes, hace una cosa u otra.', tip4: 'Selecciona cualquier texto de esta página y pulsa Ctrl + C: aparecerá en el Portapapeles.',
       tip5: 'Las barras de volumen se pulsan o se arrastran. En Audio, toca el nombre de una app para silenciarla.',
-      footer: 'CÓDIGO ABIERTO CON LICENCIA MIT', footer_home: 'WEB', footer_download: 'DESCARGAR',
-      home: 'INICIO', clip: 'PORTAPAPELES', shelf: 'BANDEJA', todo: 'TAREAS', notes: 'NOTAS', audio: 'AUDIO', quick: 'AJUSTES RÁPIDOS', menu: 'MENÚ',
-      output: 'SALIDA', outputs: ['AURICULARES', 'ALTAVOCES'], mic: 'MICRÓFONO', mic_on: 'ACTIVO', mic_off: 'SILENCIADO', vol: 'VOL', muted: 'MUDO',
-      sim_shot: 'HACER UNA CAPTURA', screenshot: 'CAPTURA AÑADIDA', shot_name: 'Captura de pantalla {time}.png',
-      z_shelf: 'A LA BANDEJA', z_ocr: 'EXTRAER TEXTO', z_resize: 'REDIMENSIONAR', z_note: 'CREAR NOTA', z_task: 'CREAR TAREA', z_title: 'GUARDAR CON TÍTULO', z_clip: 'AL PORTAPAPELES',
-      flash_ocr: 'EN LA APP, SU TEXTO IRÍA AL PORTAPAPELES', flash_resize: 'EN LA APP, {n} IMÁGENES A 1920 PX EN LA BANDEJA', flash_note: '✓ NOTA CREADA', flash_task: '✓ TAREA CREADA',
-      music: 'MÚSICA', system: 'SISTEMA', nothing: 'Nada sonando', nothing_d: 'Dale al play en cualquier app y aparecerá aquí.',
-      now: 'AHORA', later: 'MÁS TARDE', open: 'ABRIR', view: 'VER', ok: 'OK', copied: 'COPIADO',
-      clip_empty: 'COPIA ALGO CON', clip_empty2: 'Y APARECERÁ AQUÍ', shelf_empty: 'ARRASTRA ARCHIVOS HASTA EL NOTCH', shelf_empty2: 'SE GUARDAN AQUÍ HASTA QUE LOS SAQUES',
-      drop: 'SUELTA PARA GUARDAR', drop2: 'EN LA BANDEJA', new_task: '+ NUEVA TAREA', all_done: 'TODO HECHO', note_ph: 'Escribe una nota y pulsa Intro…',
-      notes_empty: 'SIN NOTAS TODAVÍA', notes_empty2: 'ESCRIBE ARRIBA O ARRASTRA TEXTO AL NOTCH',
-      dnd: 'NO MOLESTAR', mascot: 'MASCOTA', minimal: 'MINIMAL', on: 'ACTIVADO', off: 'NO', volume: 'VOLUMEN', speakers: 'ALTAVOCES', brightness: 'BRILLO', screen: 'PANTALLA',
-      flash_copied: '✓ COPIADO AL PORTAPAPELES', flash_open: 'SE ABRIRÍA {app}', flash_dnd: 'NO MOLESTAR: EL AVISO ESPERA', flash_shelf: '✓ GUARDADO EN LA BANDEJA', flash_removed: 'QUITADO DE LA BANDEJA',
+      footer: 'Código abierto con licencia MIT', footer_home: 'Web', footer_download: 'Descargar',
+      home: 'Inicio', clip: 'Portapapeles', shelf: 'Bandeja', todo: 'Tareas', notes: 'Notas', audio: 'Audio', quick: 'Ajustes rápidos', menu: 'Menú',
+      output: 'Salida', outputs: ['Auriculares', 'Altavoces'], mic: 'Micrófono', mic_on: 'Activo', mic_off: 'Silenciado', vol: 'Vol', muted: 'Mudo',
+      sim_shot: 'Hacer una captura', screenshot: 'Captura añadida', shot_name: 'Captura de pantalla {time}.png',
+      z_shelf: 'A la bandeja', z_ocr: 'Extraer texto', z_resize: 'Redimensionar', z_note: 'Crear nota', z_task: 'Crear tarea', z_title: 'Guardar con título', z_clip: 'Al portapapeles',
+      flash_ocr: 'En la app, su texto iría al portapapeles', flash_resize: 'En la app, {n} imágenes a 1920 px en la bandeja', flash_note: '✓ Nota creada', flash_task: '✓ Tarea creada',
+      music: 'Música', system: 'Sistema', nothing: 'Nada sonando', nothing_d: 'Dale al play en cualquier app y aparecerá aquí.',
+      now: 'Ahora', later: 'Más tarde', open: 'Abrir', view: 'Ver', ok: 'OK', copied: 'Copiado',
+      clip_empty: 'Copia algo con', clip_empty2: 'Y aparecerá aquí', shelf_empty: 'Arrastra archivos hasta el notch', shelf_empty2: 'Se guardan aquí hasta que los saques',
+      drop: 'Suelta para guardar', drop2: 'En la bandeja', new_task: '+ Nueva tarea', all_done: 'Todo hecho', note_ph: 'Escribe una nota y pulsa Intro…',
+      notes_empty: 'Sin notas todavía', notes_empty2: 'Escribe arriba o arrastra texto al notch',
+      dnd: 'No molestar', mascot: 'Mascota', minimal: 'Minimal', on: 'Activado', off: 'No', volume: 'Volumen', speakers: 'Altavoces', brightness: 'Brillo', screen: 'Pantalla',
+      flash_copied: '✓ Copiado al portapapeles', flash_open: 'Se abriría {app}', flash_dnd: 'No molestar: el aviso espera', flash_shelf: '✓ Guardado en la bandeja', flash_removed: 'Quitado de la bandeja',
       copy_text: 'Reunión movida a las 17:30, sala 2',
       tasks: ['Enviar el informe', 'Llamar al dentista', 'Comprar café'],
-      notify: [['WHATSAPP · ANA', '¿Vienes a la cena del viernes? Reservé a las 21:00.', 'WhatsApp'], ['DISCORD · #GENERAL', 'Leo: ¿alguien se apunta a una partida esta noche?', 'Discord'], ['CALENDARIO', 'Revisión del proyecto en 10 minutos.', 'Calendario']],
+      notify: [['WhatsApp · Ana', '¿Vienes a la cena del viernes? Reservé a las 21:00.', 'WhatsApp'], ['Discord · #General', 'Leo: ¿alguien se apunta a una partida esta noche?', 'Discord'], ['Calendario', 'Revisión del proyecto en 10 minutos.', 'Calendario']],
     },
     en: {
-      nav_back: '← HOME', nav_download: 'DOWNLOAD', eyebrow: 'TRY IT IN YOUR BROWSER', title: 'Play with the notch.',
+      nav_back: '← Home', nav_download: 'Download', eyebrow: 'Try it in your browser', title: 'Play with the notch.',
       lead: 'It’s the same island you’ll see at the top of your screen on Windows, with its real sizes and animations. Hover it, open its windows and use the buttons below to simulate what happens on your PC.',
-      hint: 'HOVER THE NOTCH', simulate: 'SIMULATE', local: 'NOTHING LEAVES YOUR BROWSER',
-      sim_play: 'PLAY MUSIC', sim_pause: 'PAUSE MUSIC', sim_notify: 'GET A NOTIFICATION', sim_voldown: 'VOLUME −', sim_volup: 'VOLUME +',
-      sim_bright: 'BRIGHTNESS', sim_copy: 'COPY SOME TEXT', sim_file: 'DROP A FILE', sim_toggle: 'WIN + ALT + N',
+      hint: 'Hover the notch', simulate: 'Simulate', local: 'Nothing leaves your browser',
+      sim_play: 'Play music', sim_pause: 'Pause music', sim_notify: 'Get a notification', sim_voldown: 'Volume −', sim_volup: 'Volume +',
+      sim_bright: 'Brightness', sim_copy: 'Copy some text', sim_file: 'Drop a file', sim_toggle: 'Win + alt + n',
       tip1: 'Hover the notch to open it; it closes when you leave.', tip2: 'The mouse wheel switches windows. Esc closes it.',
       tip3: 'Drag files, a link or some text from this page onto the notch: which half you drop it on decides what happens.', tip4: 'Select any text on this page and press Ctrl + C: it shows up in the Clipboard.',
       tip5: 'Volume bars can be clicked or dragged. In Audio, tap an app’s name to mute it.',
-      footer: 'OPEN SOURCE UNDER THE MIT LICENSE', footer_home: 'WEBSITE', footer_download: 'DOWNLOAD',
-      home: 'HOME', clip: 'CLIPBOARD', shelf: 'SHELF', todo: 'TASKS', notes: 'NOTES', audio: 'AUDIO', quick: 'QUICK SETTINGS', menu: 'MENU',
-      output: 'OUTPUT', outputs: ['HEADPHONES', 'SPEAKERS'], mic: 'MICROPHONE', mic_on: 'ON', mic_off: 'MUTED', vol: 'VOL', muted: 'MUTED',
-      sim_shot: 'TAKE A SCREENSHOT', screenshot: 'SCREENSHOT ADDED', shot_name: 'Screenshot {time}.png',
-      z_shelf: 'TO SHELF', z_ocr: 'EXTRACT TEXT', z_resize: 'RESIZE', z_note: 'NEW NOTE', z_task: 'NEW TASK', z_title: 'SAVE WITH TITLE', z_clip: 'TO CLIPBOARD',
-      flash_ocr: 'IN THE APP, ITS TEXT WOULD GO TO THE CLIPBOARD', flash_resize: 'IN THE APP, {n} IMAGES AT 1920 PX ON THE SHELF', flash_note: '✓ NOTE CREATED', flash_task: '✓ TASK CREATED',
-      music: 'MUSIC', system: 'SYSTEM', nothing: 'Nothing playing', nothing_d: 'Press play in any app and it shows up here.',
-      now: 'NOW', later: 'LATER', open: 'OPEN', view: 'VIEW', ok: 'OK', copied: 'COPIED',
-      clip_empty: 'COPY SOMETHING WITH', clip_empty2: 'AND IT SHOWS UP HERE', shelf_empty: 'DRAG FILES ONTO THE NOTCH', shelf_empty2: 'THEY STAY HERE UNTIL YOU TAKE THEM OUT',
-      drop: 'DROP TO KEEP', drop2: 'ON THE SHELF', new_task: '+ NEW TASK', all_done: 'ALL DONE', note_ph: 'Write a note and press Enter…',
-      notes_empty: 'NO NOTES YET', notes_empty2: 'TYPE ABOVE OR DRAG TEXT ONTO THE NOTCH',
-      dnd: 'DO NOT DISTURB', mascot: 'MASCOT', minimal: 'MINIMAL', on: 'ON', off: 'OFF', volume: 'VOLUME', speakers: 'SPEAKERS', brightness: 'BRIGHTNESS', screen: 'DISPLAY',
-      flash_copied: '✓ COPIED TO CLIPBOARD', flash_open: '{app} WOULD OPEN', flash_dnd: 'DO NOT DISTURB: IT WAITS', flash_shelf: '✓ KEPT ON THE SHELF', flash_removed: 'REMOVED FROM THE SHELF',
+      footer: 'Open source under the MIT license', footer_home: 'Website', footer_download: 'Download',
+      home: 'Home', clip: 'Clipboard', shelf: 'Shelf', todo: 'Tasks', notes: 'Notes', audio: 'Audio', quick: 'Quick settings', menu: 'Menu',
+      output: 'Output', outputs: ['Headphones', 'Speakers'], mic: 'Microphone', mic_on: 'On', mic_off: 'Muted', vol: 'Vol', muted: 'Muted',
+      sim_shot: 'Take a screenshot', screenshot: 'Screenshot added', shot_name: 'Screenshot {time}.png',
+      z_shelf: 'To shelf', z_ocr: 'Extract text', z_resize: 'Resize', z_note: 'New note', z_task: 'New task', z_title: 'Save with title', z_clip: 'To clipboard',
+      flash_ocr: 'In the app, its text would go to the clipboard', flash_resize: 'In the app, {n} images at 1920 px on the shelf', flash_note: '✓ Note created', flash_task: '✓ Task created',
+      music: 'Music', system: 'System', nothing: 'Nothing playing', nothing_d: 'Press play in any app and it shows up here.',
+      now: 'Now', later: 'Later', open: 'Open', view: 'View', ok: 'OK', copied: 'Copied',
+      clip_empty: 'Copy something with', clip_empty2: 'And it shows up here', shelf_empty: 'Drag files onto the notch', shelf_empty2: 'They stay here until you take them out',
+      drop: 'Drop to keep', drop2: 'On the shelf', new_task: '+ New task', all_done: 'All done', note_ph: 'Write a note and press Enter…',
+      notes_empty: 'No notes yet', notes_empty2: 'Type above or drag text onto the notch',
+      dnd: 'Do not disturb', mascot: 'Mascot', minimal: 'Minimal', on: 'On', off: 'Off', volume: 'Volume', speakers: 'Speakers', brightness: 'Brightness', screen: 'Display',
+      flash_copied: '✓ Copied to clipboard', flash_open: '{app} would open', flash_dnd: 'Do not disturb: it waits', flash_shelf: '✓ Kept on the shelf', flash_removed: 'Removed from the shelf',
       copy_text: 'Meeting moved to 5:30 pm, room 2',
       tasks: ['Send the report', 'Call the dentist', 'Buy coffee'],
-      notify: [['WHATSAPP · ANA', 'Coming to dinner on Friday? I booked for 9 pm.', 'WhatsApp'], ['DISCORD · #GENERAL', 'Leo: anyone up for a game tonight?', 'Discord'], ['CALENDAR', 'Project review in 10 minutes.', 'Calendar']],
+      notify: [['WhatsApp · Ana', 'Coming to dinner on Friday? I booked for 9 pm.', 'WhatsApp'], ['Discord · #General', 'Leo: anyone up for a game tonight?', 'Discord'], ['Calendar', 'Project review in 10 minutes.', 'Calendar']],
     },
   };
   let lang;
@@ -64,27 +63,8 @@
   if (lang !== 'es' && lang !== 'en') lang = (navigator.language || 'en').toLowerCase().startsWith('es') ? 'es' : 'en';
   const t = (k, vars = {}) => String(T[lang][k] ?? k).replace(/\{(\w+)\}/g, (_, v) => vars[v] ?? '');
 
-  // ---- Glifos (data/glyphs.json) ----
-  const G = {
-    musica: ['..XXXXX', '..XXXXX', '..X...X', '..X...X', 'XXX.XXX', 'XXX.XXX', '.......'],
-    mensaje: ['.XXXXX.', 'XXXXXXX', 'X.X.X.X', 'XXXXXXX', '.XXXXX.', '.XX....', '.X.....'],
-    sonido: ['...X...', '..XX..X', 'XXXX.X.', 'XXXX.X.', 'XXXX.X.', '..XX..X', '...X...'],
-    brillo: ['X..X..X', '.......', '..XXX..', 'X.XXX.X', '..XXX..', '.......', 'X..X..X'],
-    bandeja: ['XXX....', 'XXXXXXX', 'X.....X', 'X.....X', 'X.....X', 'XXXXXXX', '.......'],
-    copias: ['XXXXX..', 'X...X..', 'X.XXXXX', 'X.X...X', 'XXX...X', '..X...X', '..XXXXX'],
-    tareas: ['XX.XXXX', 'XX.....', '.......', 'XX.XXXX', 'XX.....', '.......', 'XX.XXX.'],
-    notas: ['XXXXXXX', 'XXXXXXX', 'X.....X', 'X.XXX.X', 'X....XX', 'X...XX.', 'XXXXX..'],
-    inicio: ['..XXX..', '.XXXXX.', 'XXXXXXX', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..'],
-    general: ['X..X..X', '.XXXXX.', '.XX.XX.', 'XX...XX', '.XX.XX.', '.XXXXX.', 'X..X..X'],
-    menu: ['X..X..X', '.......', '.......', 'X..X..X', '.......', '.......', 'X..X..X'],
-    luna: ['..XXX..', '.XX....', 'XX.....', 'XX.....', 'XX.....', '.XX....', '..XXX..'],
-    cara: ['.......', 'XX...XX', 'XX...XX', '.......', '.X...X.', '..XXX..', '.......'],
-    linea: ['.......', '.......', '.......', 'XXXXXXX', '.......', '.......', '.......'],
-    calendario: ['X.....X', 'XXXXXXX', 'X.....X', 'X.X.X.X', 'X.....X', 'X.X.X.X', 'XXXXXXX'],
-    micro: ['..XXX..', '..XXX..', 'X.XXX.X', 'X.XXX.X', '.X...X.', '..XXX..', '..XXX..'],
-  };
-  const gl = (name, size = 's', off = 'transparent') =>
-    `<span class="gl gl-${size}">${G[name].join('').split('').map(c => `<i style="background:${c === 'X' ? ON : off}"></i>`).join('')}</span>`;
+  // ---- Iconos (icons.js; en la app, Segoe Fluent Icons) ----
+  const gl = (name, size = 's') => `<span class="gl gl-${size}">${window.PARPA_ICONS(name)}</span>`;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const two = n => String(n).padStart(2, '0');
   const mmss = s => `${Math.floor(s / 60)}:${two(Math.floor(s % 60))}`;
@@ -96,9 +76,9 @@
   const PAGES = ['home', 'clip', 'shelf', 'todo', 'notes', 'audio', 'quick'];
   const PAGE_GLYPH = { home: 'inicio', clip: 'copias', shelf: 'bandeja', todo: 'tareas', notes: 'notas', audio: 'sonido', quick: 'general', menu: 'menu' };
   const TRACKS = [
-    { title: 'LUZ DE NEÓN', artist: 'Parpa FM', len: 208, art: 'linear-gradient(135deg,#e5383b,#5b1622)' },
-    { title: 'PUNTOS SUSPENSIVOS', artist: 'Matriz', len: 187, art: 'linear-gradient(135deg,#2f7bf5,#14284f)' },
-    { title: 'ISLA', artist: 'Notch', len: 231, art: 'linear-gradient(135deg,#00a64f,#0d3a22)' },
+    { title: 'Luz de neón', artist: 'Parpa FM', len: 208, art: 'linear-gradient(135deg,#e5383b,#5b1622)' },
+    { title: 'Puntos suspensivos', artist: 'Matriz', len: 187, art: 'linear-gradient(135deg,#2f7bf5,#14284f)' },
+    { title: 'Isla', artist: 'Notch', len: 231, art: 'linear-gradient(135deg,#00a64f,#0d3a22)' },
   ];
 
   // ---- Estado ----
@@ -158,11 +138,11 @@
   // ---- Cerrado ----
   function idleView() {
     if (!S.mascot) return '<div class="c-idle"></div>';
-    return `<div class="c-idle"><div class="mascot" id="mascot">${'<i></i>'.repeat(65)}</div></div>`;
+    return `<div class="c-idle"><div class="mascot" id="mascot"><b></b><b></b></div></div>`;
   }
   const track = () => TRACKS[S.music.i];
   function musicView() {
-    return `<div class="c-row">${gl('musica')}<span class="c-label">${esc(track().title)} <span class="c-sub">${esc(track().artist.toUpperCase())}</span></span><div class="eq" id="eq">${'<i></i>'.repeat(5)}</div></div>`;
+    return `<div class="c-row">${gl('musica')}<span class="c-label">${esc(track().title)} <span class="c-sub">${esc(track().artist)}</span></span><div class="eq" id="eq">${'<i></i>'.repeat(5)}</div></div>`;
   }
   function peekView() {
     const p = S.peek;
@@ -173,8 +153,7 @@
   }
   function osdView() {
     const o = S.osd, value = o.kind === 'volume' ? S.volume : S.brightness;
-    const lit = Math.round(value / 100 * 16);
-    const bars = Array.from({ length: 16 }, (_, k) => `<i class="${k < lit ? 'on' : ''}" style="height:${4 + k * 0.75}px"></i>`).join('');
+    const bars = `<b style="width:${value}%"></b>`;
     return `<div class="osd">${gl(o.kind === 'volume' ? 'sonido' : 'brillo')}<div class="osd-t"><span class="c-label">${t(o.kind === 'volume' ? 'volume' : 'brightness')}</span><span>${t(o.kind === 'volume' ? 'speakers' : 'screen')}</span></div><div class="osd-bars">${bars}</div><span class="osd-v">${value}%</span></div>`;
   }
   // Lo que se arrastra decide las zonas (como DropActions en la app); la mitad bajo el ratón, cuál se usa.
@@ -213,11 +192,11 @@
   function homeView() {
     const m = S.music, tr = track();
     const music = m.playing || m.pos > 42 || m.i > 0
-      ? `<div class="m-top"><div class="m-art" style="--art:${tr.art}">${gl('musica', 'm')}</div><div class="m-txt"><span class="m-title">${esc(tr.title)}</span><span class="m-src">${esc(tr.artist.toUpperCase())}</span></div></div>
+      ? `<div class="m-top"><div class="m-art" style="--art:${tr.art}">${gl('musica', 'm')}</div><div class="m-txt"><span class="m-title">${esc(tr.title)}</span><span class="m-src">${esc(tr.artist)}</span></div></div>
          <div class="m-prog" id="mprog">${progDots()}</div>
-         <div class="m-ctl"><span id="mpos">${mmss(m.pos)}</span><span class="m-btns"><button data-act="prev">◂◂</button><button data-act="play">${m.playing ? '▮▮' : '▸'}</button><button data-act="next">▸▸</button></span><span>${mmss(tr.len)}</span></div>
+         <div class="m-ctl"><span id="mpos">${mmss(m.pos)}</span><span class="m-btns"><button data-act="prev" aria-label="prev">${CTL.prev}</button><button data-act="play" aria-label="play">${m.playing ? CTL.pause : CTL.play}</button><button data-act="next" aria-label="next">${CTL.next}</button></span><span>${mmss(tr.len)}</span></div>
          <div class="m-vol" data-wheel><span>${t('vol')}</span>${slider('app:0', 3, 8)}${valueOf('app:0')}</div>`
-      : `<span class="card-l">${t('music')}</span><div class="m-empty"><span>${t('nothing')}</span><span>${t('nothing_d')}</span></div><button class="np np-on" data-act="play">▸ PLAY</button>`;
+      : `<span class="card-l">${t('music')}</span><div class="m-empty"><span>${t('nothing')}</span><span>${t('nothing_d')}</span></div><button class="np np-on" data-act="play">${CTL.play} Play</button>`;
     return `<div class="open">${head(t('home'))}
       <div class="cards">
         <div class="card">${music}</div>
@@ -226,16 +205,21 @@
   }
   // CPU, GPU y RAM: en la app son las de tu PC; aquí, valores de ejemplo que se mueven cada segundo.
   function sysRows() {
-    const bar = v => `<span class="s-bar">${Array.from({ length: 10 }, (_, k) => `<i class="${k < Math.round(v / 10) ? 'on' : ''}"></i>`).join('')}</span>`;
+    const bar = v => `<span class="s-bar"><b style="width:${v}%"></b></span>`;
     return Object.entries(S.sys).map(([k, v]) => `<div class="s-row"><span>${k}</span>${bar(v)}<b>${v}%</b></div>`).join('');
   }
   function progDots() {
-    const n = 28, lit = Math.round(S.music.pos / track().len * n);
-    return Array.from({ length: n }, (_, k) => `<i class="${k < lit ? 'on' : ''}"></i>`).join('');
+    return `<b style="width:${(S.music.pos / track().len * 100).toFixed(1)}%"></b>`;
   }
+  const CTL = {
+    play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>',
+    pause: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="5.5" y="4" width="4.5" height="16" rx="1.5"/><rect x="14" y="4" width="4.5" height="16" rx="1.5"/></svg>',
+    prev: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 6v12L2.5 12zM21 6v12l-8.5-6z"/></svg>',
+    next: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6v12l8.5-6zM13 6v12l8.5-6z"/></svg>',
+  };
   const ago = at => {
     const min = Math.floor((Date.now() - at) / 60000);
-    return min < 1 ? t('now') : `${min} MIN`;
+    return min < 1 ? t('now') : `${min} min`;
   };
   function clipView() {
     const body = S.clip.length
@@ -246,14 +230,14 @@
   function shelfView() {
     const body = S.shelf.length
       ? `<div class="files">${S.shelf.slice(0, 8).map((f, k) => `<div class="file"><span class="file-ext">${esc(f.ext)}</span><span class="file-n">${esc(f.name)}</span><span class="file-s">${f.size}</span><button class="file-x" data-act="unshelf" data-i="${k}" aria-label="×">×</button></div>`).join('')}</div>`
-      : `<div class="empty" style="height:168px"><div class="mascot happy">${'<i></i>'.repeat(65)}</div><span class="empty-t">${t('shelf_empty')}</span><span class="empty-s">${t('shelf_empty2')}</span></div>`;
+      : `<div class="empty" style="height:168px"><div class="mascot happy"><b></b><b></b></div><span class="empty-t">${t('shelf_empty')}</span><span class="empty-s">${t('shelf_empty2')}</span></div>`;
     return `<div class="open">${head(t('shelf'), S.shelf.length ? `<span class="count">${two(S.shelf.length)}</span>` : '')}${body}</div>`;
   }
   function todoView() {
     const done = S.tasks.filter(x => x.done).length, all = S.tasks.length;
     const count = `<span class="count ${all && done === all ? 'green' : ''}">${done} / ${all}</span>`;
     const body = all && done === all
-      ? `<div class="empty" style="height:170px"><div class="mascot happy">${'<i></i>'.repeat(65)}</div><span class="allgood">${t('all_done')}</span></div>`
+      ? `<div class="empty" style="height:170px"><div class="mascot happy"><b></b><b></b></div><span class="allgood">${t('all_done')}</span></div>`
       : `<div class="list" style="height:170px">${S.tasks.map((x, k) => `<div class="row ${x.done ? 'done' : ''}" data-act="task" data-i="${k}"><span class="check"></span><span class="txt">${esc(x.text)}</span><span class="meta">${x.time}</span></div>`).join('')}</div>`;
     return `<div class="open">${head(t('todo'), count)}${body}<input class="input" data-keep="task" data-act-enter="add-task" placeholder="${t('new_task')}" maxlength="80"></div>`;
   }
@@ -263,7 +247,7 @@
       : `<div class="empty" style="height:112px"><span class="empty-t">${t('notes_empty')}</span><span class="empty-s">${t('notes_empty2')}</span></div>`;
     return `<div class="open">${head(t('notes'), `<span class="count">${two(S.notes.length)}</span>`)}<input class="input" data-keep="note" data-act-enter="add-note" placeholder="${t('note_ph')}" maxlength="120">${list}</div>`;
   }
-  const tileGl = (glyph, on) => gl(glyph, 's', 'transparent').replaceAll(ON, on ? '#0b0b0c' : ON);
+  const tileGl = glyph => gl(glyph, 'm');
   function quickView() {
     const tile = (key, glyph, on) => `<button class="tile ${on ? 'on' : ''}" data-act="tile" data-k="${key}">${tileGl(glyph, on)}<span>${t(key)}</span><span>${t(on ? 'on' : 'off')}</span></button>`;
     return `<div class="open">${head(t('quick'))}<div class="tiles">${tile('dnd', 'luna', S.dnd)}${tile('mascot', 'cara', S.mascot)}${tile('minimal', 'linea', S.minimal)}</div>
@@ -286,10 +270,7 @@
   const appOf = key => S.audio.apps[Number(key.split(':')[1])];
   const level = key => key === 'vol' ? S.volume : appOf(key).muted ? 0 : appOf(key).v;
   const valueOf = key => `<span data-val="${key}">${key !== 'vol' && appOf(key).muted ? t('muted') : level(key) + '%'}</span>`;
-  const barsHtml = (v, min, max) => Array.from({ length: BARS }, (_, k) => {
-    const on = k < Math.round(v / (100 / BARS));
-    return `<i class="${on ? 'on' : ''}" style="height:${on ? min + Math.round(k / (BARS - 1) * (max - min)) : min}px"></i>`;
-  }).join('');
+  const barsHtml = v => `<b style="width:${v}%"></b>`;
   const slider = (key, min, max) => `<div class="vbars" data-slider="${key}" data-min="${min}" data-max="${max}">${barsHtml(level(key), min, max)}</div>`;
   function setLevel(key, v) {
     v = Math.max(0, Math.min(100, Math.round(v / 5) * 5));
@@ -314,24 +295,18 @@
       return [p, Math.round(290 + Math.cos(a) * 192), Math.round(120 - Math.sin(a) * 94)];
     });
     return `<div class="launcher">${head(t('menu'))}
-      <button class="l-pill" data-act="page" data-p="home" aria-label="${t('home')}"><div class="mascot" id="lmascot">${'<i></i>'.repeat(65)}</div></button>
+      <button class="l-pill" data-act="page" data-p="home" aria-label="${t('home')}"><div class="mascot" id="lmascot"><b></b><b></b></div></button>
       ${bubbles.map(([p, x, y], k) => `<button class="bub" data-act="page" data-p="${p}" style="left:${x}px;top:${y}px;--dl:${40 + k * 30}ms;--fx:${(290 - x) * 0.7}px;--fy:${(132 - y) * 0.7}px" aria-label="${t(p)}">${gl(PAGE_GLYPH[p], 'm')}${p === 'clip' && S.clip.length ? `<span class="badge">${S.clip.length}</span>` : ''}<span class="bub-l">${t(p)}</span></button>`).join('')}
     </div>`;
   }
 
   // ---- Partes vivas (sin redibujar la vista) ----
   let tick = 0;
-  function eyes(grid, happy = false) {
-    if (!grid) return;
-    const blink = !happy && tick % 18 === 0, look = happy ? 0 : Math.sin(tick / 6) > 0.6 ? 1 : 0;
-    [...grid.children].forEach((dot, n) => {
-      const r = Math.floor(n / 13), c = n % 13;
-      // Contenta: ojos en "^" (arriba los dos centrales, debajo los de fuera).
-      const on = happy
-        ? [3, 8].some(x => (r === 1 && (c === x || c === x + 1)) || (r === 2 && (c === x - 1 || c === x + 2)))
-        : [3, 8].some(x => (c === x + look || c === x + 1 + look) && r >= 1 && r <= 3 && (!blink || r === 2));
-      dot.style.background = on ? ON : '#1b1b1e';
-    });
+  // La mascota: dos ojos que parpadean y miran a un lado (la contenta, en "^", está quieta).
+  function eyes(el, happy = false) {
+    if (!el || happy) return;
+    el.classList.toggle('blink', tick % 18 === 0);
+    el.classList.toggle('look', Math.sin(tick / 6) > 0.6);
   }
   function tickParts() {
     eyes(document.getElementById('mascot'));
@@ -584,7 +559,7 @@
       case 'music': S.music.playing = !S.music.playing; render(); break;
       case 'notify': {
         const [head, body, app] = T[lang].notify[S.notifyIndex++ % T[lang].notify.length];
-        showPeek({ glyph: head.startsWith('CAL') ? 'calendario' : 'mensaje', head, body, primary: t('open'), secondary: t('later'), respectDnd: true, onPrimary: () => flash(t('flash_open', { app: app.toUpperCase() })) });
+        showPeek({ glyph: /^cal/i.test(head) ? 'calendario' : 'mensaje', head, body, primary: t('open'), secondary: t('later'), respectDnd: true, onPrimary: () => flash(t('flash_open', { app })) });
         break;
       }
       case 'voldown': S.volume = Math.max(0, S.volume - 10); showOsd('volume'); break;

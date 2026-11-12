@@ -54,7 +54,7 @@ public sealed partial class QuickView : Grid, INotchPageView
         Grid.SetRow(bottom, 1);
         Children.Add(bottom);
 
-        var sounds = new Grid { Padding = new Thickness(12, 10, 12, 10), Background = Res<Brush>("CardBrush"), CornerRadius = new CornerRadius(14), ColumnSpacing = 12 };
+        var sounds = new Grid { Padding = new Thickness(12, 10, 12, 10), Background = Res<Brush>("CardBrush"), CornerRadius = new CornerRadius(20), ColumnSpacing = 12 };
         sounds.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         sounds.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         sounds.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -76,13 +76,12 @@ public sealed partial class QuickView : Grid, INotchPageView
         {
             Padding = new Thickness(14, 0, 14, 0),
             Background = Theme.Brush("primary"),
-            CornerRadius = new CornerRadius(14),
+            CornerRadius = new CornerRadius(20),
             Child = _allSettings,
         };
         _allSettings.FontFamily = Res<FontFamily>("FontMono");
-        _allSettings.FontSize = 10;
+        _allSettings.FontSize = 12;
         _allSettings.FontWeight = Microsoft.UI.Text.FontWeights.Medium;
-        _allSettings.CharacterSpacing = 100;
         _allSettings.Foreground = Theme.Brush("bg");
         _allSettings.VerticalAlignment = VerticalAlignment.Center;
         allSettings.Tapped += (_, e) =>
@@ -151,8 +150,7 @@ public sealed partial class QuickView : Grid, INotchPageView
         {
             Text = state is null ? "—" : Loc.Get(on ? "quick_on" : "quick_off"),
             FontFamily = Res<FontFamily>("FontMono"),
-            FontSize = 9,
-            CharacterSpacing = 80,
+            FontSize = 11,
             Foreground = fg,
             Opacity = 0.7,
             HorizontalAlignment = HorizontalAlignment.Right,
@@ -181,7 +179,7 @@ public sealed partial class QuickView : Grid, INotchPageView
         var tile = Motion.SmoothBackground(new Border
         {
             Padding = new Thickness(12, 10, 12, 10),
-            CornerRadius = new CornerRadius(14),
+            CornerRadius = new CornerRadius(20),
             Background = on ? Theme.Brush("primary") : Res<Brush>("CardBrush"),
             Opacity = state is null ? 0.45 : 1,
             Child = content,

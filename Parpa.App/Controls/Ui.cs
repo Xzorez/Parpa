@@ -10,7 +10,7 @@ public static class Ui
 {
     public static FontFamily Font(string key) => (FontFamily)Application.Current.Resources[key];
 
-    /// <summary>Geist (texto).</summary>
+    /// <summary>Segoe UI Variable (texto).</summary>
     public static TextBlock Text(string text, double size, string color = "primary", bool semibold = false) => new()
     {
         Text = text,
@@ -21,25 +21,30 @@ public static class Ui
         TextWrapping = TextWrapping.Wrap,
     };
 
-    /// <summary>Geist Mono (etiquetas en mayúsculas), tracking en milésimas de em.</summary>
+    /// <summary>
+    /// Etiqueta corta (antes Geist Mono en mayúsculas). En el estilo isla es texto tipo frase algo mayor,
+    /// sin tracking; <paramref name="tracking"/> se conserva por compatibilidad y no se usa.
+    /// </summary>
     public static TextBlock Mono(string text, double size, string color = "secondary", int tracking = 80, bool medium = false) => new()
     {
         Text = text,
         FontFamily = Font("FontMono"),
-        FontSize = size,
-        CharacterSpacing = tracking,
-        FontWeight = medium ? Microsoft.UI.Text.FontWeights.Medium : Microsoft.UI.Text.FontWeights.Normal,
+        FontSize = LabelSize(size),
+        FontWeight = medium ? Microsoft.UI.Text.FontWeights.SemiBold : Microsoft.UI.Text.FontWeights.Normal,
         Foreground = Theme.Brush(color),
         VerticalAlignment = VerticalAlignment.Center,
     };
 
-    /// <summary>Doto (números).</summary>
+    /// <summary>Tamaño de etiqueta: las de 9–11 px en mono pasan a 11–13 px en Segoe UI.</summary>
+    public static double LabelSize(double monoSize) => monoSize <= 11 ? monoSize + 2 : monoSize + 1;
+
+    /// <summary>Números grandes (antes Doto): Segoe UI Variable Display semibold.</summary>
     public static TextBlock Doto(string text, double size, bool black = false, string color = "primary") => new()
     {
         Text = text,
         FontFamily = Font("FontDisplay"),
         FontSize = size,
-        FontWeight = black ? Microsoft.UI.Text.FontWeights.Black : Microsoft.UI.Text.FontWeights.Bold,
+        FontWeight = black ? Microsoft.UI.Text.FontWeights.Bold : Microsoft.UI.Text.FontWeights.SemiBold,
         Foreground = Theme.Brush(color),
         VerticalAlignment = VerticalAlignment.Center,
     };
@@ -47,8 +52,27 @@ public static class Ui
     public static SolidColorBrush Clear => new(Microsoft.UI.Colors.Transparent);
 
     /// <summary>
-    /// Control segmentado: fondo #0b0b0c, padding 3, radio 8, gap 2; opciones mono 500 10 px,
-    /// padding 6×10, radio 5; la elegida en claro.
+    /// Color de cada ventana del notch, como los iconos de app (menú de burbujas, cabecera):
+    /// portapapeles ámbar, bandeja azul, tareas verde, notas amarillo, audio rosa, ajustes gris.
+    /// </summary>
+    public static Windows.UI.Color PageColor(string pageId) => pageId switch
+    {
+        "home" => Tokens.ParseHex("#5e5ce6"),
+        "clip" => Tokens.ParseHex("#ff9f0a"),
+        "shelf" => Tokens.ParseHex("#0a84ff"),
+        "todo" => Tokens.ParseHex("#30d158"),
+        "notes" => Tokens.ParseHex("#ffd60a"),
+        "audio" => Tokens.ParseHex("#ff375f"),
+        _ => Tokens.ParseHex("#8e8e93"),
+    };
+
+    /// <summary>Icono sobre <see cref="PageColor"/>: negro en las claras (notas), blanco en el resto.</summary>
+    public static Windows.UI.Color PageInk(string pageId) =>
+        pageId == "notes" ? Microsoft.UI.Colors.Black : Microsoft.UI.Colors.White;
+
+    /// <summary>
+    /// Control segmentado en píldora: fondo gris oscuro, padding 3, gap 2; opciones semibold,
+    /// la elegida en claro.
     /// </summary>
     public static StackPanel Segmented<T>(IEnumerable<(T Value, string Label)> options, T current, Action<T> pick, double padX = 10, double padY = 6)
     {
@@ -57,8 +81,8 @@ public static class Ui
             Orientation = Orientation.Horizontal,
             Spacing = 2,
             Padding = new Thickness(3),
-            Background = Theme.Brush("bg"),
-            CornerRadius = new CornerRadius(8),
+            Background = Theme.Brush("divider"),
+            CornerRadius = new CornerRadius(999),
             VerticalAlignment = VerticalAlignment.Center,
         };
         var views = new List<(Border Option, TextBlock Text)>();
@@ -68,8 +92,8 @@ public static class Ui
             var text = Mono(label, 10, selected ? "bg" : "secondary", 60, medium: true);
             var option = Motion.SmoothBackground(new Border
             {
-                Padding = new Thickness(padX, padY, padX, padY),
-                CornerRadius = new CornerRadius(5),
+                Padding = new Thickness(padX + 2, padY - 1, padX + 2, padY - 1),
+                CornerRadius = new CornerRadius(999),
                 Background = selected ? Theme.Brush("primary") : Clear,
                 Child = text,
             });

@@ -6,7 +6,8 @@
     Width="420"
     Height="112">
 
-    <!-- Aviso: padding 10 16 12, gap 8. Cabecera + cuerpo con dos botones + barra de tiempo restante. -->
+    <!-- Aviso (estilo isla): icono de app en baldosa de color + cabecera, cuerpo con dos botones píldora y
+         una línea con el tiempo restante. -->
     <StackPanel Padding="16,10,16,12" Spacing="8">
         <Grid ColumnSpacing="10">
             <Grid.ColumnDefinitions>
@@ -14,27 +15,35 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <c:DotMatrix
-                x:Name="PeekGlyph"
+            <Border
+                x:Name="PeekTile"
+                Width="24"
+                Height="24"
                 VerticalAlignment="Center"
-                OffBrush="{StaticResource GlyphOffBrush}" />
+                CornerRadius="7">
+                <c:DotMatrix
+                    x:Name="PeekGlyph"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    DotSize="1.6"
+                    Gap="0.8" />
+            </Border>
             <TextBlock
                 x:Name="Head"
                 Grid.Column="1"
                 VerticalAlignment="Center"
-                CharacterSpacing="100"
-                FontFamily="{StaticResource FontMono}"
-                FontSize="10"
-                FontWeight="Medium"
-                Foreground="{StaticResource SecondaryBrush}"
+                FontFamily="{StaticResource FontUi}"
+                FontSize="13"
+                FontWeight="SemiBold"
+                Foreground="{StaticResource PrimaryBrush}"
                 TextTrimming="CharacterEllipsis" />
             <TextBlock
                 x:Name="When"
                 Grid.Column="2"
                 VerticalAlignment="Center"
-                FontFamily="{StaticResource FontMono}"
-                FontSize="10"
-                Foreground="{StaticResource QuaternaryBrush}" />
+                FontFamily="{StaticResource FontUi}"
+                FontSize="12"
+                Foreground="{StaticResource MutedBrush}" />
         </Grid>
 
         <Grid ColumnSpacing="12">
@@ -62,47 +71,43 @@
                 <!-- Secundario: borde #2a2a2e. Principal: fondo claro. Píldoras mono 500 10 px, padding 6×10. -->
                 <Border
                     x:Name="SecondaryButton"
-                    Padding="10,6"
-                    Background="Transparent"
-                    BorderBrush="{StaticResource BorderBrush}"
-                    BorderThickness="1"
+                    Padding="14,7"
+                    Background="{StaticResource BorderBrush}"
                     c:Pill.IsPill="True"
                     PointerEntered="SecondaryButton_PointerEntered"
                     PointerExited="SecondaryButton_PointerExited"
                     Tapped="SecondaryButton_Tapped">
                     <TextBlock
                         x:Name="SecondaryLabel"
-                        CharacterSpacing="60"
-                        FontFamily="{StaticResource FontMono}"
-                        FontSize="10"
-                        FontWeight="Medium" />
+                        FontFamily="{StaticResource FontUi}"
+                        FontSize="12"
+                        FontWeight="SemiBold" />
                 </Border>
                 <Border
                     x:Name="PrimaryButton"
-                    Padding="10,6"
+                    Padding="14,7"
                     c:Pill.IsPill="True"
                     PointerEntered="PrimaryButton_PointerEntered"
                     PointerExited="PrimaryButton_PointerExited"
                     Tapped="PrimaryButton_Tapped">
                     <TextBlock
                         x:Name="PrimaryLabel"
-                        CharacterSpacing="60"
-                        FontFamily="{StaticResource FontMono}"
-                        FontSize="10"
-                        FontWeight="Medium"
+                        FontFamily="{StaticResource FontUi}"
+                        FontSize="12"
+                        FontWeight="SemiBold"
                         Foreground="{StaticResource BgBrush}" />
                 </Border>
             </StackPanel>
         </Grid>
 
-        <!-- 30 puntos de 2 px: tiempo restante del aviso. -->
+        <!-- Tiempo restante del aviso: línea redondeada que se acorta. -->
         <c:DotMatrix
             x:Name="TimeBar"
             Columns="30"
             Rows="1"
-            DotSize="2"
-            Gap="2"
-            OnBrush="{StaticResource TertiaryBrush}"
-            OffBrush="{StaticResource GlyphOffBrush}" />
+            DotSize="3"
+            Gap="1"
+            Merge="Blobs"
+            OnBrush="{StaticResource BorderBrush}" />
     </StackPanel>
 </UserControl>

@@ -14,7 +14,7 @@
         <Grid
             Padding="12,10"
             Background="{StaticResource CardBrush}"
-            CornerRadius="14"
+            CornerRadius="20"
             RowSpacing="8">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -30,9 +30,8 @@
                 <TextBlock
                     x:Name="SaveHint"
                     VerticalAlignment="Center"
-                    CharacterSpacing="80"
                     FontFamily="{StaticResource FontMono}"
-                    FontSize="9"
+                    FontSize="11"
                     Foreground="{StaticResource TertiaryBrush}" />
                 <c:PillButton
                     x:Name="SaveButton"
@@ -72,7 +71,7 @@
             Grid.Column="1"
             Padding="12,10"
             Background="{StaticResource CardBrush}"
-            CornerRadius="14"
+            CornerRadius="20"
             RowSpacing="8"
             Visibility="Collapsed">
             <Grid.RowDefinitions>
@@ -86,7 +85,7 @@
                     x:Name="NoteTime"
                     HorizontalAlignment="Right"
                     FontFamily="{StaticResource FontMono}"
-                    FontSize="9"
+                    FontSize="11"
                     Foreground="{StaticResource QuaternaryBrush}" />
             </Grid>
             <ScrollViewer Grid.Row="1" HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Hidden">

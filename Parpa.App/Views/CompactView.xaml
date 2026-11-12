@@ -5,8 +5,8 @@
     xmlns:c="using:Parpa.Controls"
     Height="34">
 
-    <!-- Compacto: padding 0 14 2 12, gap 10. Glifo 7×7 + etiqueta (y subetiqueta) + elemento derecho. -->
-    <Grid Padding="12,0,14,2" ColumnSpacing="10">
+    <!-- Compacto (estilo isla): icono + título (y artista) + elemento derecho, gap 10. -->
+    <Grid Padding="14,0,16,2" ColumnSpacing="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
@@ -24,15 +24,14 @@
             x:Name="Label"
             Grid.Column="1"
             VerticalAlignment="Center"
-            CharacterSpacing="60"
-            FontFamily="{StaticResource FontMono}"
-            FontSize="11"
-            FontWeight="Medium"
+            FontFamily="{StaticResource FontUi}"
+            FontSize="13"
+            FontWeight="SemiBold"
             Foreground="{StaticResource PrimaryBrush}"
             TextTrimming="CharacterEllipsis"
             TextWrapping="NoWrap">
             <Run x:Name="LabelMain" />
-            <Run x:Name="LabelSub" Foreground="{StaticResource QuaternaryBrush}" />
+            <Run x:Name="LabelSub" FontWeight="Normal" Foreground="{StaticResource MutedBrush}" />
         </TextBlock>
 
         <!-- Luna de No molestar junto a la actividad. -->
@@ -44,15 +43,14 @@
             OnBrush="{StaticResource SecondaryBrush}"
             Visibility="Collapsed" />
 
-        <!-- Temporizadores (foco…): Doto 700 16 px, tracking .02em. -->
+        <!-- Temporizadores (foco…): Segoe UI Variable Display semibold 15 px. -->
         <TextBlock
             x:Name="RightText"
             Grid.Column="3"
             VerticalAlignment="Center"
-            CharacterSpacing="20"
             FontFamily="{StaticResource FontDisplay}"
-            FontSize="16"
-            FontWeight="Bold"
+            FontSize="15"
+            FontWeight="SemiBold"
             Foreground="{StaticResource PrimaryBrush}"
             Visibility="Collapsed" />
 
@@ -65,16 +63,15 @@
             VerticalAlignment="Center"
             Visibility="Collapsed" />
 
-        <!-- Ecualizador: 5 columnas × 4 filas, puntos 2 px, gap 1,5. Tick 100 ms; se congela en pausa. -->
+        <!-- Ecualizador: 5 barras redondeadas de 3 px que suben y bajan. Tick 100 ms; se congela en pausa. -->
         <c:DotMatrix
             x:Name="Equalizer"
             Grid.Column="3"
             VerticalAlignment="Center"
             Columns="5"
             Rows="4"
-            DotSize="2"
-            Gap="1.5"
-            OnBrush="{StaticResource PrimaryBrush}"
-            OffBrush="{StaticResource GlyphOffBrush}" />
+            DotSize="3"
+            Gap="2"
+            Merge="Columns" />
     </Grid>
 </UserControl>

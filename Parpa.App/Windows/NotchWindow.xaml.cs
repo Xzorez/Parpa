@@ -245,7 +245,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
             SizeToken: "mic",
             Glyph: state.Mic ? "micro" : "ojo",
             Label: Loc.Get(state.Mic && state.Camera ? "compact_mic_cam" : state.Mic ? "compact_mic" : "compact_camera"),
-            Sub: state.App.ToUpperInvariant(),
+            Sub: state.App,
             IsPlaying: false,
             Live: true));
     }

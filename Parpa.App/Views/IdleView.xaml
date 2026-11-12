@@ -6,7 +6,7 @@
     Width="120"
     Height="34">
 
-    <!-- Reposo: mascota 13×5 (puntos 3 px, gap 1,5) o reloj Doto 700 16 px; luna si No molestar. Gap 10. -->
+    <!-- Reposo: ojos de la mascota (píldoras redondeadas) o reloj; luna si No molestar. Gap 10. -->
     <StackPanel
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
@@ -14,19 +14,19 @@
         Spacing="10">
         <c:DotMatrix
             x:Name="Mascot"
+            Merge="Blobs"
             VerticalAlignment="Center"
             Columns="13"
             Rows="5"
             DotSize="3"
             Gap="1.5"
-            OnBrush="{StaticResource PrimaryBrush}"
-            OffBrush="{StaticResource MatrixOffBrush}" />
+            OnBrush="{StaticResource PrimaryBrush}" />
         <TextBlock
             x:Name="Clock"
             VerticalAlignment="Center"
             FontFamily="{StaticResource FontDisplay}"
-            FontSize="16"
-            FontWeight="Bold"
+            FontSize="15"
+            FontWeight="SemiBold"
             Foreground="{StaticResource PrimaryBrush}"
             Visibility="Collapsed" />
         <c:DotMatrix

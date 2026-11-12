@@ -36,9 +36,8 @@ public sealed partial class DropView : UserControl
             var label = new TextBlock
             {
                 Text = Loc.Get(key),
-                CharacterSpacing = 120,
                 FontFamily = Res<FontFamily>("FontMono"),
-                FontSize = 10,
+                FontSize = 12,
                 FontWeight = Microsoft.UI.Text.FontWeights.Medium,
             };
             var content = new StackPanel { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, Orientation = Orientation.Horizontal, Spacing = 10 };

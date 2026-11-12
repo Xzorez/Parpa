@@ -12,14 +12,14 @@ namespace Parpa.Views;
 
 public sealed partial class HomeView : UserControl, INotchPageView
 {
-    private const int SystemDots = 12;
     private static readonly string[] SystemKeys = ["CPU", "GPU", "RAM"];
+    private static readonly string[] SystemColors = ["verde", "azul", "ambar"];
 
     private readonly NotchServices _app;
     private readonly SystemStats _stats = new();
     private readonly DispatcherQueueTimer _progressTimer;
-    private readonly List<(TextBlock Label, DotMatrix Dots, TextBlock Value)> _systemRows = new();
-    private readonly BarSlider _musicVolume = new(20, 4, 4, 9, spacing: 2);
+    private readonly List<Ring> _systemRings = new();
+    private readonly BarSlider _musicVolume = new(20, 4, 4, 5, spacing: 2);
     private AppVolume? _musicApp;
     private object? _artworkFor;
     private bool _shown;
@@ -29,6 +29,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
         _app = app;
         InitializeComponent();
         foreach (var control in new FrameworkElement[] { PreviousButton, PlayPauseButton, NextButton }) Motion.PressFeedback(control);
+        ArtworkGlow.OpacityTransition = new ScalarTransition { Duration = TimeSpan.FromMilliseconds(450) };
 
         _progressTimer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         _progressTimer.Interval = TimeSpan.FromSeconds(1);
@@ -47,34 +48,24 @@ public sealed partial class HomeView : UserControl, INotchPageView
             MusicVolumeValue.Text = $"{percent}%";
         };
 
-        foreach (var key in SystemKeys)
+        // Anillos de CPU (verde), GPU (azul) y RAM (ámbar), repartidos a lo ancho con su nombre debajo.
+        for (var i = 0; i < SystemKeys.Length; i++)
         {
-            var row = new Grid { ColumnSpacing = 8 };
-            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(28) });
-            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            var label = new TextBlock { Style = (Style)Application.Current.Resources["RowMeta"], Text = key };
-            var dots = new DotMatrix
+            SystemRows.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            var ring = new Ring(48, 5, AccentByName(SystemColors[i]), Theme.Brush("border"));
+            var item = new StackPanel { Spacing = 5, HorizontalAlignment = HorizontalAlignment.Center };
+            item.Children.Add(ring);
+            item.Children.Add(new TextBlock
             {
-                Columns = SystemDots, Rows = 1, DotSize = 3, Gap = 2, VerticalAlignment = VerticalAlignment.Center,
-                OnBrush = Theme.Brush("primary"), OffBrush = Theme.Brush("border"),
-            };
-            var value = new TextBlock
-            {
-                FontFamily = Res<FontFamily>("FontDisplay"), FontSize = 13, FontWeight = Microsoft.UI.Text.FontWeights.Bold,
-                Foreground = Res<Brush>("PrimaryBrush"), VerticalAlignment = VerticalAlignment.Center,
-            };
-            Grid.SetColumn(dots, 1);
-            Grid.SetColumn(value, 2);
-            row.Children.Add(label);
-            row.Children.Add(dots);
-            row.Children.Add(value);
-            SystemRows.Children.Add(row);
-            _systemRows.Add((label, dots, value));
+                Text = SystemKeys[i], FontFamily = Res<FontFamily>("FontUi"), FontSize = 11,
+                Foreground = Res<Brush>("SecondaryBrush"), HorizontalAlignment = HorizontalAlignment.Center,
+            });
+            Grid.SetColumn(item, i);
+            SystemRows.Children.Add(item);
+            _systemRings.Add(ring);
         }
 
-        MusicProgress.SizeChanged += (_, _) => FitProgress();
-        Cards.SizeChanged += (_, _) => FitProgress();
+        MusicProgress.SizeChanged += (_, _) => DrawProgress();
 
         app.System.Media.CardChanged += () => { if (_shown) RenderMusic(); };
         _stats.Changed += () => { if (_shown) RenderSystem(); };
@@ -83,6 +74,15 @@ public sealed partial class HomeView : UserControl, INotchPageView
     }
 
     private static T Res<T>(string key) => (T)Application.Current.Resources[key];
+
+    /// <summary>Color de acento por nombre de tokens.json (rojo, ambar, verde, azul).</summary>
+    private static Color AccentByName(string name) => name switch
+    {
+        "rojo" => Tokens.Current.Accent(0),
+        "ambar" => Tokens.Current.Accent(1),
+        "verde" => Tokens.Current.Accent(2),
+        _ => Tokens.Current.Accent(3),
+    };
 
     /// <summary>Tarjetas (o la tarjeta de permiso) entran escalonadas.</summary>
     public IEnumerable<UIElement> EntranceItems =>
@@ -155,9 +155,9 @@ public sealed partial class HomeView : UserControl, INotchPageView
         }
 
         MusicTitle.Text = card.Title.Length > 0 ? card.Title : Loc.Get("home_music");
-        MusicApp.Text = Loc.Upper(card.App);
+        MusicApp.Text = card.Artist is { Length: > 0 } artist ? $"{artist} · {card.App}" : card.App;
         ToolTipService.SetToolTip(MusicTitle, string.IsNullOrEmpty(card.Artist) ? card.Title : $"{card.Title} · {card.Artist}");
-        PlayPauseButton.Text = card.IsPlaying ? "▮▮" : "▶";
+        PlayPauseButton.Text = card.IsPlaying ? "" : "";
         _ = LoadArtworkAsync(card);
         DrawProgress();
         RenderMusicVolume();
@@ -172,29 +172,34 @@ public sealed partial class HomeView : UserControl, INotchPageView
         if (card.Thumbnail is null)
         {
             Artwork.Source = null;
+            ArtworkGlow.Opacity = 0;
             return;
         }
         try
         {
-            using var stream = await card.Thumbnail.OpenReadAsync();
+            var art = await ArtColor.LoadAsync(card.Thumbnail);
+            if (!ReferenceEquals(_artworkFor, card.Thumbnail)) return;
+            if (art is null) throw new InvalidOperationException("sin carátula");
+            using var memory = new Windows.Storage.Streams.InMemoryRandomAccessStream();
+            await memory.WriteAsync(System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.AsBuffer(art.Bytes));
+            memory.Seek(0);
             var image = new BitmapImage { DecodePixelWidth = 96 };
-            await image.SetSourceAsync(stream);
-            if (ReferenceEquals(_artworkFor, card.Thumbnail)) Artwork.Source = image;
+            await image.SetSourceAsync(memory);
+            if (!ReferenceEquals(_artworkFor, card.Thumbnail)) return;
+            Artwork.Source = image;
+            // Resplandor del color de la carátula detrás (como el iPhone): da profundidad a la tarjeta.
+            if (art.Color is { } color)
+            {
+                ArtworkGlow.Background = ArtColor.GlowBrush(color);
+                ArtworkGlow.Opacity = 1;
+            }
+            else ArtworkGlow.Opacity = 0;
         }
         catch (Exception)
         {
-            Artwork.Source = null; // carátula no disponible: queda el fondo de puntos
+            Artwork.Source = null; // carátula no disponible: queda el icono de nota
+            ArtworkGlow.Opacity = 0;
         }
-    }
-
-    /// <summary>Tantos puntos de 4 px (gap 3) como quepan en el ancho de la tarjeta.</summary>
-    private void FitProgress()
-    {
-        var width = MusicFilled.ActualWidth - MusicFilled.Padding.Left - MusicFilled.Padding.Right;
-        if (width <= 0) return;
-        var columns = Math.Max(4, (int)((width + 3) / 7));
-        if (MusicProgress.Columns != columns) MusicProgress.Columns = columns;
-        DrawProgress();
     }
 
     private void DrawProgress()
@@ -202,10 +207,9 @@ public sealed partial class HomeView : UserControl, INotchPageView
         if (_app.System.Media.Card is not { } card) return;
         var position = card.PositionNow;
         var fraction = card.Duration > TimeSpan.Zero ? position / card.Duration : 0;
-        var filled = (int)Math.Round(Math.Clamp(fraction, 0, 1) * MusicProgress.Columns);
-        MusicProgress.Cells = Enumerable.Range(0, MusicProgress.Columns).Select(i => i < filled).ToArray();
+        MusicProgressFill.Width = Math.Clamp(fraction, 0, 1) * MusicProgress.ActualWidth;
         MusicPosition.Text = card.Duration > TimeSpan.Zero ? FormatTime(position) : string.Empty;
-        MusicDuration.Text = card.Duration > TimeSpan.Zero ? FormatTime(card.Duration) : string.Empty;
+        MusicDuration.Text = card.Duration > TimeSpan.Zero ? "−" + FormatTime(card.Duration - position < TimeSpan.Zero ? TimeSpan.Zero : card.Duration - position) : string.Empty;
     }
 
     private static string FormatTime(TimeSpan time) =>
@@ -253,13 +257,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
         SetRow(2, ram);
     }
 
-    private void SetRow(int index, int? percent)
-    {
-        var (_, dots, value) = _systemRows[index];
-        var filled = percent is { } p ? (int)Math.Round(p / 100.0 * SystemDots) : 0;
-        dots.Cells = Enumerable.Range(0, SystemDots).Select(i => i < filled).ToArray();
-        value.Text = percent is { } v ? $"{v}%" : "—";
-    }
+    private void SetRow(int index, int? percent) => _systemRings[index].Set(percent);
 
     // ---- PRÓXIMA TAREA ----
 

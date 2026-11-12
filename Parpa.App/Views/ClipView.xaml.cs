@@ -93,9 +93,8 @@ public sealed partial class ClipView : UserControl, INotchPageView
     {
         Text = text,
         FontFamily = Res<FontFamily>("FontMono"),
-        FontSize = 10,
+        FontSize = 12,
         FontWeight = Microsoft.UI.Text.FontWeights.Medium,
-        CharacterSpacing = 80,
         Foreground = Res<Brush>("SoftBrush"),
         VerticalAlignment = VerticalAlignment.Center,
     };
@@ -110,7 +109,7 @@ public sealed partial class ClipView : UserControl, INotchPageView
         {
             Text = key,
             FontFamily = Res<FontFamily>("FontMono"),
-            FontSize = 10,
+            FontSize = 12,
             FontWeight = Microsoft.UI.Text.FontWeights.Medium,
             Foreground = Res<Brush>("PrimaryBrush"),
         },

@@ -197,6 +197,7 @@ public sealed class MediaService
         {
             Card = cardInfo;
             CardChanged?.Invoke();
+            _ = ArtColor.FromAsync(cardInfo?.Thumbnail); // color de la carátula para el ecualizador y el resplandor
         }
 
         if (playing is null)

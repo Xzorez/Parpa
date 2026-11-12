@@ -8,30 +8,34 @@ using Parpa.Services;
 namespace Parpa.Controls;
 
 /// <summary>
-/// Interruptor del diseño: pista redondeada (#f2f2f0 encendido / #2a2a2e apagado) con perilla
-/// (#0b0b0c / #8d8d92). Ajustes: 40×22 y perilla 14; menú de bandeja: 30×16 y perilla 10.
-/// La perilla se desliza con rebote (<c>cubic-bezier(.3,1.4,.5,1)</c>, 0,2 s) y la pista cambia de color con transición.
+/// Interruptor estilo iOS: pista redondeada verde encendida / gris apagada y perilla blanca casi del alto
+/// de la pista (se ignora el tamaño de perilla pedido: alto − 4). La perilla se desliza con rebote y la pista
+/// cambia de color con transición.
 /// </summary>
 public static class SwitchVisual
 {
     private sealed record State(Ellipse Knob, double Travel);
 
+    private static Microsoft.UI.Xaml.Media.SolidColorBrush Track(bool on) =>
+        on ? new Microsoft.UI.Xaml.Media.SolidColorBrush(Tokens.Current.Accent(2)) : Theme.Brush("border");
+
     public static Grid Create(bool on, double width, double height, double knob)
     {
+        knob = height - 4;
         var inset = (height - knob) / 2;
         var track = Motion.SmoothBackground(new Grid
         {
             Width = width,
             Height = height,
             CornerRadius = new CornerRadius(height / 2),
-            Background = Theme.Brush(on ? "primary" : "border"),
+            Background = Track(on),
             VerticalAlignment = VerticalAlignment.Center,
         });
         var dot = new Ellipse
         {
             Width = knob,
             Height = knob,
-            Fill = Theme.Brush(on ? "bg" : "secondary"),
+            Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White),
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Top,
             Margin = new Thickness(inset, inset, 0, 0),
@@ -52,8 +56,7 @@ public static class SwitchVisual
     public static void Flip(Grid track, bool on)
     {
         if (track.Tag is not State state) return;
-        track.Background = Theme.Brush(on ? "primary" : "border");
-        state.Knob.Fill = Theme.Brush(on ? "bg" : "secondary");
+        track.Background = Track(on);
         ElementCompositionPreview.GetElementVisual(state.Knob).Properties
             .InsertVector3("Translation", new Vector3(on ? (float)state.Travel : 0, 0, 0));
     }

@@ -28,11 +28,11 @@ public sealed class SettingsWindow : Window
     private readonly ParpaSettings _s = SettingsService.Current.S;
     private readonly StackPanel _nav = new() { Spacing = 4 };
     private readonly StackPanel _content = new() { Spacing = 18 };
-    private readonly TextBlock _title = Ui.Text(string.Empty, 22, semibold: true);
+    private readonly TextBlock _title = Ui.Text(string.Empty, 26, semibold: true);
     private readonly TextBlock _toast = Ui.Mono(string.Empty, 10, tracking: 80);
     private readonly TextBox _search = new();
     private readonly TextBlock _windowTitle = Ui.Text(string.Empty, 12);
-    private readonly TextBlock _brand = Ui.Doto(string.Empty, 16);
+    private readonly TextBlock _brand = Ui.Text(string.Empty, 15, semibold: true);
     private readonly TextBlock _version = Ui.Mono(string.Empty, 9, "tertiary");
     private readonly DispatcherTimerLite _toastTimer;
     private string _section = "general";
@@ -128,11 +128,11 @@ public sealed class SettingsWindow : Window
         root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
         // Barra de título 40 px: mascota + "Ajustes".
-        var titleBar = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, Padding = new Thickness(16, 0, 0, 0), Background = Theme.Brush("bg") };
+        var titleBar = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, Padding = new Thickness(16, 0, 0, 0), Background = Theme.Brush("sideBg") };
         var logo = new DotMatrix
         {
-            Columns = MascotFrames.Columns, Rows = MascotFrames.Rows, DotSize = 2, Gap = 1, VerticalAlignment = VerticalAlignment.Center,
-            OnBrush = Theme.Brush("primary"), OffBrush = Theme.Brush("glyphOff"), Cells = MascotFrames.Awake(),
+            Columns = MascotFrames.Columns, Rows = MascotFrames.Rows, Merge = DotMerge.Blobs, DotSize = 2, Gap = 1, VerticalAlignment = VerticalAlignment.Center,
+            OnBrush = Theme.Brush("primary"), Cells = MascotFrames.Awake(),
         };
         _windowTitle.VerticalAlignment = VerticalAlignment.Center;
         _windowTitle.FontWeight = Microsoft.UI.Text.FontWeights.Medium;
@@ -148,24 +148,32 @@ public sealed class SettingsWindow : Window
         root.Children.Add(body);
 
         // Lateral: buscador, secciones y la marca abajo.
-        var side = new Grid { Background = Theme.Brush("bg"), Padding = new Thickness(12, 8, 12, 16) };
+        var side = new Grid { Background = Theme.Brush("sideBg"), Padding = new Thickness(12, 8, 12, 16) };
         side.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         side.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
         side.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         _search.Style = (Style)Application.Current.Resources["BareTextBox"];
-        _search.FontSize = 12;
-        _search.Padding = new Thickness(10, 8, 10, 8);
+        _search.FontSize = 13;
+        _search.Padding = new Thickness(0, 8, 10, 8);
         _search.MinHeight = 0;
         _search.TextChanged += (_, _) => Render();
-        // Buscador: fondo #151517, borde #1e1e21, radio 8, padding 8 10.
+        // Buscador estilo iOS: lupa + campo sobre gris, radio 10.
+        var searchRow = new Grid { ColumnSpacing = 8, Padding = new Thickness(10, 0, 0, 0) };
+        searchRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        searchRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        searchRow.Children.Add(new TextBlock
+        {
+            Text = "", FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets"), FontSize = 12,
+            Foreground = Theme.Brush("muted"), VerticalAlignment = VerticalAlignment.Center,
+        });
+        Grid.SetColumn(_search, 1);
+        searchRow.Children.Add(_search);
         var searchBox = new Border
         {
             Background = Theme.Brush("card"),
-            BorderBrush = Theme.Brush("divider"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
-            Margin = new Thickness(0, 0, 0, 10),
-            Child = _search,
+            CornerRadius = new CornerRadius(10),
+            Margin = new Thickness(0, 0, 0, 12),
+            Child = searchRow,
         };
         side.Children.Add(searchBox);
         Grid.SetRow(_nav, 1);
@@ -183,7 +191,7 @@ public sealed class SettingsWindow : Window
         _toast.HorizontalAlignment = HorizontalAlignment.Right;
         _toast.Foreground = new SolidColorBrush(Tokens.Current.Success);
         header.Children.Add(_toast);
-        var page = new StackPanel { Spacing = 18, Padding = new Thickness(32, 22, 32, 32) };
+        var page = new StackPanel { Spacing = 16, Padding = new Thickness(32, 22, 32, 32) };
         page.Children.Add(header);
         page.Children.Add(_content);
         var scroll = new ScrollViewer { Content = page, HorizontalScrollMode = ScrollMode.Disabled, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
@@ -214,18 +222,33 @@ public sealed class SettingsWindow : Window
             foreach (var (id, key, _) in Sections)
                 foreach (var row in RowsFor(id).OfType<Row>())
                     if ($"{row.Label} {row.Desc}".Contains(query, StringComparison.CurrentCultureIgnoreCase))
-                        rows.Children.Add(RowView(row, Loc.Upper(Loc.Get(key))));
-            if (rows.Children.Count == 0) rows.Children.Add(new Border { Padding = new Thickness(0, 30, 0, 30), Child = Ui.Mono(Loc.Get("settings_no_results"), 11, "tertiary") });
-            _content.Children.Add(rows);
+                        rows.Children.Add(RowView(row, Loc.Get(key), rows.Children.Count == 0));
+            if (rows.Children.Count == 0) _content.Children.Add(new Border { Padding = new Thickness(0, 30, 0, 30), Child = Ui.Mono(Loc.Get("settings_no_results"), 11, "tertiary") });
+            else _content.Children.Add(Group(rows));
             return;
         }
 
         _title.Text = Loc.Get(Sections.First(s => s.Id == _section).Key);
         if (_section == "position") _content.Children.Add(MonitorsPanel());
         if (_section == "look") _content.Children.Add(PreviewPanel());
+        // Filas agrupadas en bloques redondeados bajo cada encabezado (como los ajustes del iPhone).
         var list = new StackPanel();
+        StackPanel? group = null;
         foreach (var item in RowsFor(_section))
-            list.Children.Add(item is Head head ? HeadView(head.Label) : RowView((Row)item, null));
+        {
+            if (item is Head head)
+            {
+                list.Children.Add(HeadView(head.Label));
+                group = null;
+                continue;
+            }
+            if (group is null)
+            {
+                group = new StackPanel();
+                list.Children.Add(Group(group));
+            }
+            group.Children.Add(RowView((Row)item, null, group.Children.Count == 0));
+        }
         _content.Children.Add(list);
         if (_animateSection)
         {
@@ -236,7 +259,20 @@ public sealed class SettingsWindow : Window
         }
     }
 
-    /// <summary>Secciones del lateral: glifo + nombre; la elegida con fondo #1a1a1d.</summary>
+    /// <summary>Color de la baldosa de cada sección del lateral (como los iconos de Ajustes del iPhone).</summary>
+    private static Windows.UI.Color SectionColor(string id) => Tokens.ParseHex(id switch
+    {
+        "position" => "#0a84ff",
+        "look" => "#5e5ce6",
+        "alerts" => "#ff453a",
+        "windows" => "#ff9f0a",
+        "sound" => "#ff375f",
+        "system" => "#30d158",
+        "shortcuts" => "#64d2ff",
+        _ => "#8e8e93",
+    });
+
+    /// <summary>Secciones del lateral: icono blanco en baldosa de color + nombre; la elegida con fondo gris.</summary>
     private void RenderNav(bool searching)
     {
         _nav.Children.Clear();
@@ -244,13 +280,25 @@ public sealed class SettingsWindow : Window
         {
             var selected = id == _section && !searching;
             var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12 };
-            row.Children.Add(new DotMatrix { Glyph = glyph, VerticalAlignment = VerticalAlignment.Center, OnColor = Theme.Get(selected ? "primary" : "secondary") });
-            var label = Ui.Text(Loc.Get(key), 13, selected ? "primary" : "soft");
+            row.Children.Add(new Border
+            {
+                Width = 26,
+                Height = 26,
+                CornerRadius = new CornerRadius(7),
+                Background = new SolidColorBrush(SectionColor(id)),
+                VerticalAlignment = VerticalAlignment.Center,
+                Child = new DotMatrix
+                {
+                    Glyph = glyph, DotSize = 1.7, Gap = 0.8, OnColor = Microsoft.UI.Colors.White,
+                    HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
+                },
+            });
+            var label = Ui.Text(Loc.Get(key), 13.5, "primary", semibold: selected);
             label.VerticalAlignment = VerticalAlignment.Center;
             row.Children.Add(label);
-            var item = new Border { Padding = new Thickness(10, 9, 10, 9), CornerRadius = new CornerRadius(8), Background = selected ? Theme.Brush("navSelected") : Ui.Clear, Child = row };
+            var item = new Border { Padding = new Thickness(8, 6, 8, 6), CornerRadius = new CornerRadius(10), Background = selected ? Theme.Brush("navSelected") : Ui.Clear, Child = row };
             Motion.SmoothBackground(item);
-            item.PointerEntered += (_, _) => { if (!selected) item.Background = Theme.Brush("card"); };
+            item.PointerEntered += (_, _) => { if (!selected) item.Background = Theme.Brush("hoverFill"); };
             item.PointerExited += (_, _) => { if (!selected) item.Background = Ui.Clear; };
             item.Tapped += (_, e) =>
             {
@@ -266,16 +314,24 @@ public sealed class SettingsWindow : Window
     }
 
     private static Border HeadView(string label) =>
-        new() { Padding = new Thickness(0, 18, 0, 8), Child = Ui.Mono(label, 10, tracking: 120, medium: true) };
+        new() { Padding = new Thickness(4, 20, 0, 8), Child = Ui.Text(label, 13, "secondary", semibold: true) };
 
-    /// <summary>Fila: padding 12 0, borde superior #1e1e21; etiqueta 14 px, descripción 12 px #8d8d92.</summary>
-    private static Grid RowView(Row row, string? where)
+    /// <summary>Bloque redondeado (fondo de tarjeta, radio 12) que agrupa filas.</summary>
+    private static Border Group(StackPanel rows) => new()
+    {
+        Background = Theme.Brush("card"),
+        CornerRadius = new CornerRadius(12),
+        Child = rows,
+    };
+
+    /// <summary>Fila dentro de un bloque: padding 16 12, separador fino arriba salvo la primera; etiqueta 14 px y descripción 12 px.</summary>
+    private static Grid RowView(Row row, string? where, bool first)
     {
         var grid = new Grid
         {
-            Padding = new Thickness(0, 12, 0, 12),
+            Padding = new Thickness(16, 12, 16, 12),
             BorderBrush = Theme.Brush("divider"),
-            BorderThickness = new Thickness(0, 1, 0, 0),
+            BorderThickness = new Thickness(0, first ? 0 : 1, 0, 0),
             ColumnSpacing = 20,
             Opacity = row.Opacity,
         };
@@ -285,7 +341,7 @@ public sealed class SettingsWindow : Window
         var text = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
         var title = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         title.Children.Add(Ui.Text(row.Label, 14));
-        if (where is not null) title.Children.Add(Ui.Mono(where, 9, "tertiary"));
+        if (where is not null) title.Children.Add(Ui.Mono(where, 10, "tertiary"));
         text.Children.Add(title);
         if (row.Desc.Length > 0) text.Children.Add(Ui.Text(row.Desc, 12, "secondary"));
         grid.Children.Add(text);
@@ -431,39 +487,48 @@ public sealed class SettingsWindow : Window
         return view;
     }
 
-    /// <summary>16 barras de 6 px (alto 6 → 16) y el valor en Doto 700 15 (ancho 58). Tocar una barra fija el valor.</summary>
+    /// <summary>
+    /// Barra continua de 170 px (pista gris, relleno claro y perilla blanca) y el valor a la derecha (ancho 58).
+    /// Tocar en la barra fija el valor en ese punto, redondeado al paso.
+    /// </summary>
     private static FrameworkElement Slider(double value, double min, double max, double step, Func<double, string> format, Action<double> set)
     {
-        const int bars = 16;
-        var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12 };
-        var dots = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
-        var fraction = (value - min) / (max - min);
-        for (var i = 0; i < bars; i++)
+        const double width = 170;
+        var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 14 };
+        var fraction = Math.Clamp((value - min) / (max - min), 0, 1);
+        // Zona de toque más alta que la barra para que sea fácil acertar.
+        var hit = new Grid { Width = width, Height = 24, Background = Ui.Clear, VerticalAlignment = VerticalAlignment.Center };
+        hit.Children.Add(new Border { Height = 6, CornerRadius = new CornerRadius(3), Background = Theme.Brush("border"), VerticalAlignment = VerticalAlignment.Center });
+        hit.Children.Add(new Border
         {
-            var filled = (i + 0.5) / bars <= fraction + 0.001;
-            var index = i;
-            // Zona de toque más alta que la barra para que sea fácil acertar.
-            var hit = new Grid { Height = 22, Background = Ui.Clear };
-            hit.Children.Add(new Border
-            {
-                Width = 6,
-                Height = filled ? 6 + Math.Round(i / (double)bars * 10) : 6,
-                CornerRadius = new CornerRadius(3),
-                Background = Theme.Brush(filled ? "primary" : "border"),
-                VerticalAlignment = VerticalAlignment.Center,
-            });
-            hit.Tapped += (_, e) =>
-            {
-                e.Handled = true;
-                var raw = min + (index + 1) / (double)bars * (max - min);
-                set(Math.Round(raw / step) * step);
-            };
-            dots.Children.Add(hit);
-        }
-        panel.Children.Add(dots);
-        var text = Ui.Doto(format(value), 15);
+            Width = Math.Max(6, fraction * width),
+            Height = 6,
+            CornerRadius = new CornerRadius(3),
+            Background = Theme.Brush("primary"),
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center,
+        });
+        hit.Children.Add(new Ellipse
+        {
+            Width = 18,
+            Height = 18,
+            Fill = new SolidColorBrush(Microsoft.UI.Colors.White),
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(Math.Clamp(fraction * width - 9, 0, width - 18), 0, 0, 0),
+        });
+        hit.Tapped += (_, e) =>
+        {
+            e.Handled = true;
+            var x = e.GetPosition(hit).X;
+            var raw = min + Math.Clamp(x / width, 0, 1) * (max - min);
+            set(Math.Round(raw / step) * step);
+        };
+        panel.Children.Add(hit);
+        var text = Ui.Text(format(value), 13, "secondary");
         text.Width = 58;
         text.TextAlignment = TextAlignment.Right;
+        text.VerticalAlignment = VerticalAlignment.Center;
         panel.Children.Add(text);
         return panel;
     }
@@ -473,7 +538,7 @@ public sealed class SettingsWindow : Window
     {
         var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10 };
         panel.Children.Add(Circle("−", () => set(Math.Max(min, value - step))));
-        var text = Ui.Doto(Loc.Format("time_min", ("n", value)), 18);
+        var text = Ui.Doto(Loc.Format("time_min", ("n", value)), 16);
         text.MinWidth = 92;
         text.TextAlignment = TextAlignment.Center;
         panel.Children.Add(text);
@@ -483,16 +548,15 @@ public sealed class SettingsWindow : Window
 
     private static Border Circle(string symbol, Action onTap)
     {
-        var label = Ui.Mono(symbol, 13, "soft", 0);
+        var label = Ui.Text(symbol, 15, "primary", semibold: true);
         label.HorizontalAlignment = HorizontalAlignment.Center;
+        label.VerticalAlignment = VerticalAlignment.Center;
         var circle = new Border
         {
-            Width = 26,
-            Height = 26,
-            CornerRadius = new CornerRadius(13),
-            BorderBrush = Theme.Brush("border"),
-            BorderThickness = new Thickness(1),
-            Background = Ui.Clear,
+            Width = 28,
+            Height = 28,
+            CornerRadius = new CornerRadius(14),
+            Background = Theme.Brush("border"),
             Child = label,
         };
         circle.Tapped += (_, e) =>
@@ -611,7 +675,7 @@ public sealed class SettingsWindow : Window
             panel.Children.Add(new Border
             {
                 Padding = new Thickness(8, 5, 8, 5),
-                CornerRadius = new CornerRadius(5),
+                CornerRadius = new CornerRadius(8),
                 Background = Theme.Brush("glyphOff"),
                 BorderBrush = Theme.Brush("border"),
                 BorderThickness = new Thickness(0, 0, 0, 2),
@@ -661,7 +725,7 @@ public sealed class SettingsWindow : Window
 
     private FrameworkElement MonitorsPanel()
     {
-        var panel = new StackPanel { Spacing = 14, Padding = new Thickness(22), Background = Theme.Brush("bg"), CornerRadius = new CornerRadius(14) };
+        var panel = new StackPanel { Spacing = 14, Padding = new Thickness(22), Background = Theme.Brush("card"), CornerRadius = new CornerRadius(16) };
         var monitors = Ui.MonitorPicker(_s, 170, 96, 22, n => Set(x => x.Monitor = n));
         monitors.Height = 110;
         panel.Children.Add(monitors);
@@ -675,8 +739,11 @@ public sealed class SettingsWindow : Window
     private FrameworkElement PreviewPanel()
     {
         var light = Theme.IsLight;
-        var wall = new Grid { Height = 120, CornerRadius = new CornerRadius(14), Background = new SolidColorBrush(Tokens.ParseHex(light ? "#f2f2f0" : "#d9d7d2")) };
-        wall.Children.Add(new DotPattern { DotColor = Tokens.ParseHex(light ? "#dcdad4" : "#b9b6af"), Spacing = 12, CornerRadius = new CornerRadius(14) });
+        // Fondo de escritorio de colores (morado → azul), como el de la maqueta.
+        var gradient = new LinearGradientBrush { StartPoint = new Windows.Foundation.Point(0, 0), EndPoint = new Windows.Foundation.Point(1, 1) };
+        gradient.GradientStops.Add(new GradientStop { Color = Tokens.ParseHex(light ? "#c9b8f0" : "#3a2a5c"), Offset = 0 });
+        gradient.GradientStops.Add(new GradientStop { Color = Tokens.ParseHex(light ? "#a9d4f0" : "#12425e"), Offset = 1 });
+        var wall = new Grid { Height = 120, CornerRadius = new CornerRadius(16), Background = gradient };
 
         var notch = new StackPanel
         {
@@ -696,8 +763,8 @@ public sealed class SettingsWindow : Window
             if (_s.Mascot)
                 inner.Children.Add(new DotMatrix
                 {
-                    Columns = MascotFrames.Columns, Rows = MascotFrames.Rows, DotSize = 3, Gap = 1.5, VerticalAlignment = VerticalAlignment.Center,
-                    OnBrush = Theme.Brush("primary"), OffBrush = Theme.Brush("glyphOff"), Cells = MascotFrames.At(0, _s.Mood, false).Cells,
+                    Columns = MascotFrames.Columns, Rows = MascotFrames.Rows, Merge = DotMerge.Blobs, DotSize = 3, Gap = 1.5, VerticalAlignment = VerticalAlignment.Center,
+                    OnBrush = Theme.Brush("primary"), Cells = MascotFrames.At(10, _s.Mood, false).Cells,
                 });
             if (_s.Clock) inner.Children.Add(Ui.Doto(ClockService.Format(DateTime.Now, _s.H24), 16));
             inner.Children.Add(new Ellipse { Width = 6, Height = 6, Fill = new SolidColorBrush(Tokens.Current.Accent(_s.Accent)), VerticalAlignment = VerticalAlignment.Center });
@@ -708,7 +775,7 @@ public sealed class SettingsWindow : Window
         wall.Children.Add(notch);
 
         var caption = Ui.Mono(L("settings_preview"), 9, "secondary", 100);
-        caption.Foreground = new SolidColorBrush(Tokens.ParseHex("#6b675f"));
+        caption.Foreground = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(200, 255, 255, 255));
         caption.HorizontalAlignment = HorizontalAlignment.Left;
         caption.VerticalAlignment = VerticalAlignment.Bottom;
         caption.Margin = new Thickness(14, 0, 0, 10);

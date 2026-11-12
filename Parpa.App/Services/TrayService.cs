@@ -99,17 +99,17 @@ public sealed class TrayService : IDisposable
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         var face = new DotMatrix
         {
-            Columns = MascotFrames.Columns, Rows = MascotFrames.Rows, DotSize = 2, Gap = 1, VerticalAlignment = VerticalAlignment.Center,
+            Columns = MascotFrames.Columns, Rows = MascotFrames.Rows, Merge = DotMerge.Blobs, DotSize = 2, Gap = 1, VerticalAlignment = VerticalAlignment.Center,
             OnBrush = Theme.Brush("primary"), OffBrush = Theme.Brush("glyphOff"), Cells = MascotFrames.Awake(),
         };
         var name = new TextBlock
         {
-            Text = Loc.Upper(Loc.Get("app_name")), FontFamily = Res<FontFamily>("FontDisplay"), FontSize = 15,
+            Text = Loc.Upper(Loc.Get("app_name")), FontFamily = Res<FontFamily>("FontDisplay"), FontSize = 16,
             FontWeight = Microsoft.UI.Text.FontWeights.Bold, Foreground = Theme.Brush("primary"), VerticalAlignment = VerticalAlignment.Center,
         };
         var version = new TextBlock
         {
-            Text = Version, FontFamily = Res<FontFamily>("FontMono"), FontSize = 9, Foreground = Theme.Brush("tertiary"),
+            Text = Version, FontFamily = Res<FontFamily>("FontMono"), FontSize = 11, Foreground = Theme.Brush("tertiary"),
             VerticalAlignment = VerticalAlignment.Center,
         };
         Grid.SetColumn(name, 1);
@@ -162,7 +162,7 @@ public sealed class TrayService : IDisposable
         }
         var rightText = new TextBlock
         {
-            Text = right, FontFamily = Res<FontFamily>("FontMono"), FontSize = 9, Foreground = Theme.Brush("quaternary"),
+            Text = right, FontFamily = Res<FontFamily>("FontMono"), FontSize = 11, Foreground = Theme.Brush("quaternary"),
             VerticalAlignment = VerticalAlignment.Center,
         };
         Grid.SetColumn(rightText, 2);

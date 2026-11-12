@@ -6,7 +6,7 @@
     Width="340"
     Height="40">
 
-    <!-- Indicador: padding 0 16 2, gap 12. Glifo + etiqueta/subetiqueta + 16 barras + valor Doto 700 15 (mín. 40). -->
+    <!-- Indicador: padding 0 16 2, gap 12. Icono + etiqueta/subetiqueta + línea de nivel + valor (mín. 40). -->
     <Grid Padding="16,0,16,2" ColumnSpacing="12">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -20,28 +20,33 @@
         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
             <TextBlock
                 x:Name="Label"
-                CharacterSpacing="100"
-                FontFamily="{StaticResource FontMono}"
-                FontSize="10"
-                FontWeight="Medium"
+                FontFamily="{StaticResource FontUi}"
+                FontSize="13"
+                FontWeight="SemiBold"
                 Foreground="{StaticResource PrimaryBrush}"
                 TextTrimming="CharacterEllipsis" />
             <TextBlock
                 x:Name="Sub"
-                CharacterSpacing="60"
-                FontFamily="{StaticResource FontMono}"
-                FontSize="9"
-                Foreground="{StaticResource QuaternaryBrush}"
+                FontFamily="{StaticResource FontUi}"
+                FontSize="11"
+                Foreground="{StaticResource MutedBrush}"
                 TextTrimming="CharacterEllipsis" />
         </StackPanel>
 
-        <StackPanel
+        <Grid
             x:Name="Bars"
             Grid.Column="2"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Center"
-            Orientation="Horizontal"
-            Spacing="3" />
+            Height="6"
+            MinWidth="60"
+            MaxWidth="150"
+            VerticalAlignment="Center">
+            <Border Background="{StaticResource BorderBrush}" CornerRadius="3" />
+            <Border
+                x:Name="BarFill"
+                Width="0"
+                HorizontalAlignment="Left"
+                CornerRadius="3" />
+        </Grid>
 
         <TextBlock
             x:Name="Value"
@@ -50,7 +55,7 @@
             VerticalAlignment="Center"
             FontFamily="{StaticResource FontDisplay}"
             FontSize="15"
-            FontWeight="Bold"
+            FontWeight="SemiBold"
             Foreground="{StaticResource PrimaryBrush}"
             TextAlignment="Right" />
     </Grid>

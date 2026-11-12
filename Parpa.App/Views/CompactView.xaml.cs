@@ -27,7 +27,15 @@ public sealed partial class CompactView : UserControl
         _eqTimer.Interval = TimeSpan.FromMilliseconds(100);
         _eqTimer.Tick += (_, _) => { _tick++; DrawEqualizer(); };
         DrawEqualizer();
+
+        // Las barras del ecualizador toman el color de la carátula (gris claro si no hay).
+        var queue = DispatcherQueue.GetForCurrentThread();
+        ApplyArtColor();
+        ArtColor.Changed += () => queue.TryEnqueue(ApplyArtColor);
+        Theme.Changed += ApplyArtColor;
     }
+
+    private void ApplyArtColor() => Equalizer.OnColor = ArtColor.Current ?? Theme.Get("primary");
 
     public void Show(NotchActivity activity, bool doNotDisturb, Windows.UI.Color accent)
     {

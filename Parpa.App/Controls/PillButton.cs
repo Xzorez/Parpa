@@ -25,9 +25,8 @@ public sealed partial class PillButton : Grid
     private readonly TextBlock _label = new()
     {
         FontFamily = (FontFamily)Application.Current.Resources["FontMono"],
-        FontSize = 10,
+        FontSize = 12,
         FontWeight = Microsoft.UI.Text.FontWeights.Medium,
-        CharacterSpacing = 60,
         TextWrapping = TextWrapping.NoWrap,
     };
 

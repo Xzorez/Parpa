@@ -1,34 +1,33 @@
 // Web de Parpa: demo del notch, idioma (es/en) y enlace al último instalador.
 (() => {
   const REPO = 'Xzorez/Parpa';
-  const ON = '#f2f2f0';
 
   // ---- Textos en inglés (el HTML trae los de español) ----
   const EN = {
-    nav_features: 'FEATURES',
-    nav_privacy: 'PRIVACY',
-    nav_specs: 'SPECS',
-    nav_download: 'DOWNLOAD',
-    hero_eyebrow: 'FREE · OPEN SOURCE · WINDOWS 10 & 11',
+    nav_features: 'Features',
+    nav_privacy: 'Privacy',
+    nav_specs: 'Specs',
+    nav_download: 'Download',
+    hero_eyebrow: 'Free · Open source · Windows 10 & 11',
     hero_title: 'Your Windows, with a notch that blinks.',
     hero_lead: 'Music, notifications, files and notes in an island at the top of the screen. It opens when you hover it and hides when you don’t need it.',
-    hero_download: 'DOWNLOAD FOR WINDOWS',
-    hero_demo: 'TRY THE DEMO →',
-    nav_demo: 'DEMO',
-    demo_try: 'TRY IT YOURSELF →',
-    demo_state: 'STATE',
-    demo_now: 'NOW',
+    hero_download: 'Download for Windows',
+    hero_demo: 'Try the demo →',
+    nav_demo: 'Demo',
+    demo_try: 'Try it yourself →',
+    demo_state: 'State',
+    demo_now: 'Now',
     demo_message: 'Coming to dinner on Friday? I booked for 9 pm.',
-    demo_later: 'LATER',
-    demo_open: 'OPEN',
-    demo_volume: 'VOLUME',
-    demo_speakers: 'SPEAKERS',
+    demo_later: 'Later',
+    demo_open: 'Open',
+    demo_volume: 'Volume',
+    demo_speakers: 'Speakers',
     tick_size: '43 MB',
-    tick_license: 'MIT LICENSE',
-    tick_admin: 'NO ADMIN RIGHTS',
-    tick_free: 'FREE',
-    tick_privacy: 'NO ACCOUNTS · NO TRACKING',
-    features_eyebrow: 'WHAT IT DOES',
+    tick_license: 'MIT license',
+    tick_admin: 'No admin rights',
+    tick_free: 'Free',
+    tick_privacy: 'No accounts · No tracking',
+    features_eyebrow: 'What it does',
     features_title: 'Everything you check often, in one place.',
     f1_t: 'What’s playing',
     f1_d: 'Song, artwork and controls from Spotify or any player, without switching windows.',
@@ -42,45 +41,45 @@
     f5_d: 'The last things you copied, always at hand. Passwords are never saved.',
     f6_t: 'Tasks, notes and system',
     f6_d: 'Drop text to turn it into a note or task, save links with their title and check CPU, GPU and RAM usage from the top.',
-    privacy_eyebrow: 'PRIVACY',
+    privacy_eyebrow: 'Privacy',
     privacy_title: 'Everything stays on your PC.',
     privacy_lead: 'Parpa reads your notifications and clipboard to show them at the top. That’s why it has no accounts, sends nothing to any server and its code is open for anyone to read.',
-    p1_t: 'ACCOUNTS',
+    p1_t: 'Accounts',
     p1_d: 'Install and use. No sign-up, no email.',
-    p2_t: 'SERVERS',
+    p2_t: 'Servers',
     p2_d: 'Notifications, clipboard and notes are stored only on your PC.',
-    p3_t: 'TRACKING',
+    p3_t: 'Tracking',
     p3_d: 'No ads, no analytics. Parpa never goes online on its own.',
-    p4_t: 'OPEN SOURCE',
+    p4_t: 'Open source',
     p4_d: 'Anyone can check what it does. MIT license.',
-    privacy_link: 'READ THE PRIVACY POLICY ↗',
-    specs_eyebrow: 'SPECS',
+    privacy_link: 'Read the privacy policy ↗',
+    specs_eyebrow: 'Specs',
     specs_title: 'Small on the outside. Light on the inside.',
-    s_os: 'SYSTEM',
+    s_os: 'System',
     s_os_v: 'Windows 10 (2004+) and Windows 11',
-    s_arch: 'ARCHITECTURE',
-    s_installer: 'INSTALLER',
+    s_arch: 'Architecture',
+    s_installer: 'Installer',
     s_installer_v: '43 MB · per user, no admin rights',
-    s_lang: 'LANGUAGES',
-    s_startup: 'STARTUP',
+    s_lang: 'Languages',
+    s_startup: 'Startup',
     s_startup_v: 'With Windows (can be turned off)',
-    s_shortcut: 'SHORTCUT',
-    s_updates: 'UPDATES',
+    s_shortcut: 'Shortcut',
+    s_updates: 'Updates',
     s_updates_v: 'From the app, in one click',
-    s_data: 'DATA',
-    s_license: 'LICENSE',
-    download_eyebrow: 'DOWNLOAD',
+    s_data: 'Data',
+    s_license: 'License',
+    download_eyebrow: 'Download',
     download_title: 'Install it in a minute.',
-    download_exe: 'DOWNLOAD INSTALLER (.EXE)',
-    download_all: 'ALL VERSIONS',
-    download_terminal: 'OR FROM THE TERMINAL',
+    download_exe: 'Download installer (.exe)',
+    download_all: 'All versions',
+    download_terminal: 'Or from the terminal',
     download_note: 'If Windows warns about an “unknown publisher”, click More info › Run anyway. The code is on GitHub for anyone to review.',
-    copy: 'COPY',
-    copied: 'COPIED',
-    footer_license: 'OPEN SOURCE UNDER THE MIT LICENSE',
-    footer_privacy: 'PRIVACY',
-    footer_contribute: 'CONTRIBUTE',
-    footer_bug: 'REPORT A BUG',
+    copy: 'Copy',
+    copied: 'Copied',
+    footer_license: 'Open source under the MIT license',
+    footer_privacy: 'Privacy',
+    footer_contribute: 'Contribute',
+    footer_bug: 'Report a bug',
     title: 'Parpa · a notch for Windows',
     description: 'Music, notifications, files and notes in an island at the top of the screen. Free and open source for Windows 10 and 11.',
   };
@@ -95,9 +94,7 @@
 
   function applyLang() {
     document.documentElement.lang = lang;
-    stopDecoding();
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
-    decode(document.querySelector('h1'), 1100);
     document.title = t('title');
     document.querySelector('meta[name=description]').content = t('description');
     const button = document.getElementById('lang');
@@ -112,26 +109,8 @@
     applyLang();
   });
 
-  // ---- Glifos de puntos 7×7 (data/glyphs.json) ----
-  const G = {
-    musica: ['..XXXXX', '..XXXXX', '..X...X', '..X...X', 'XXX.XXX', 'XXX.XXX', '.......'],
-    mensaje: ['.XXXXX.', 'XXXXXXX', 'X.X.X.X', 'XXXXXXX', '.XXXXX.', '.XX....', '.X.....'],
-    sonido: ['...X...', '..XX..X', 'XXXX.X.', 'XXXX.X.', 'XXXX.X.', '..XX..X', '...X...'],
-    bandeja: ['XXX....', 'XXXXXXX', 'X.....X', 'X.....X', 'X.....X', 'XXXXXXX', '.......'],
-    copias: ['XXXXX..', 'X...X..', 'X.XXXXX', 'X.X...X', 'XXX...X', '..X...X', '..XXXXX'],
-    tareas: ['XX.XXXX', 'XX.....', '.......', 'XX.XXXX', 'XX.....', '.......', 'XX.XXX.'],
-  };
-  function fill(grid, rows, off = 'transparent') {
-    grid.replaceChildren(...rows.join('').split('').map(ch => {
-      const dot = document.createElement('i');
-      dot.style.background = ch === 'X' ? ON : off;
-      if (ch === 'X') dot.dataset.on = '';
-      return dot;
-    }));
-  }
-  // En la demo los puntos apagados no se ven; en las tarjetas se dibujan en gris, como los glifos de la app.
-  document.querySelectorAll('[data-glyph]').forEach(grid => fill(grid, G[grid.dataset.glyph], grid.classList.contains('g7l') ? '#1d1d20' : 'transparent'));
-  fill(document.getElementById('eyes'), ['XX...XX', 'XX...XX', 'XX...XX']);
+  // ---- Iconos (icons.js) ----
+  document.querySelectorAll('[data-glyph]').forEach(el => { el.innerHTML = window.PARPA_ICONS(el.dataset.glyph); });
 
   // ---- Demo: Reposo → Música → Aviso → Volumen ----
   const S = [
@@ -146,14 +125,7 @@
   const states = [...body.querySelectorAll('[data-state]')];
   const stateName = document.getElementById('state-name');
   const mascot = document.getElementById('mascot');
-  const mascotDots = Array.from({ length: 65 }, () => mascot.appendChild(document.createElement('i')));
   const eq = [...document.querySelectorAll('#eq i')];
-  const bars = document.getElementById('bars');
-  for (let k = 0; k < 16; k++) {
-    const bar = bars.appendChild(document.createElement('i'));
-    bar.style.height = (4 + k * 0.75) + 'px';
-    bar.style.background = k < 11 ? ON : '#2a2a2e';
-  }
   const dots = document.getElementById('dots');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let i = 0, tick = 0;
@@ -181,16 +153,13 @@
     all.forEach(d => d.classList.remove('on'));
     void dots.offsetWidth;
     all[i]?.classList.add('on');
-    stateName.textContent = s[lang].toUpperCase();
+    stateName.textContent = s[lang];
   }
 
   function frame() {
     // La mascota mira a los lados y parpadea; el ecualizador sigue la "música".
-    const blink = tick % 18 === 0, look = Math.sin(tick / 6) > 0.6 ? 1 : 0;
-    for (let r = 0; r < 5; r++) for (let c = 0; c < 13; c++) {
-      const on = [3, 8].some(x => (c === x + look || c === x + 1 + look) && r >= 1 && r <= 3 && (!blink || r === 2));
-      mascotDots[r * 13 + c].style.background = on ? ON : '#1b1b1e';
-    }
+    mascot.classList.toggle('blink', tick % 18 === 0);
+    mascot.classList.toggle('look', Math.sin(tick / 6) > 0.6);
     eq.forEach((bar, k) => { bar.style.height = (3 + 9 * Math.abs(Math.sin(tick * (0.9 + k * 0.37) + k))).toFixed(1) + 'px'; });
   }
 
@@ -227,42 +196,6 @@
     })
     .catch(() => { /* sin conexión con GitHub: enlace a Releases */ });
 
-  // ---- Titulares que se "descifran" (Doto es monoespaciada: el ancho no baila) ----
-  const NOISE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%+=*';
-  function decode(el, duration = 800) {
-    if (reduced || !el) return;
-    const text = el.textContent;
-    cancelAnimationFrame(el._decode);
-    el.classList.add('decoding');
-    const start = performance.now();
-    const run = now => {
-      const p = Math.min(1, (now - start) / duration);
-      const done = Math.floor(p * text.length);
-      let out = '';
-      for (let k = 0; k < text.length; k++) {
-        const ch = text[k];
-        out += k < done || ch === ' ' ? ch : NOISE[(Math.random() * NOISE.length) | 0];
-      }
-      el.textContent = out;
-      if (p < 1) el._decode = requestAnimationFrame(run);
-      else { el.textContent = text; el.classList.remove('decoding'); }
-    };
-    el._decode = requestAnimationFrame(run);
-  }
-  function stopDecoding() {
-    document.querySelectorAll('.decoding').forEach(el => { cancelAnimationFrame(el._decode); el.classList.remove('decoding'); });
-  }
-
-  // ---- Glifos que se encienden punto a punto ----
-  function lightUp(grid, step = 9) {
-    if (reduced || !grid) return;
-    const cells = [...grid.children];
-    const order = cells.map((_, k) => k).sort(() => Math.random() - 0.5);
-    cells.forEach(c => { clearTimeout(c._t); c.style.background = '#1d1d20'; });
-    order.forEach((k, n) => { cells[k]._t = setTimeout(() => { cells[k].style.background = cells[k].dataset.on !== undefined ? ON : '#1d1d20'; }, 80 + n * step); });
-  }
-  document.querySelectorAll('.cell').forEach(cell => cell.addEventListener('pointerenter', () => lightUp(cell.querySelector('.g7l'), 4)));
-
   // ---- Contadores: los ceros "buscan" su valor y el 100 sube ----
   function count(el) {
     if (reduced) return;
@@ -285,8 +218,6 @@
   });
   function onReveal(el) {
     el.classList.add('in');
-    if (el.matches('h2')) decode(el, 700);
-    if (el.matches('.cell')) setTimeout(() => lightUp(el.querySelector('.g7l')), parseInt(el.style.getPropertyValue('--d')) || 0);
     if (el.matches('.zero')) setTimeout(() => count(el.querySelector('.count')), parseInt(el.style.getPropertyValue('--d')) || 0);
   }
   if (reduced || !('IntersectionObserver' in window)) {

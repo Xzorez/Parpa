@@ -18,7 +18,7 @@ public sealed partial class PeekView : UserControl
     private static readonly Color CallGreen = Tokens.ParseOklch("oklch(0.72 0.17 150)");
 
     private readonly DispatcherQueueTimer _barTimer;
-    private readonly SolidColorBrush _hoverBrush = Theme.Brush("glyphOff");
+    private readonly SolidColorBrush _hoverBrush = Theme.Brush("dotPattern");
     private NotchViewModel? _vm;
     private int _filled = -1;
 
@@ -40,7 +40,8 @@ public sealed partial class PeekView : UserControl
         var primary = Theme.Get("primary");
 
         PeekGlyph.Glyph = peek.Glyph;
-        PeekGlyph.OnColor = peek.IsCall ? accent : primary;
+        PeekGlyph.OnColor = Microsoft.UI.Colors.White;
+        PeekTile.Background = new SolidColorBrush(TileColor(peek.Glyph, peek.IsCall));
         Head.Text = peek.Head;
         ToolTipService.SetToolTip(Head, peek.Head);
         When.Text = peek.When;
@@ -54,6 +55,16 @@ public sealed partial class PeekView : UserControl
         _filled = -1;
         DrawBar();
     }
+
+    /// <summary>Baldosa del icono con el color de su tipo, como los iconos de app (llamada verde, mensaje azul…).</summary>
+    private static Color TileColor(string glyph, bool call) => call ? CallGreen : glyph switch
+    {
+        "mensaje" or "descarga" or "bandeja" or "copias" => Tokens.Current.Accent(3),
+        "claude" or "tareas" or "foco" => Tokens.Current.Accent(1),
+        "llamada" => CallGreen,
+        "luna" => Tokens.ParseHex("#5e5ce6"),
+        _ => Theme.Get("border"),
+    };
 
     /// <summary>La barra solo se actualiza mientras el aviso se ve.</summary>
     public void SetVisible(bool visible)

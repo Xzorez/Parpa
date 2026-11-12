@@ -17,18 +17,17 @@
             x:Name="Label"
             Grid.Column="1"
             VerticalAlignment="Center"
-            CharacterSpacing="100"
-            FontFamily="{StaticResource FontMono}"
-            FontSize="10"
-            FontWeight="Medium"
+            FontFamily="{StaticResource FontUi}"
+            FontSize="13"
+            FontWeight="SemiBold"
             Foreground="{StaticResource PrimaryBrush}"
             TextTrimming="CharacterEllipsis" />
         <TextBlock
             x:Name="Link"
             Grid.Column="2"
             VerticalAlignment="Center"
-            FontFamily="{StaticResource FontMono}"
-            FontSize="10"
+            FontFamily="{StaticResource FontUi}"
+            FontSize="12"
             Foreground="{StaticResource SecondaryBrush}" />
     </Grid>
 </UserControl>

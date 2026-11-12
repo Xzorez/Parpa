@@ -55,7 +55,7 @@ public sealed partial class AudioView : Grid, INotchPageView
         master.Children.Add(_masterLabel);
         master.Children.Add(_masterBars);
         master.Children.Add(_masterValue);
-        _master = new Border { Padding = new Thickness(12, 10, 12, 10), Background = Res<Brush>("CardBrush"), CornerRadius = new CornerRadius(14), Child = master };
+        _master = new Border { Padding = new Thickness(12, 10, 12, 10), Background = Res<Brush>("CardBrush"), CornerRadius = new CornerRadius(20), Child = master };
         Grid.SetRow(_master, 1);
         Children.Add(_master);
         _masterBars.ValueChanged += percent =>
@@ -136,8 +136,7 @@ public sealed partial class AudioView : Grid, INotchPageView
         {
             Text = mic is null ? "—" : Loc.Get(on ? "audio_mic_on" : "audio_mic_off"),
             FontFamily = Res<FontFamily>("FontMono"),
-            FontSize = 9,
-            CharacterSpacing = 80,
+            FontSize = 11,
             Foreground = fg,
             Opacity = 0.7,
             HorizontalAlignment = HorizontalAlignment.Right,
@@ -162,7 +161,7 @@ public sealed partial class AudioView : Grid, INotchPageView
         var tile = Motion.SmoothBackground(new Border
         {
             Padding = new Thickness(12, 10, 12, 10),
-            CornerRadius = new CornerRadius(14),
+            CornerRadius = new CornerRadius(20),
             Background = on ? Theme.Brush("primary") : Res<Brush>("CardBrush"),
             Opacity = mic is null ? 0.45 : 1,
             Child = content,
@@ -279,7 +278,7 @@ public sealed partial class AudioView : Grid, INotchPageView
     {
         Padding = new Thickness(12, 10, 12, 10),
         Background = Res<Brush>("CardBrush"),
-        CornerRadius = new CornerRadius(14),
+        CornerRadius = new CornerRadius(20),
         Child = child,
     };
 

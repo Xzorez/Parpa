@@ -45,5 +45,6 @@ public static class Loc
     }
 
     /// <summary>Etiquetas mono en MAYÚSCULAS con la cultura activa.</summary>
-    public static string Upper(string text) => text.ToUpper(Culture);
+    /// <remarks>El rediseño estilo isla usa texto tipo frase: ya no se pasa a mayúsculas.</remarks>
+    public static string Upper(string text) => text;
 }

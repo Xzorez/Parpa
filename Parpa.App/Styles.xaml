@@ -4,42 +4,42 @@
 
     <!-- Se fusiona en App.OnLaunched después de cargar los colores de tokens.json. -->
 
-    <!-- Etiqueta de tarjeta: Geist Mono 10 px, tracking .08em, #8d8d92. -->
+    <!-- Etiqueta de tarjeta: Segoe UI Variable semibold 12 px, tipo frase, gris secundario. -->
     <Style x:Key="CardLabel" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
-        <Setter Property="FontSize" Value="10" />
-        <Setter Property="CharacterSpacing" Value="80" />
+        <Setter Property="FontFamily" Value="{StaticResource FontUi}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
 
-    <!-- Controles de música "◀◀ ▮▮ ▶▶": mono 10 px en primario. -->
+    <!-- Controles de música: iconos de Segoe Fluent Icons en primario. -->
     <Style x:Key="MediaControl" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
-        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+        <Setter Property="FontSize" Value="16" />
         <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
     </Style>
 
-    <!-- Fila de lista: Geist 12 px. -->
+    <!-- Fila de lista: Segoe UI Variable 13 px. -->
     <Style x:Key="RowText" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource FontUi}" />
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
         <Setter Property="TextWrapping" Value="NoWrap" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
-    <!-- Índice de fila: Doto 700 14 px, #5a5a60. -->
+    <!-- Índice de fila: semibold 13 px, gris terciario. -->
     <Style x:Key="RowIndex" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource FontDisplay}" />
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
-    <!-- Campo de texto sin fondo ni borde (textarea del prototipo): Geist 13 px / 1,45. -->
+    <!-- Campo de texto sin fondo ni borde: Segoe UI Variable 13 px. -->
     <Style x:Key="BareTextBox" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource FontUi}" />
         <Setter Property="FontSize" Value="13" />
@@ -52,10 +52,10 @@
         <Setter Property="SelectionHighlightColor" Value="{StaticResource BorderAltBrush}" />
     </Style>
 
-    <!-- Hora/meta de fila: Geist Mono 10 px, #8d8d92. -->
+    <!-- Hora/meta de fila: 11 px, gris secundario. -->
     <Style x:Key="RowMeta" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="{StaticResource FontMono}" />
-        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontFamily" Value="{StaticResource FontUi}" />
+        <Setter Property="FontSize" Value="11" />
         <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>

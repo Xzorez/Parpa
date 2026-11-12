@@ -43,7 +43,7 @@ public sealed partial class LauncherView : Grid, INotchPageView
         Height = AreaHeight;
         Children.Add(_canvas);
 
-        _mascot = new DotMatrix { Columns = 13, Rows = 5, DotSize = 4, Gap = 1.5, OnBrush = Theme.Brush("primary"), OffBrush = Theme.Brush("glyphOff") };
+        _mascot = new DotMatrix { Columns = 13, Rows = 5, Merge = DotMerge.Blobs, DotSize = 4, Gap = 1.5, OnBrush = Theme.Brush("primary") };
         _mascotPill = new Border
         {
             Width = 108,
@@ -69,10 +69,9 @@ public sealed partial class LauncherView : Grid, INotchPageView
     /// <summary>Etiqueta bajo la burbuja: mono 500 9 px, tracking .14em; aparece con fundido en hover.</summary>
     private static TextBlock BubbleLabel() => new()
     {
-        FontFamily = Res<FontFamily>("FontMono"),
-        FontSize = 9,
-        FontWeight = Microsoft.UI.Text.FontWeights.Medium,
-        CharacterSpacing = 140,
+        FontFamily = Res<FontFamily>("FontUi"),
+        FontSize = 12,
+        FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
         Opacity = 0,
         OpacityTransition = Motion.Reduced ? null : new ScalarTransition { Duration = Motion.Quick },
     };
@@ -120,16 +119,17 @@ public sealed partial class LauncherView : Grid, INotchPageView
 
     private Bubble CreateBubble(NotchPage page, (int, int) look)
     {
-        var circle = Motion.SmoothBackground(new Border
+        // Baldosa redondeada del color de la ventana, como un icono de app.
+        var circle = new Border
         {
-            CornerRadius = new CornerRadius(BubbleSize / 2),
-            Background = Res<Brush>("CardBrush"),
-            BorderThickness = new Thickness(1.5),
+            CornerRadius = new CornerRadius(BubbleSize * 0.32),
+            Background = new SolidColorBrush(Ui.PageColor(page.Id)),
+            BorderThickness = new Thickness(2),
             BorderBrush = new SolidColorBrush(Microsoft.UI.Colors.Transparent),
-        });
+        };
         var glyph = new DotMatrix
         {
-            Glyph = page.Glyph, DotSize = 3, Gap = 1.5,
+            Glyph = page.Glyph, DotSize = 3, Gap = 1.5, OnColor = Ui.PageInk(page.Id),
             HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
         };
         // root: posición, entrada y hover. floater: la flotación continua (no se pisan las animaciones).
@@ -167,9 +167,9 @@ public sealed partial class LauncherView : Grid, INotchPageView
                 Child = new TextBlock
                 {
                     Text = count.ToString(),
-                    FontFamily = Res<FontFamily>("FontDisplay"),
+                    FontFamily = Res<FontFamily>("FontUi"),
                     FontSize = 11,
-                    FontWeight = Microsoft.UI.Text.FontWeights.Black,
+                    FontWeight = Microsoft.UI.Text.FontWeights.Bold,
                     Foreground = isTodo ? new SolidColorBrush(Microsoft.UI.Colors.White) : Res<Brush>("BgBrush"),
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
@@ -301,9 +301,7 @@ public sealed partial class LauncherView : Grid, INotchPageView
         foreach (var bubble in _bubbles)
         {
             var isHover = _hover == bubble.Page.Id;
-            bubble.Circle.Background = isHover ? new SolidColorBrush(HoverFill) : Res<Brush>("CardBrush");
             bubble.Circle.BorderBrush = isHover ? Res<Brush>("PrimaryBrush") : new SolidColorBrush(Microsoft.UI.Colors.Transparent);
-            bubble.Glyph.OnColor = Theme.Get(isHover ? "primary" : "soft");
             bubble.Label.Opacity = isHover ? 1 : 0;
             Motion.SetOpacity(bubble.Root, _hover is not null && !isHover ? 0.45f : 1f);
             Motion.SetScale(bubble.Root, isHover ? 1.14f : 1f);

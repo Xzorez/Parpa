@@ -176,9 +176,9 @@ public sealed class WelcomeWindow : Window
     {
         _face = new DotMatrix
         {
-            Columns = MascotFrames.Columns, Rows = MascotFrames.Rows, DotSize = 6, Gap = 3,
+            Columns = MascotFrames.Columns, Rows = MascotFrames.Rows, Merge = DotMerge.Blobs, DotSize = 6, Gap = 3,
             HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
-            OnBrush = Theme.Brush("primary"), OffBrush = Theme.Brush("glyphOff"),
+            OnBrush = Theme.Brush("primary"),
         };
         DrawFace();
         return new Border
@@ -232,8 +232,8 @@ public sealed class WelcomeWindow : Window
         {
             Height = 140,
             Padding = new Thickness(22),
-            Background = Theme.Brush("bg"),
-            CornerRadius = new CornerRadius(14),
+            Background = Theme.Brush("card"),
+            CornerRadius = new CornerRadius(16),
             Child = Ui.MonitorPicker(_s, 150, 84, 20, n => Change(s => s.Monitor = n)),
         };
         panel.Children.Add(monitors);
@@ -260,7 +260,7 @@ public sealed class WelcomeWindow : Window
             keys.Children.Add(new Border
             {
                 Padding = new Thickness(20, 14, 20, 14),
-                CornerRadius = new CornerRadius(12),
+                CornerRadius = new CornerRadius(16),
                 Background = Theme.Brush("glyphOff"),
                 BorderBrush = Theme.Brush("border"),
                 BorderThickness = new Thickness(0, 0, 0, 4),
@@ -303,7 +303,7 @@ public sealed class WelcomeWindow : Window
             var tile = new Grid
             {
                 Padding = new Thickness(16, 14, 16, 14),
-                CornerRadius = new CornerRadius(12),
+                CornerRadius = new CornerRadius(16),
                 Background = Theme.Brush(on ? "primary" : "card"),
             };
             var name = Ui.Text(app, 14, on ? "bg" : "primary");
