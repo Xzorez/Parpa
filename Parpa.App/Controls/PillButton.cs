@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
@@ -14,7 +14,7 @@ namespace Parpa.Controls;
 public sealed partial class PillButton : Grid
 {
     public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
-        nameof(Text), typeof(string), typeof(PillButton), new PropertyMetadata(string.Empty, (d, e) => ((PillButton)d)._label.Text = (string)e.NewValue));
+        nameof(Text), typeof(string), typeof(PillButton), new PropertyMetadata(string.Empty, (d, e) => ((PillButton)d)._label.Text = ((string)e.NewValue).ToUpper(Services.Loc.Culture)));
 
     public static readonly DependencyProperty PrimaryProperty = DependencyProperty.Register(
         nameof(Primary), typeof(bool), typeof(PillButton), new PropertyMetadata(false, (d, _) => ((PillButton)d).ApplyStyle()));
@@ -24,9 +24,11 @@ public sealed partial class PillButton : Grid
 
     private readonly TextBlock _label = new()
     {
-        FontFamily = (FontFamily)Application.Current.Resources["FontMono"],
-        FontSize = 12,
-        FontWeight = Microsoft.UI.Text.FontWeights.Medium,
+        FontFamily = (FontFamily)Application.Current.Resources["FontWide"],
+        FontStretch = Windows.UI.Text.FontStretch.Expanded,
+        FontSize = 9.5,
+        FontWeight = Microsoft.UI.Text.FontWeights.Bold,
+        CharacterSpacing = 110,
         TextWrapping = TextWrapping.NoWrap,
     };
 
@@ -36,7 +38,7 @@ public sealed partial class PillButton : Grid
 
     public PillButton()
     {
-        Padding = new Thickness(10, 6, 10, 6);
+        Padding = new Thickness(12, 7, 12, 7);
         HorizontalAlignment = HorizontalAlignment.Left;
         VerticalAlignment = VerticalAlignment.Center;
         Children.Add(_label);
@@ -71,15 +73,16 @@ public sealed partial class PillButton : Grid
         if (Primary)
         {
             Background = Res("PrimaryBrush");
-            BorderThickness = new Thickness(0);
+            BorderBrush = Res("PrimaryBrush");
+            BorderThickness = new Thickness(1.5);
             _label.Foreground = Res("BgBrush");
             Motion.SetOpacity(this, _hover ? 0.85f : 1f);
         }
         else
         {
             Background = _hover ? Res("GlyphOffBrush") : new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-            BorderBrush = Res("BorderBrush");
-            BorderThickness = new Thickness(1);
+            BorderBrush = Res("PrimaryBrush");
+            BorderThickness = new Thickness(1.5);
             _label.Foreground = Foreground ?? Res("PrimaryBrush");
             Motion.SetOpacity(this, 1f);
         }

@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Parpa.Services;
@@ -91,27 +91,17 @@ public sealed partial class ClipView : UserControl, INotchPageView
 
     private static TextBlock HintText(string text) => new()
     {
-        Text = text,
-        FontFamily = Res<FontFamily>("FontMono"),
-        FontSize = 12,
-        FontWeight = Microsoft.UI.Text.FontWeights.Medium,
-        Foreground = Res<Brush>("SoftBrush"),
+        Text = text.ToUpper(Loc.Culture),
+        Style = Res<Style>("Tiny"),
         VerticalAlignment = VerticalAlignment.Center,
     };
 
     private static Border KeyCap(string key) => new()
     {
         Padding = new Thickness(6, 3, 6, 3),
-        BorderBrush = Res<Brush>("BorderBrush"),
-        BorderThickness = new Thickness(1),
-        CornerRadius = new CornerRadius(4),
-        Child = new TextBlock
-        {
-            Text = key,
-            FontFamily = Res<FontFamily>("FontMono"),
-            FontSize = 12,
-            FontWeight = Microsoft.UI.Text.FontWeights.Medium,
-            Foreground = Res<Brush>("PrimaryBrush"),
-        },
+        BorderBrush = Res<Brush>("PrimaryBrush"),
+        BorderThickness = new Thickness(1.5),
+        CornerRadius = new CornerRadius(6),
+        Child = new TextBlock { Text = key, Style = Res<Style>("Wide"), FontSize = 11 },
     };
 }

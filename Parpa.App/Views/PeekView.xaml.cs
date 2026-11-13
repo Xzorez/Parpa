@@ -1,4 +1,4 @@
-using Microsoft.UI.Dispatching;
+﻿using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -40,31 +40,22 @@ public sealed partial class PeekView : UserControl
         var primary = Theme.Get("primary");
 
         PeekGlyph.Glyph = peek.Glyph;
-        PeekGlyph.OnColor = Microsoft.UI.Colors.White;
-        PeekTile.Background = new SolidColorBrush(TileColor(peek.Glyph, peek.IsCall));
-        Head.Text = peek.Head;
+        // Baldosa rosa con el glifo en negro (verde solo en llamadas).
+        PeekGlyph.OnColor = peek.IsCall ? Microsoft.UI.Colors.White : Theme.Get("bg");
+        PeekTile.Background = new SolidColorBrush(peek.IsCall ? CallGreen : primary);
+        Head.Text = peek.Head.ToUpper(Loc.Culture);
         ToolTipService.SetToolTip(Head, peek.Head);
-        When.Text = peek.When;
+        When.Text = peek.When.ToUpper(Loc.Culture);
         Body.Text = peek.Body;
 
-        PrimaryLabel.Text = peek.PrimaryLabel;
+        PrimaryLabel.Text = peek.PrimaryLabel.ToUpper(Loc.Culture);
         PrimaryButton.Background = new SolidColorBrush(peek.IsCall ? CallGreen : primary);
-        SecondaryLabel.Text = peek.SecondaryLabel;
-        SecondaryLabel.Foreground = new SolidColorBrush(peek.IsCall ? accent : Theme.Get("secondary"));
+        SecondaryLabel.Text = peek.SecondaryLabel.ToUpper(Loc.Culture);
+        SecondaryLabel.Foreground = new SolidColorBrush(peek.IsCall ? accent : primary);
 
         _filled = -1;
         DrawBar();
     }
-
-    /// <summary>Baldosa del icono con el color de su tipo, como los iconos de app (llamada verde, mensaje azul…).</summary>
-    private static Color TileColor(string glyph, bool call) => call ? CallGreen : glyph switch
-    {
-        "mensaje" or "descarga" or "bandeja" or "copias" => Tokens.Current.Accent(3),
-        "claude" or "tareas" or "foco" => Tokens.Current.Accent(1),
-        "llamada" => CallGreen,
-        "luna" => Tokens.ParseHex("#5e5ce6"),
-        _ => Theme.Get("border"),
-    };
 
     /// <summary>La barra solo se actualiza mientras el aviso se ve.</summary>
     public void SetVisible(bool visible)

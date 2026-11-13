@@ -1,4 +1,4 @@
-<UserControl
+﻿<UserControl
     x:Class="Parpa.Views.OpenView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -33,11 +33,8 @@
                 <TextBlock
                     x:Name="PageTitle"
                     VerticalAlignment="Center"
-                    FontFamily="{StaticResource FontDisplay}"
-                    FontSize="15"
-                    FontWeight="SemiBold"
-                    Foreground="{StaticResource PrimaryBrush}"
-                    TextTrimming="CharacterEllipsis" />
+                    FontSize="18"
+                    Style="{StaticResource Wide}" />
             </StackPanel>
 
             <!-- Botón de menú circular 28 px: abre/cierra el menú de burbujas. -->
@@ -64,9 +61,10 @@
                 Grid.Column="2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                FontFamily="{StaticResource FontDisplay}"
-                FontSize="17"
-                FontWeight="SemiBold"
+                FontFamily="{StaticResource FontWide}"
+                FontSize="13"
+                FontStretch="Expanded"
+                FontWeight="Bold"
                 Foreground="{StaticResource PrimaryBrush}" />
             <TextBlock
                 x:Name="HeaderRight"

@@ -1,4 +1,4 @@
-using Microsoft.UI.Dispatching;
+﻿using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -55,7 +55,7 @@ public sealed partial class AudioView : Grid, INotchPageView
         master.Children.Add(_masterLabel);
         master.Children.Add(_masterBars);
         master.Children.Add(_masterValue);
-        _master = new Border { Padding = new Thickness(12, 10, 12, 10), Background = Res<Brush>("CardBrush"), CornerRadius = new CornerRadius(20), Child = master };
+        _master = new Border { Padding = new Thickness(12, 10, 12, 10), BorderBrush = Res<Brush>("PrimaryBrush"), BorderThickness = new Thickness(1.5), CornerRadius = new CornerRadius(10), Child = master };
         Grid.SetRow(_master, 1);
         Children.Add(_master);
         _masterBars.ValueChanged += percent =>
@@ -85,7 +85,7 @@ public sealed partial class AudioView : Grid, INotchPageView
     public void OnShown()
     {
         _shown = true;
-        _masterLabel.Text = Loc.Get("audio_volume");
+        _masterLabel.Text = Loc.Get("audio_volume").ToUpper(Loc.Culture);
         Render();
         _list.ChangeView(null, 0, null, disableAnimation: true);
         _poll.Start();
@@ -113,7 +113,7 @@ public sealed partial class AudioView : Grid, INotchPageView
         var outputs = _audio.Outputs().Take(MaxOutputs).ToList();
         var current = outputs.FirstOrDefault(o => o.IsDefault)?.Id ?? string.Empty;
         var output = new StackPanel { Spacing = 8 };
-        output.Children.Add(new TextBlock { Style = Res<Style>("CardLabel"), Text = Loc.Get("audio_output") });
+        output.Children.Add(new TextBlock { Style = Res<Style>("CardLabel"), Text = Loc.Get("audio_output").ToUpper(Loc.Culture) });
         output.Children.Add(outputs.Count == 0
             ? Ui.Mono(Loc.Get("audio_no_output"), 10)
             : Ui.Segmented(outputs.Select(o => (o.Id, ShortName(o.Name))), current, id => _audio.SetDefaultOutput(id)));
@@ -134,9 +134,9 @@ public sealed partial class AudioView : Grid, INotchPageView
         var glyph = new DotMatrix { Glyph = "micro", OnColor = fg.Color, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top };
         var status = new TextBlock
         {
-            Text = mic is null ? "—" : Loc.Get(on ? "audio_mic_on" : "audio_mic_off"),
-            FontFamily = Res<FontFamily>("FontMono"),
-            FontSize = 11,
+            Text = mic is null ? "—" : Loc.Get(on ? "audio_mic_on" : "audio_mic_off").ToUpper(Loc.Culture),
+            Style = Res<Style>("Tiny"),
+            FontSize = 8,
             Foreground = fg,
             Opacity = 0.7,
             HorizontalAlignment = HorizontalAlignment.Right,
@@ -144,10 +144,11 @@ public sealed partial class AudioView : Grid, INotchPageView
         };
         var label = new TextBlock
         {
-            Text = Loc.Get("audio_mic"),
-            FontFamily = Res<FontFamily>("FontUi"),
-            FontSize = 12,
-            FontWeight = Microsoft.UI.Text.FontWeights.Medium,
+            Text = Loc.Get("audio_mic").ToUpper(Loc.Culture),
+            FontFamily = Res<FontFamily>("FontWide"),
+            FontStretch = Windows.UI.Text.FontStretch.Expanded,
+            FontSize = 11,
+            FontWeight = Microsoft.UI.Text.FontWeights.Black,
             Foreground = fg,
             VerticalAlignment = VerticalAlignment.Bottom,
             Margin = new Thickness(0, 22, 0, 0),
@@ -161,8 +162,10 @@ public sealed partial class AudioView : Grid, INotchPageView
         var tile = Motion.SmoothBackground(new Border
         {
             Padding = new Thickness(12, 10, 12, 10),
-            CornerRadius = new CornerRadius(20),
-            Background = on ? Theme.Brush("primary") : Res<Brush>("CardBrush"),
+            CornerRadius = new CornerRadius(10),
+            BorderBrush = Theme.Brush("primary"),
+            BorderThickness = new Thickness(1.5),
+            Background = on ? Theme.Brush("primary") : Ui.Clear,
             Opacity = mic is null ? 0.45 : 1,
             Child = content,
         });
@@ -277,17 +280,16 @@ public sealed partial class AudioView : Grid, INotchPageView
     private static Border Card(UIElement child) => new()
     {
         Padding = new Thickness(12, 10, 12, 10),
-        Background = Res<Brush>("CardBrush"),
-        CornerRadius = new CornerRadius(20),
+        BorderBrush = Res<Brush>("PrimaryBrush"),
+        BorderThickness = new Thickness(1.5),
+        CornerRadius = new CornerRadius(10),
         Child = child,
     };
 
     private static TextBlock Value() => new()
     {
-        FontFamily = Res<FontFamily>("FontDisplay"),
+        Style = Res<Style>("Wide"),
         FontSize = 13,
-        FontWeight = Microsoft.UI.Text.FontWeights.Bold,
-        Foreground = Theme.Brush("primary"),
         VerticalAlignment = VerticalAlignment.Center,
     };
 }

@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Parpa.Controls;
@@ -54,16 +54,14 @@ public sealed partial class QuickView : Grid, INotchPageView
         Grid.SetRow(bottom, 1);
         Children.Add(bottom);
 
-        var sounds = new Grid { Padding = new Thickness(12, 10, 12, 10), Background = Res<Brush>("CardBrush"), CornerRadius = new CornerRadius(20), ColumnSpacing = 12 };
+        var sounds = new Grid { Padding = new Thickness(12, 10, 12, 10), BorderBrush = Res<Brush>("PrimaryBrush"), BorderThickness = new Thickness(1.5), CornerRadius = new CornerRadius(10), ColumnSpacing = 12 };
         sounds.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         sounds.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         sounds.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         _soundsLabel.Style = Res<Style>("CardLabel");
         _soundsLabel.VerticalAlignment = VerticalAlignment.Center;
-        _volumeValue.FontFamily = Res<FontFamily>("FontDisplay");
+        _volumeValue.Style = Res<Style>("Wide");
         _volumeValue.FontSize = 13;
-        _volumeValue.FontWeight = Microsoft.UI.Text.FontWeights.Bold;
-        _volumeValue.Foreground = Theme.Brush("primary");
         _volumeValue.VerticalAlignment = VerticalAlignment.Center;
         Grid.SetColumn(_bars, 1);
         Grid.SetColumn(_volumeValue, 2);
@@ -76,12 +74,11 @@ public sealed partial class QuickView : Grid, INotchPageView
         {
             Padding = new Thickness(14, 0, 14, 0),
             Background = Theme.Brush("primary"),
-            CornerRadius = new CornerRadius(20),
+            CornerRadius = new CornerRadius(10),
             Child = _allSettings,
         };
-        _allSettings.FontFamily = Res<FontFamily>("FontMono");
-        _allSettings.FontSize = 12;
-        _allSettings.FontWeight = Microsoft.UI.Text.FontWeights.Medium;
+        _allSettings.Style = Res<Style>("Tiny");
+        _allSettings.FontWeight = Microsoft.UI.Text.FontWeights.Bold;
         _allSettings.Foreground = Theme.Brush("bg");
         _allSettings.VerticalAlignment = VerticalAlignment.Center;
         allSettings.Tapped += (_, e) =>
@@ -116,8 +113,8 @@ public sealed partial class QuickView : Grid, INotchPageView
     public void OnShown()
     {
         _shown = true;
-        _soundsLabel.Text = Loc.Get("home_sounds");
-        _allSettings.Text = Loc.Get("home_all_settings") + " ›";
+        _soundsLabel.Text = Loc.Get("home_sounds").ToUpper(Loc.Culture);
+        _allSettings.Text = Loc.Get("home_all_settings").ToUpper(Loc.Culture) + " ›";
         _ = RenderAsync();
     }
 
@@ -148,9 +145,9 @@ public sealed partial class QuickView : Grid, INotchPageView
         var glyph = new DotMatrix { Glyph = def.Glyph, OnColor = fg.Color };
         var status = new TextBlock
         {
-            Text = state is null ? "—" : Loc.Get(on ? "quick_on" : "quick_off"),
-            FontFamily = Res<FontFamily>("FontMono"),
-            FontSize = 11,
+            Text = state is null ? "—" : Loc.Get(on ? "quick_on" : "quick_off").ToUpper(Loc.Culture),
+            Style = Res<Style>("Tiny"),
+            FontSize = 8,
             Foreground = fg,
             Opacity = 0.7,
             HorizontalAlignment = HorizontalAlignment.Right,
@@ -163,10 +160,11 @@ public sealed partial class QuickView : Grid, INotchPageView
 
         var label = new TextBlock
         {
-            Text = Loc.Get(def.LabelKey),
-            FontFamily = Res<FontFamily>("FontUi"),
-            FontSize = 12,
-            FontWeight = Microsoft.UI.Text.FontWeights.Medium,
+            Text = Loc.Get(def.LabelKey).ToUpper(Loc.Culture),
+            FontFamily = Res<FontFamily>("FontWide"),
+            FontStretch = Windows.UI.Text.FontStretch.Expanded,
+            FontSize = 11,
+            FontWeight = Microsoft.UI.Text.FontWeights.Black,
             Foreground = fg,
             VerticalAlignment = VerticalAlignment.Bottom,
             TextTrimming = TextTrimming.CharacterEllipsis,
@@ -179,8 +177,10 @@ public sealed partial class QuickView : Grid, INotchPageView
         var tile = Motion.SmoothBackground(new Border
         {
             Padding = new Thickness(12, 10, 12, 10),
-            CornerRadius = new CornerRadius(20),
-            Background = on ? Theme.Brush("primary") : Res<Brush>("CardBrush"),
+            CornerRadius = new CornerRadius(10),
+            BorderBrush = Theme.Brush("primary"),
+            BorderThickness = new Thickness(1.5),
+            Background = on ? Theme.Brush("primary") : Ui.Clear,
             Opacity = state is null ? 0.45 : 1,
             Child = content,
         });
@@ -192,11 +192,11 @@ public sealed partial class QuickView : Grid, INotchPageView
             SoundService.Play("click");
             // El mosaico cambia de color con transición y después se aplica el ajuste (que lo redibuja todo).
             var next = !on;
-            tile.Background = next ? Theme.Brush("primary") : Res<Brush>("CardBrush");
+            tile.Background = next ? Theme.Brush("primary") : Ui.Clear;
             var nextFg = Theme.Brush(next ? "bg" : "primary");
             glyph.OnColor = nextFg.Color;
             status.Foreground = label.Foreground = nextFg;
-            status.Text = Loc.Get(next ? "quick_on" : "quick_off");
+            status.Text = Loc.Get(next ? "quick_on" : "quick_off").ToUpper(Loc.Culture);
             Motion.AfterTransition(async () =>
             {
                 await def.Toggle();

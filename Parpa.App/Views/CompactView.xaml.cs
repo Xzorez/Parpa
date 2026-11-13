@@ -1,4 +1,4 @@
-using Microsoft.UI.Composition;
+﻿using Microsoft.UI.Composition;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -35,7 +35,8 @@ public sealed partial class CompactView : UserControl
         Theme.Changed += ApplyArtColor;
     }
 
-    private void ApplyArtColor() => Equalizer.OnColor = ArtColor.Current ?? Theme.Get("primary");
+    // Estilo Akira: una sola tinta, también en el ecualizador.
+    private void ApplyArtColor() => Equalizer.OnColor = Theme.Get("primary");
 
     public void Show(NotchActivity activity, bool doNotDisturb, Windows.UI.Color accent)
     {
@@ -43,9 +44,9 @@ public sealed partial class CompactView : UserControl
         Width = Tokens.Current.NotchSize(activity.SizeToken).W;
         ActivityGlyph.Glyph = activity.Glyph;
         // Canción nueva (u otra actividad): el título entra deslizándose un poco.
-        if (LabelMain.Text.Length > 0 && LabelMain.Text != activity.Label) Motion.FadeUp(Label, 0, TimeSpan.Zero, TimeSpan.FromMilliseconds(260), fromX: 8);
-        LabelMain.Text = activity.Label;
-        LabelSub.Text = activity.Sub.Length > 0 ? " " + activity.Sub : string.Empty;
+        if (LabelMain.Text.Length > 0 && LabelMain.Text != activity.Label.ToUpper(Loc.Culture)) Motion.FadeUp(Label, 0, TimeSpan.Zero, TimeSpan.FromMilliseconds(260), fromX: 8);
+        LabelMain.Text = activity.Label.ToUpper(Loc.Culture);
+        LabelSub.Text = activity.Sub.Length > 0 ? "  " + activity.Sub.ToUpper(Loc.Culture) : string.Empty;
         ToolTipService.SetToolTip(this, string.IsNullOrEmpty(activity.Sub) ? activity.Label : $"{activity.Label} · {activity.Sub}");
         RightText.Text = activity.RightText ?? string.Empty;
         RightText.Visibility = activity.RightText is null || activity.Live ? Visibility.Collapsed : Visibility.Visible;

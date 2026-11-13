@@ -1,4 +1,4 @@
-<Application
+﻿<Application
     x:Class="Parpa.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -10,10 +10,12 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Tipografía del sistema (estilo isla): Segoe UI Variable para texto, etiquetas y números. -->
-            <FontFamily x:Key="FontUi">Segoe UI Variable Text, Segoe UI</FontFamily>
-            <FontFamily x:Key="FontMono">Segoe UI Variable Text, Segoe UI</FontFamily>
-            <FontFamily x:Key="FontDisplay">Segoe UI Variable Display, Segoe UI</FontFamily>
+            <!-- Tipografía (estilo Akira): todo en Archivo, como un cartel de una sola familia. -->
+            <FontFamily x:Key="FontUi">ms-appx:///Assets/Fonts/Archivo-Variable.ttf#Archivo, Segoe UI Variable Text, Segoe UI</FontFamily>
+            <FontFamily x:Key="FontMono">ms-appx:///Assets/Fonts/Archivo-Variable.ttf#Archivo, Segoe UI Variable Text, Segoe UI</FontFamily>
+            <FontFamily x:Key="FontDisplay">ms-appx:///Assets/Fonts/Archivo-Variable.ttf#Archivo, Segoe UI Variable Display, Segoe UI</FontFamily>
+            <!-- Estilo Akira: Archivo ancha y muy gruesa para títulos y cifras, y en pequeño muy espaciada. -->
+            <FontFamily x:Key="FontWide">ms-appx:///Assets/Fonts/Archivo-Variable.ttf#Archivo, Arial Black</FontFamily>
 
             <!-- Campos de texto sin fondo ni borde en ningún estado (el diseño no los dibuja). -->
             <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="Transparent" />

@@ -1,4 +1,4 @@
-using Microsoft.UI.Input;
+﻿using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -37,12 +37,11 @@ public sealed partial class NotesView : UserControl, INotchPageView
         Draft.PlaceholderText = Loc.Get("notes_ph");
         SaveHint.Text = Loc.Get("notes_save_hint");
         SaveButton.Text = Loc.Get("notes_save");
-        SavedLabel.Text = Loc.Get("notes_saved_list");
+        SavedLabel.Text = Loc.Get("notes_saved_list").ToUpper(Loc.Culture);
         BackButton.Text = "‹ " + Loc.Get("notes_back");
         CopyButton.Text = Loc.Get("clip_copy");
         DeleteButton.Text = Loc.Get("notes_delete");
-        DeleteButton.Foreground = new SolidColorBrush(Tokens.Current.Accent(_app.Settings.Accent));
-        EmptyTitle.Text = Loc.Get("notes_empty");
+        EmptyTitle.Text = Loc.Get("notes_empty").ToUpper(Loc.Culture);
         EmptyText.Text = Loc.Get("notes_empty_2");
         Render();
     }
@@ -66,7 +65,7 @@ public sealed partial class NotesView : UserControl, INotchPageView
         if (_open is not null)
         {
             var number = notes.ToList().IndexOf(_open) + 1;
-            NoteTitle.Text = Loc.Format("notes_note_n", ("n", number.ToString("00")));
+            NoteTitle.Text = Loc.Format("notes_note_n", ("n", number.ToString("00"))).ToUpper(Loc.Culture);
             NoteTime.Text = ClockService.Format(_open.Created, _app.Settings.H24);
             NoteText.Text = _open.Text;
             CopyButton.Text = Loc.Get("clip_copy");

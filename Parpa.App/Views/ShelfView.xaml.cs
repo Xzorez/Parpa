@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
@@ -36,10 +36,10 @@ public sealed partial class ShelfView : UserControl, INotchPageView
     public void OnShown()
     {
         _shown = true;
-        PickTitle.Text = Loc.Get("shelf_empty_1");
-        PickText.Text = Loc.Get("shelf_pick_hint");
-        EmptyTitle.Text = Loc.Get("shelf_empty_1");
-        EmptyText.Text = Loc.Get("shelf_empty_2");
+        PickTitle.Text = Loc.Get("shelf_empty_1").ToUpper(Loc.Culture);
+        PickText.Text = Loc.Get("shelf_pick_hint").ToUpper(Loc.Culture);
+        EmptyTitle.Text = Loc.Get("shelf_empty_1").ToUpper(Loc.Culture);
+        EmptyText.Text = Loc.Get("shelf_empty_2").ToUpper(Loc.Culture);
         Retry.Text = Loc.Get("empty_errors_retry");
         Render();
     }
@@ -85,15 +85,13 @@ public sealed partial class ShelfView : UserControl, INotchPageView
     /// <summary>Tarjeta: icono de puntos 22 px + tipo arriba; nombre y tamaño abajo. Anillo 1,5 px si está elegida.</summary>
     private Border CreateTile(ShelfItem item)
     {
-        var icon = new Grid { Width = 22, Height = 22, Background = Res<Brush>("DividerBrush"), CornerRadius = new CornerRadius(8) };
-        icon.Children.Add(new DotPattern { DotColor = Color.FromArgb(255, 0x4a, 0x4a, 0x50), Spacing = 4, CornerRadius = new CornerRadius(8) });
+        var icon = new Grid { Width = 22, Height = 22, BorderBrush = Res<Brush>("PrimaryBrush"), BorderThickness = new Thickness(1.5), CornerRadius = new CornerRadius(6) };
+        icon.Children.Add(new DotPattern { DotColor = Theme.Get("primary"), Spacing = 4, CornerRadius = new CornerRadius(6) });
 
         var kind = new TextBlock
         {
-            Text = item.Kind,
-            FontFamily = Res<FontFamily>("FontMono"),
-            FontSize = 11,
-            Foreground = Res<Brush>("QuaternaryBrush"),
+            Text = item.Kind.ToUpper(Loc.Culture),
+            Style = Res<Style>("Tiny"),
             HorizontalAlignment = HorizontalAlignment.Right,
         };
         var top = new Grid();
@@ -105,10 +103,8 @@ public sealed partial class ShelfView : UserControl, INotchPageView
         ToolTipService.SetToolTip(name, item.Path);
         var size = new TextBlock
         {
-            Text = ShelfService.SizeText(item),
-            FontFamily = Res<FontFamily>("FontMono"),
-            FontSize = 11,
-            Foreground = Res<Brush>("SecondaryBrush"),
+            Text = ShelfService.SizeText(item).ToUpper(Loc.Culture),
+            Style = Res<Style>("Tiny"),
         };
         var bottom = new StackPanel { Spacing = 1, VerticalAlignment = VerticalAlignment.Bottom };
         bottom.Children.Add(name);
@@ -121,10 +117,11 @@ public sealed partial class ShelfView : UserControl, INotchPageView
         var tile = new Border
         {
             Padding = new Thickness(10),
-            Background = Res<Brush>("CardBrush"),
-            CornerRadius = new CornerRadius(16),
-            BorderThickness = new Thickness(1.5),
-            BorderBrush = item == _selected ? Res<Brush>("PrimaryBrush") : new SolidColorBrush(Microsoft.UI.Colors.Transparent),
+            // Marco rosa; la elegida lleva un marco más grueso.
+            Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent),
+            CornerRadius = new CornerRadius(10),
+            BorderThickness = new Thickness(item == _selected ? 3 : 1.5),
+            BorderBrush = Res<Brush>("PrimaryBrush"),
             Child = content,
             CanDrag = true,
         };

@@ -104,7 +104,7 @@ public sealed partial class OpenView : UserControl
         // Cabecera: glifo + título de la ventana; en el menú, solo "MENÚ".
         PageGlyph.Visibility = launcher ? Visibility.Collapsed : Visibility.Visible;
         PageGlyph.Glyph = page.Glyph;
-        PageTitle.Text = Loc.Get(launcher ? "windows_menu" : page.TitleKey);
+        PageTitle.Text = Loc.Get(launcher ? "windows_menu" : page.TitleKey).ToUpper(Loc.Culture);
         UpdateMenuButton();
         UpdateHeaderRight();
     }

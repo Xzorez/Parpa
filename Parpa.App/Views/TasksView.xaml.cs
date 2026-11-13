@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
@@ -45,11 +45,11 @@ public sealed partial class TasksView : UserControl, INotchPageView
     public void OnShown()
     {
         _shown = true;
-        TodayLabel.Text = Loc.Get("todo_today");
-        NewLabel.Text = Loc.Get("todo_new");
+        TodayLabel.Text = Loc.Get("todo_today").ToUpper(Loc.Culture);
+        NewLabel.Text = Loc.Get("todo_new").ToUpper(Loc.Culture);
         NewBox.PlaceholderText = Loc.Get("todo_new_ph");
-        DoneTitle.Text = Loc.Get("todo_all_done");
-        DoneText.Text = Loc.Get("todo_all_done_2");
+        DoneTitle.Text = Loc.Get("todo_all_done").ToUpper(Loc.Culture);
+        DoneText.Text = Loc.Get("todo_all_done_2").ToUpper(Loc.Culture);
         DoneNew.Text = Loc.Get("todo_new");
         Render();
     }

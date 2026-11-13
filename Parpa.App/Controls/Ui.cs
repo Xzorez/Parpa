@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Parpa.Services;
@@ -82,9 +82,10 @@ public static class Ui
             Spacing = 2,
             Padding = new Thickness(3),
             Background = Theme.Brush("divider"),
-            CornerRadius = new CornerRadius(999),
             VerticalAlignment = VerticalAlignment.Center,
         };
+        // Radio = mitad del alto real (999 en XAML sale como un óvalo).
+        Pill.SetIsPill(panel, true);
         var views = new List<(Border Option, TextBlock Text)>();
         foreach (var (value, label) in options)
         {
@@ -93,10 +94,10 @@ public static class Ui
             var option = Motion.SmoothBackground(new Border
             {
                 Padding = new Thickness(padX + 2, padY - 1, padX + 2, padY - 1),
-                CornerRadius = new CornerRadius(999),
                 Background = selected ? Theme.Brush("primary") : Clear,
                 Child = text,
             });
+            Pill.SetIsPill(option, true);
             views.Add((option, text));
             option.Tapped += (_, e) =>
             {

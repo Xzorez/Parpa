@@ -5,7 +5,8 @@
     xmlns:c="using:Parpa.Controls">
 
     <Grid>
-        <!-- Música arriba (carátula de fondo) y una fila de píldoras debajo: CPU, GPU, RAM, volumen y próxima tarea. -->
+        <!-- Estilo Akira: carátula en duotono a la izquierda, título ancho y una píldora con progreso y controles;
+             debajo, píldoras con borde: CPU, GPU, RAM (la más alta, rellena), volumen y próxima tarea. -->
         <Grid x:Name="Cards" RowSpacing="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -14,162 +15,189 @@
 
             <!-- MÚSICA -->
             <Grid x:Name="MusicCard" Height="100">
-                <Grid x:Name="MusicFilled" Background="{StaticResource CardBrush}" CornerRadius="20">
-                    <!-- Fondo: la carátula decodificada a 12 px y estirada se ve difuminada; encima, un velo oscuro. -->
-                    <Image
-                        x:Name="ArtBackdrop"
-                        Margin="-30"
-                        IsHitTestVisible="False"
-                        Opacity="0"
-                        Stretch="UniformToFill" />
-                    <Border x:Name="ArtShade" IsHitTestVisible="False" Opacity="0">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Offset="0" Color="#14000000" />
-                                <GradientStop Offset="1" Color="#73000000" />
-                            </LinearGradientBrush>
-                        </Border.Background>
-                    </Border>
-
-                    <Grid Padding="12" ColumnSpacing="14">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="76" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <!-- Carátula 76 px, radio 14 (nota si la app no la da). -->
-                        <Grid
-                            x:Name="ArtTile"
-                            Width="76"
-                            Height="76"
-                            Background="#33FFFFFF"
-                            CornerRadius="14">
+                <Grid x:Name="MusicFilled" ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <!-- Carátula a dos tintas (negro y rosa), con grano; nota si la app no la da. -->
+                    <Border
+                        x:Name="ArtTile"
+                        Background="{StaticResource CardBrush}"
+                        BorderBrush="{StaticResource PrimaryBrush}"
+                        BorderThickness="1.5"
+                        CornerRadius="10">
+                        <Grid>
                             <TextBlock
+                                x:Name="ArtIcon"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                x:Name="ArtIcon"
                                 FontSize="26"
-                                Foreground="#B3FFFFFF"
+                                Foreground="{StaticResource PrimaryBrush}"
                                 Text="&#xE8D6;" />
                             <Image x:Name="Artwork" Stretch="UniformToFill" />
                         </Grid>
+                    </Border>
 
-                        <Grid Grid.Column="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Margin="0,2,12,0" Spacing="2">
-                                <TextBlock
-                                    x:Name="MusicTitle"
-                                    FontFamily="{StaticResource FontUi}"
-                                    FontSize="16"
-                                    FontWeight="SemiBold"
-                                    Foreground="White"
-                                    TextTrimming="CharacterEllipsis" />
-                                <TextBlock
-                                    x:Name="MusicApp"
-                                    FontFamily="{StaticResource FontUi}"
-                                    FontSize="12"
-                                    Foreground="#B3FFFFFF"
-                                    TextTrimming="CharacterEllipsis" />
-                            </StackPanel>
-                            <StackPanel
-                                Grid.Column="1"
-                                Margin="0,2,2,0"
-                                VerticalAlignment="Top"
-                                Orientation="Horizontal"
-                                Spacing="18">
-                                <TextBlock x:Name="PreviousButton" VerticalAlignment="Center" Foreground="White" Text="&#xE892;" Style="{StaticResource MediaControl}" Tapped="PreviousButton_Tapped" />
-                                <TextBlock x:Name="PlayPauseButton" VerticalAlignment="Center" FontSize="22" Foreground="White" Text="&#xE769;" Style="{StaticResource MediaControl}" Tapped="PlayPauseButton_Tapped" />
-                                <TextBlock x:Name="NextButton" VerticalAlignment="Center" Foreground="White" Text="&#xE893;" Style="{StaticResource MediaControl}" Tapped="NextButton_Tapped" />
-                            </StackPanel>
-                            <!-- Progreso: tiempo · línea de 4 px · lo que falta. -->
-                            <Grid
-                                Grid.Row="2"
-                                Grid.ColumnSpan="2"
-                                Margin="0,0,2,2"
-                                ColumnSpacing="10">
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
+                        <TextBlock x:Name="MusicTitle" FontSize="21" LineHeight="25" Style="{StaticResource Wide}" />
+                        <!-- Adornos de cartel: píldora, onda y estrella. -->
+                        <StackPanel
+                            Grid.Row="1"
+                            Margin="0,4,0,0"
+                            Orientation="Horizontal"
+                            Spacing="10">
+                            <Border
+                                Width="40"
+                                Height="14"
+                                VerticalAlignment="Center"
+                                BorderBrush="{StaticResource PrimaryBrush}"
+                                BorderThickness="1.4"
+                                CornerRadius="7">
+                                <Border
+                                    Height="1.4"
+                                    Margin="6,0"
+                                    VerticalAlignment="Center"
+                                    Background="{StaticResource PrimaryBrush}" />
+                            </Border>
+                            <Path
+                                Width="48"
+                                Height="14"
+                                VerticalAlignment="Center"
+                                Data="M1,7 C4,-1 7,15 10,7 S16,-1 19,7 S25,15 28,7 S34,-1 37,7 S43,15 46,7"
+                                Stroke="{StaticResource PrimaryBrush}"
+                                StrokeThickness="1.4" />
+                            <Grid Width="14" Height="14" VerticalAlignment="Center">
+                                <Ellipse Stroke="{StaticResource PrimaryBrush}" StrokeThickness="1.3" />
+                                <Path
+                                    Data="M7,1 V13 M1,7 H13 M2.8,2.8 L11.2,11.2 M11.2,2.8 L2.8,11.2"
+                                    Stroke="{StaticResource PrimaryBrush}"
+                                    StrokeThickness="1.1" />
+                            </Grid>
+                        </StackPanel>
+                        <TextBlock x:Name="MusicApp" Grid.Row="2" Margin="0,6,0,0" Style="{StaticResource Tiny}" />
+
+                        <!-- Píldora: tiempo · línea con bolita · lo que falta · anterior, play/pausa, siguiente. -->
+                        <Border
+                            Grid.Row="4"
+                            Padding="10,0,3,0"
+                            BorderBrush="{StaticResource PrimaryBrush}"
+                            BorderThickness="1.5"
+                            CornerRadius="12">
+                            <Grid ColumnSpacing="8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock
-                                    x:Name="MusicPosition"
-                                    MinWidth="30"
-                                    VerticalAlignment="Center"
-                                    FontFamily="{StaticResource FontUi}"
-                                    FontSize="11"
-                                    Foreground="#B3FFFFFF" />
+                                <TextBlock x:Name="MusicPosition" Style="{StaticResource Tiny}" CharacterSpacing="60" />
                                 <Grid
                                     x:Name="MusicProgress"
                                     Grid.Column="1"
-                                    Height="4"
+                                    Height="9"
                                     VerticalAlignment="Center">
-                                    <Border x:Name="MusicTrack" Background="#40FFFFFF" CornerRadius="2" />
                                     <Border
-                                        x:Name="MusicProgressFill"
-                                        Width="0"
+                                        x:Name="MusicTrack"
+                                        Height="1.5"
+                                        VerticalAlignment="Center"
+                                        Background="{StaticResource PrimaryBrush}" />
+                                    <Ellipse
+                                        x:Name="MusicKnob"
+                                        Width="9"
+                                        Height="9"
                                         HorizontalAlignment="Left"
-                                        Background="White"
-                                        CornerRadius="2" />
+                                        Fill="{StaticResource PrimaryBrush}" />
                                 </Grid>
-                                <TextBlock
-                                    x:Name="MusicDuration"
-                                    Grid.Column="2"
-                                    MinWidth="34"
+                                <TextBlock x:Name="MusicDuration" Grid.Column="2" Style="{StaticResource Tiny}" CharacterSpacing="60" />
+                                <StackPanel
+                                    Grid.Column="3"
                                     VerticalAlignment="Center"
-                                    FontFamily="{StaticResource FontUi}"
-                                    FontSize="11"
-                                    Foreground="#B3FFFFFF"
-                                    TextAlignment="Right" />
+                                    Orientation="Horizontal"
+                                    Spacing="1">
+                                    <Border
+                                        x:Name="PreviousButton"
+                                        Width="20"
+                                        Height="18"
+                                        Background="Transparent"
+                                        Tapped="PreviousButton_Tapped">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontSize="9"
+                                            Style="{StaticResource MediaControl}"
+                                            Text="&#xE892;" />
+                                    </Border>
+                                    <Border
+                                        x:Name="PlayPauseButton"
+                                        Width="18"
+                                        Height="18"
+                                        Background="{StaticResource PrimaryBrush}"
+                                        CornerRadius="9"
+                                        Tapped="PlayPauseButton_Tapped">
+                                        <TextBlock
+                                            x:Name="PlayPauseIcon"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontSize="8"
+                                            Foreground="{StaticResource BgBrush}"
+                                            Style="{StaticResource MediaControl}"
+                                            Text="&#xE769;" />
+                                    </Border>
+                                    <Border
+                                        x:Name="NextButton"
+                                        Width="20"
+                                        Height="18"
+                                        Background="Transparent"
+                                        Tapped="NextButton_Tapped">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontSize="9"
+                                            Style="{StaticResource MediaControl}"
+                                            Text="&#xE893;" />
+                                    </Border>
+                                </StackPanel>
                             </Grid>
-                        </Grid>
+                        </Border>
                     </Grid>
                 </Grid>
 
-                <!-- Sin música: la tarjeta se queda, con el icono de nota y el aviso. -->
-                <Grid
-                    x:Name="MusicEmpty"
-                    Padding="12"
-                    Background="{StaticResource CardBrush}"
-                    ColumnSpacing="14"
-                    CornerRadius="20"
-                    Visibility="Collapsed">
+                <!-- Sin música: marco con la nota y el aviso. -->
+                <Grid x:Name="MusicEmpty" ColumnSpacing="12" Visibility="Collapsed">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="76" />
+                        <ColumnDefinition Width="150" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <Grid Background="{StaticResource BorderBrush}" CornerRadius="14">
+                    <Border
+                        BorderBrush="{StaticResource PrimaryBrush}"
+                        BorderThickness="1.5"
+                        CornerRadius="10">
                         <TextBlock
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                             FontSize="26"
-                            Foreground="{StaticResource MutedBrush}"
+                            Foreground="{StaticResource PrimaryBrush}"
                             Text="&#xE8D6;" />
-                    </Grid>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
-                        <TextBlock x:Name="MusicEmptyLabel" Style="{StaticResource CardLabel}" />
-                        <TextBlock
-                            x:Name="NoMusicTitle"
-                            FontFamily="{StaticResource FontUi}"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            Foreground="{StaticResource PrimaryBrush}" />
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
+                        <TextBlock x:Name="MusicEmptyLabel" Style="{StaticResource Tiny}" />
+                        <TextBlock x:Name="NoMusicTitle" FontSize="18" Style="{StaticResource Wide}" />
                         <TextBlock
                             x:Name="NoMusicText"
-                            FontFamily="{StaticResource FontUi}"
-                            FontSize="12"
-                            Foreground="{StaticResource SecondaryBrush}"
-                            MaxLines="1"
-                            TextTrimming="CharacterEllipsis" />
+                            MaxLines="2"
+                            LineHeight="14"
+                            Style="{StaticResource Tiny}"
+                            TextWrapping="Wrap" />
                     </StackPanel>
                 </Grid>
             </Grid>
@@ -184,79 +212,67 @@
                     <ColumnDefinition x:Name="TaskColumn" Width="2.2*" />
                 </Grid.ColumnDefinitions>
 
-                <Grid
+                <Border
                     x:Name="MusicVolume"
                     Grid.Column="3"
-                    Padding="12,0"
-                    Background="{StaticResource CardBrush}"
-                    ColumnSpacing="8"
-                    CornerRadius="14"
+                    Padding="10,0"
+                    Background="Transparent"
+                    BorderBrush="{StaticResource PrimaryBrush}"
+                    BorderThickness="1.5"
+                    CornerRadius="8"
                     PointerWheelChanged="MusicVolume_PointerWheelChanged"
                     Visibility="Collapsed">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock
-                        x:Name="MusicVolumeLabel"
-                        VerticalAlignment="Center"
-                        FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                        FontSize="14"
-                        Foreground="{StaticResource SecondaryBrush}"
-                        Text="&#xE767;" />
-                    <TextBlock
-                        x:Name="MusicVolumeValue"
-                        Grid.Column="2"
-                        MinWidth="28"
-                        VerticalAlignment="Center"
-                        FontFamily="{StaticResource FontUi}"
-                        FontSize="12"
-                        FontWeight="SemiBold"
-                        Foreground="{StaticResource PrimaryBrush}"
-                        TextAlignment="Right" />
-                </Grid>
+                    <Grid x:Name="MusicVolumeRow" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Name="MusicVolumeLabel" Style="{StaticResource Tiny}" Text="VOL" />
+                        <TextBlock
+                            x:Name="MusicVolumeValue"
+                            Grid.Column="2"
+                            MinWidth="30"
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            Style="{StaticResource Wide}"
+                            TextAlignment="Right" />
+                    </Grid>
+                </Border>
 
                 <!-- PRÓXIMA TAREA: círculo para marcarla hecha, texto y hora. -->
-                <Grid
+                <Border
                     x:Name="TaskCard"
                     Grid.Column="4"
-                    Padding="10,0,12,0"
-                    Background="{StaticResource CardBrush}"
-                    ColumnSpacing="8"
-                    CornerRadius="14">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Border
-                        x:Name="TaskDone"
-                        Width="16"
-                        Height="16"
-                        VerticalAlignment="Center"
-                        Background="Transparent"
-                        BorderBrush="{StaticResource MutedBrush}"
-                        BorderThickness="2"
-                        CornerRadius="8"
-                        Tapped="TaskDone_Tapped" />
-                    <TextBlock
-                        x:Name="TaskText"
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        FontFamily="{StaticResource FontUi}"
-                        FontSize="12"
-                        FontWeight="SemiBold"
-                        Foreground="{StaticResource PrimaryBrush}"
-                        TextTrimming="CharacterEllipsis" />
-                    <TextBlock
-                        x:Name="TaskTime"
-                        Grid.Column="2"
-                        VerticalAlignment="Center"
-                        FontFamily="{StaticResource FontUi}"
-                        FontSize="12"
-                        FontWeight="SemiBold" />
-                </Grid>
+                    Padding="10,0"
+                    BorderBrush="{StaticResource PrimaryBrush}"
+                    BorderThickness="1.5"
+                    CornerRadius="8">
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            x:Name="TaskDone"
+                            Width="14"
+                            Height="14"
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            BorderBrush="{StaticResource PrimaryBrush}"
+                            BorderThickness="1.5"
+                            CornerRadius="7"
+                            Tapped="TaskDone_Tapped" />
+                        <TextBlock x:Name="TaskText" Grid.Column="1" Style="{StaticResource Tiny}" />
+                        <TextBlock
+                            x:Name="TaskTime"
+                            Grid.Column="2"
+                            VerticalAlignment="Center"
+                            FontSize="12"
+                            Style="{StaticResource Wide}" />
+                    </Grid>
+                </Border>
             </Grid>
         </Grid>
 

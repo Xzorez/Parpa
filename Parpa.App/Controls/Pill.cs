@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace Parpa.Controls;
@@ -38,6 +38,7 @@ public static class Pill
         {
             case Border border: border.CornerRadius = radius; break;
             case Grid grid: grid.CornerRadius = radius; break;
+            case StackPanel panel: panel.CornerRadius = radius; break;
         }
     }
 }
