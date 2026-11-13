@@ -44,13 +44,16 @@ public sealed partial class CompactView : UserControl
         Width = Tokens.Current.NotchSize(activity.SizeToken).W;
         ActivityGlyph.Glyph = activity.Glyph;
         // Canción nueva (u otra actividad): el título entra deslizándose un poco.
-        if (LabelMain.Text.Length > 0 && LabelMain.Text != activity.Label.ToUpper(Loc.Culture)) Motion.FadeUp(Label, 0, TimeSpan.Zero, TimeSpan.FromMilliseconds(260), fromX: 8);
+        if (LabelMain.Text.Length > 0 && LabelMain.Text != activity.Label.ToUpper(Loc.Culture) && activity.Swatch is null) Motion.FadeUp(Label, 0, TimeSpan.Zero, TimeSpan.FromMilliseconds(260), fromX: 8);
         LabelMain.Text = activity.Label.ToUpper(Loc.Culture);
         LabelSub.Text = activity.Sub.Length > 0 ? "  " + activity.Sub.ToUpper(Loc.Culture) : string.Empty;
         ToolTipService.SetToolTip(this, string.IsNullOrEmpty(activity.Sub) ? activity.Label : $"{activity.Label} · {activity.Sub}");
         RightText.Text = activity.RightText ?? string.Empty;
-        RightText.Visibility = activity.RightText is null || activity.Live ? Visibility.Collapsed : Visibility.Visible;
-        Equalizer.Visibility = activity.RightText is null && !activity.Live ? Visibility.Visible : Visibility.Collapsed;
+        var swatch = activity.Swatch is { } color;
+        Swatch.Fill = swatch ? new SolidColorBrush(activity.Swatch!.Value) : null;
+        Swatch.Visibility = swatch ? Visibility.Visible : Visibility.Collapsed;
+        RightText.Visibility = activity.RightText is null || activity.Live || swatch ? Visibility.Collapsed : Visibility.Visible;
+        Equalizer.Visibility = activity.RightText is null && !activity.Live && !swatch ? Visibility.Visible : Visibility.Collapsed;
         LiveDot.Fill = new SolidColorBrush(accent);
         LiveDot.Visibility = activity.Live ? Visibility.Visible : Visibility.Collapsed;
         if (activity.Live) StartBlink();

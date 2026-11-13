@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
 using Parpa.ViewModels;
 
 namespace Parpa.Services;
@@ -23,7 +23,9 @@ public sealed record NotchServices(
     ClipboardService Clipboard,
     ShelfService Shelf,
     TasksService Tasks,
-    NotesService Notes);
+    NotesService Notes,
+    WeatherService Weather,
+    Eyedropper Picker);
 
 /// <summary>Una ventana del notch abierto (Inicio, Portapapeles…).</summary>
 public interface INotchPageView

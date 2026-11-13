@@ -69,12 +69,13 @@ public static class MascotFrames
     }
 
     /// <summary>Mira hacia una burbuja del menú: desplazamiento horizontal −2…2 y una fila abajo si está debajo.</summary>
-    public static bool[] Looking(int column, int row)
+    public static bool[] Looking(int column, int row, bool blink = false)
     {
         var cells = new bool[Columns * Rows];
         foreach (var x in new[] { 3, 8 })
             for (var r = 1; r <= 3; r++)
             {
+                if (blink && r != 2) continue;
                 Set(cells, r + row, x + column);
                 Set(cells, r + row, x + 1 + column);
             }
@@ -90,6 +91,12 @@ public static class MascotFrames
                 if (!((r == 0 || r == 4) && (c == 4 || c == 8))) Set(cells, r, c);
         return cells;
     }
+
+    /// <summary>Dormida con la "z" subiendo (cuando nadie toca el PC).</summary>
+    public static bool[] Sleeping(long tick) => Sleep(tick);
+
+    /// <summary>Contenta botando (al volver alguien al PC).</summary>
+    public static bool[] Waking(long tick) => Happy(tick);
 
     /// <summary>Contenta y quieta ("^ ^"), para estados vacíos.</summary>
     public static bool[] HappyStill() => Happy(0);

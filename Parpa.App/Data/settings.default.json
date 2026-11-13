@@ -43,7 +43,8 @@
     "homeCards": {
       "MÚSICA": true,
       "SISTEMA": true,
-      "PRÓXIMA TAREA": false
+      "PRÓXIMA TAREA": false,
+      "TIEMPO": true
     },
     "pomo": 25,
     "brk": 5,

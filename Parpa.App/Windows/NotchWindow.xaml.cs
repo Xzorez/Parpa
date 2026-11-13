@@ -38,6 +38,9 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     private readonly ClipboardService _clipboard;
     private readonly ShelfService _shelf;
     private readonly ScreenshotWatcher _screenshots = new();
+    private readonly DownloadWatcher _downloads = new();
+    private readonly WeatherService _weather = new();
+    private readonly Eyedropper _picker = new();
     private readonly TasksService _tasks = new();
     private readonly NotesService _notes = new();
     private readonly MemoryTrim _trim;
@@ -101,7 +104,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         _notices = new NoticeCenter(_vm, _s);
         _clipboard = new ClipboardService(_hwnd, _s);
         _shelf = new ShelfService(_s, _clipboard);
-        _open = new OpenView(new NotchServices(_vm, _s, this, _system, _notices, _clipboard, _shelf, _tasks, _notes));
+        _open = new OpenView(new NotchServices(_vm, _s, this, _system, _notices, _clipboard, _shelf, _tasks, _notes, _weather, _picker));
         _vm.Changed += OnStateChanged;
         _trim = new MemoryTrim(() => !_vm.IsOpen);
 
@@ -117,6 +120,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         Shape.AddView(_drop, anchorLeft: true);
         Shape.AddView(_open, anchorLeft: true);
         Shape.TransitionCompleted += () => UpdateRegion(_geometry, null);
+        _idle.Bounds = () => { Win32.GetWindowRect(_hwnd, out var rect); return rect; };
         _idle.Apply(_s, ReducedMotion);
 
         _clock.MinuteChanged += () => { _idle.Apply(_s, ReducedMotion); _open.Apply(_s); _trim.Collect(); };
@@ -204,6 +208,8 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
             _hotkey.Dispose();
             _outside.Dispose();
             _screenshots.Dispose();
+            _downloads.Dispose();
+            _picker.Dispose();
             _system.Dispose();
             _notices.Dispose();
             _privacy.Dispose();
@@ -335,6 +341,68 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
                 Key: "screenshot"));
         };
 
+        // Descarga del navegador: actividad con lo que lleva bajado; al terminar, a la bandeja con un aviso breve.
+        _downloads.Progress += progress =>
+        {
+            _vm.SetActivity(NotchViewModel.ActivityDownload, progress is null ? null : new NotchActivity(
+                SizeToken: "download",
+                Glyph: "descarga",
+                Label: Loc.Get(progress.Count > 1 ? "compact_downloads" : "compact_download").Replace("{n}", $"{progress.Count}"),
+                Sub: progress.Name,
+                IsPlaying: false,
+                RightText: SizeText(progress.Bytes)));
+        };
+        _downloads.Completed += path =>
+        {
+            if (!_s.ShelfDownloads) return;
+            var index = _shelf.Add([path]);
+            if (index >= _shelf.Items.Count) return; // ya estaba
+            _open.Shelf.Select(index);
+            if (_vm.IsOpen) return;
+            _vm.EnqueuePeek(new NotchPeek(
+                Glyph: "descarga",
+                Head: $"{Loc.Get("windows_shelf")} · {Loc.Get("peek_downloaded")}",
+                When: string.Empty,
+                Body: Path.GetFileName(path),
+                PrimaryLabel: Loc.Get("peek_view"),
+                SecondaryLabel: Loc.Get("peek_ok"),
+                Priority: NotchPeek.PriorityInfo,
+                IsCall: false,
+                OnPrimary: () =>
+                {
+                    _open.Shelf.Select(index);
+                    _vm.ShowPage(NotchPage.Shelf);
+                },
+                Key: "download"));
+        };
+        _downloads.Start();
+
+        // Cuentagotas (Ajustes rápidos): el notch se cierra y enseña el color bajo el cursor; el clic lo copia.
+        _picker.Hover += color => _vm.SetActivity(NotchViewModel.ActivityPicker, new NotchActivity(
+            SizeToken: "music",
+            Glyph: "gotero",
+            Label: Eyedropper.Hex(color),
+            Sub: Loc.Get("compact_pick_hint"),
+            IsPlaying: false,
+            Swatch: color));
+        _picker.Finished += color =>
+        {
+            _vm.SetActivity(NotchViewModel.ActivityPicker, null);
+            if (color is not { } picked) return;
+            var hex = Eyedropper.Hex(picked);
+            try
+            {
+                var package = new global::Windows.ApplicationModel.DataTransfer.DataPackage();
+                package.SetText(hex);
+                global::Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(package);
+            }
+            catch (Exception e)
+            {
+                Log.Info($"Cuentagotas: no se pudo copiar ({e.Message})");
+            }
+            _clipboard.Add(hex); // al historial, con el aviso "Copiado"
+        };
+
         // Tarea a su hora: HECHO / POSPONER (10 min). No molestar la silencia.
         _tasks.Due += task =>
         {
@@ -353,6 +421,14 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         };
 
     }
+
+    /// <summary>Bytes en 1 decimal: 840 KB, 12,4 MB, 1,2 GB.</summary>
+    private static string SizeText(long bytes) => bytes switch
+    {
+        < 1024 * 1024 => $"{Math.Max(1, bytes / 1024)} KB",
+        < 1024L * 1024 * 1024 => (bytes / 1048576.0).ToString(bytes < 100L * 1048576 ? "0.0" : "0", Loc.Culture) + " MB",
+        _ => (bytes / 1073741824.0).ToString("0.0", Loc.Culture) + " GB",
+    };
 
     /// <summary>Muestra la ventana sin quitar el foco a la app activa (salvo que esté apartada por pantalla completa).</summary>
     public void ShowWithoutActivation()

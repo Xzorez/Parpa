@@ -32,10 +32,13 @@
     "mic":          { "es": "Micro", "en": "Mic" },
     "camera":       { "es": "Cámara", "en": "Camera" },
     "download":     { "es": "Descarga", "en": "Download" },
+    "downloads":    { "es": "{n} descargas", "en": "{n} downloads" },
+    "pick_hint":    { "es": "Clic: copiar", "en": "Click: copy" },
     "in_call":      { "es": "En llamada", "en": "In call" },
     "reply_ready":  { "es": "Respuesta lista", "en": "Reply ready" }
   },
   "home": {
+    "weather":  { "es": "Tiempo", "en": "Weather" },
     "music":            { "es": "Música", "en": "Music" },
     "focus":            { "es": "Foco", "en": "Focus" },
     "system":           { "es": "Sistema", "en": "System" },
@@ -50,6 +53,8 @@
     "sounds":           { "es": "Sonidos", "en": "Sounds" }
   },
   "quick": {
+    "picker":   { "es": "Cuentagotas", "en": "Eyedropper" },
+    "pick":     { "es": "Elegir", "en": "Pick" },
     "wifi":      { "es": "Wi-Fi", "en": "Wi-Fi" },
     "bluetooth": { "es": "Bluetooth", "en": "Bluetooth" },
     "dnd":       { "es": "No molestar", "en": "Do not disturb" },
@@ -81,6 +86,7 @@
     "download_done":  { "es": "Descarga completa", "en": "Download complete" },
     "task_due":       { "es": "Tarea para ahora", "en": "Task due now" },
     "copied":         { "es": "Copiado", "en": "Copied" },
+    "downloaded":     { "es": "Descargado", "en": "Downloaded" },
     "screenshot":     { "es": "Captura añadida", "en": "Screenshot added" },
     "dnd_blocked":    { "es": "☾ No molestar activo", "en": "☾ Do not disturb is on" },
     "app_blocked":    { "es": "✕ Avisos de esta app desactivados", "en": "✕ Alerts off for this app" },
@@ -329,6 +335,7 @@
     "shelf_path":     { "es": "Carpeta de la bandeja", "en": "Shelf folder" },
     "shelf_clear":    { "es": "Vaciar al reiniciar", "en": "Clear on restart" },
     "shelf_screenshots": { "es": "Capturas a la bandeja", "en": "Screenshots to the shelf" },
+    "shelf_downloads": { "es": "Descargas a la bandeja", "en": "Downloads to the shelf" },
     "shelf_actions":  { "es": "Acciones rápidas", "en": "Quick actions" },
     "sounds":         { "es": "Sonidos", "en": "Sounds" },
     "volume":         { "es": "Volumen", "en": "Volume" },
@@ -370,6 +377,7 @@
     "clip_exclude_d": { "es": "Nunca guarda lo que copies desde aquí.", "en": "Never keeps what you copy from these." },
     "shelf_clear_d":  { "es": "La bandeja empieza vacía cada vez que se abre Parpa.", "en": "The shelf starts empty every time Parpa opens." },
     "shelf_screenshots_d": { "es": "Cada captura que guarda Windows (Win+Mayús+S, Impr Pant) aparece en la bandeja.", "en": "Every screenshot Windows saves (Win+Shift+S, Print Screen) shows up in the shelf." },
+    "shelf_downloads_d": { "es": "Lo que termina de bajar el navegador en Descargas aparece en la bandeja.", "en": "Whatever your browser finishes downloading to Downloads shows up in the shelf." },
     "shelf_actions_d":{ "es": "Aparecen al tocar un archivo según su tipo.", "en": "Shown when you tap a file, by type." },
     "pomo_d":         { "es": "Duración de cada sesión de foco.", "en": "Length of each focus session." },
     "export":         { "es": "Exportar ajustes", "en": "Export settings" },

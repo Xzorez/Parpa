@@ -18,6 +18,7 @@ public sealed partial class QuickView : Grid, INotchPageView
     private readonly TextBlock _volumeValue = new();
     private readonly TextBlock _soundsLabel = new();
     private readonly TextBlock _allSettings = new();
+    private readonly TextBlock _pickerLabel = new();
     private bool _shown;
 
     private sealed record Tile(string LabelKey, string Glyph, Func<Task<bool?>> Read, Func<Task> Toggle);
@@ -50,6 +51,7 @@ public sealed partial class QuickView : Grid, INotchPageView
         // Fila inferior: SONIDOS + barras + valor | TODOS LOS AJUSTES ›
         var bottom = new Grid { ColumnSpacing = 8 };
         bottom.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        bottom.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         bottom.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         Grid.SetRow(bottom, 1);
         Children.Add(bottom);
@@ -87,7 +89,35 @@ public sealed partial class QuickView : Grid, INotchPageView
             SoundService.Play("page");
             App.Current.OpenSettings();
         };
-        Grid.SetColumn(allSettings, 1);
+        Grid.SetColumn(allSettings, 2);
+
+        // Cuentagotas: el notch se cierra y el siguiente clic copia el color que haya bajo el cursor.
+        _pickerLabel.Style = Res<Style>("Tiny");
+        _pickerLabel.FontWeight = Microsoft.UI.Text.FontWeights.Bold;
+        _pickerLabel.VerticalAlignment = VerticalAlignment.Center;
+        var pickerRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center };
+        pickerRow.Children.Add(new DotMatrix { Glyph = "gotero", OnBrush = Res<SolidColorBrush>("PrimaryBrush"), VerticalAlignment = VerticalAlignment.Center });
+        pickerRow.Children.Add(_pickerLabel);
+        var picker = Motion.SmoothBackground(new Border
+        {
+            Padding = new Thickness(12, 0, 14, 0),
+            BorderBrush = Res<Brush>("PrimaryBrush"),
+            BorderThickness = new Thickness(1.5),
+            CornerRadius = new CornerRadius(10),
+            Background = Ui.Clear,
+            Child = pickerRow,
+        });
+        Motion.PressFeedback(picker);
+        picker.Tapped += (_, e) =>
+        {
+            e.Handled = true;
+            SoundService.Play("click");
+            _app.Vm.RequestClose();
+            _app.Picker.Start();
+        };
+        ToolTipService.SetToolTip(picker, Loc.Get("compact_pick_hint"));
+        Grid.SetColumn(picker, 1);
+        bottom.Children.Add(picker);
         bottom.Children.Add(allSettings);
 
         _bars.ValueChanged += percent => Update(s => s.Vol = percent);
@@ -115,6 +145,7 @@ public sealed partial class QuickView : Grid, INotchPageView
         _shown = true;
         _soundsLabel.Text = Loc.Get("home_sounds").ToUpper(Loc.Culture);
         _allSettings.Text = Loc.Get("home_all_settings").ToUpper(Loc.Culture) + " ›";
+        _pickerLabel.Text = Loc.Get("quick_picker").ToUpper(Loc.Culture);
         _ = RenderAsync();
     }
 

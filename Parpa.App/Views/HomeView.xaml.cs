@@ -21,6 +21,9 @@ public sealed partial class HomeView : UserControl, INotchPageView
     private readonly List<TextBlock> _systemValues = new();
     private readonly List<TextBlock> _systemNames = new();
     private readonly List<Border> _systemChips = new();
+    private readonly DotMatrix _weatherGlyph = new() { DotSize = 2, Gap = 1, VerticalAlignment = VerticalAlignment.Center };
+    private readonly TextBlock _weatherValue = new() { FontSize = 13, VerticalAlignment = VerticalAlignment.Center };
+    private readonly Border _weatherChip = new();
     private readonly BarSlider _musicVolume = new(10, 4, 4, 5, spacing: 2);
     private AppVolume? _musicApp;
     private object? _artworkFor;
@@ -59,7 +62,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
         {
             var value = new TextBlock { Style = Res<Style>("Wide"), FontSize = 13, VerticalAlignment = VerticalAlignment.Center };
             var name = new TextBlock { Style = Res<Style>("Tiny"), Text = SystemKeys[i] };
-            var row = new Grid();
+            var row = new Grid { ColumnSpacing = 6 };
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             Grid.SetColumn(value, 1);
@@ -67,7 +70,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
             row.Children.Add(value);
             var chip = new Border
             {
-                Padding = new Thickness(10, 0, 10, 0),
+                Padding = new Thickness(8, 0, 8, 0),
                 BorderBrush = Res<Brush>("PrimaryBrush"),
                 BorderThickness = new Thickness(1.5),
                 CornerRadius = new CornerRadius(8),
@@ -79,6 +82,26 @@ public sealed partial class HomeView : UserControl, INotchPageView
             _systemNames.Add(name);
             _systemChips.Add(chip);
         }
+
+        // Tiempo: glifo de puntos (sol, nube, lluvia…) y la temperatura en letra ancha.
+        _weatherValue.Style = Res<Style>("Wide");
+        _weatherGlyph.OnBrush = Res<SolidColorBrush>("PrimaryBrush");
+        var weatherRow = new Grid { ColumnSpacing = 8 };
+        weatherRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        weatherRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        Grid.SetColumn(_weatherValue, 1);
+        _weatherValue.HorizontalAlignment = HorizontalAlignment.Right;
+        weatherRow.Children.Add(_weatherGlyph);
+        weatherRow.Children.Add(_weatherValue);
+        _weatherChip.Padding = new Thickness(10, 0, 10, 0);
+        _weatherChip.BorderBrush = Res<Brush>("PrimaryBrush");
+        _weatherChip.BorderThickness = new Thickness(1.5);
+        _weatherChip.CornerRadius = new CornerRadius(8);
+        _weatherChip.Child = weatherRow;
+        _weatherChip.Visibility = Visibility.Collapsed;
+        Grid.SetColumn(_weatherChip, 4);
+        Chips.Children.Add(_weatherChip);
+        app.Weather.Changed += () => { if (_shown) ApplyLayout(); };
 
         MusicProgress.SizeChanged += (_, _) => DrawProgress();
 
@@ -107,6 +130,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
         RenderSystem();
         _stats.Start();
         RenderTask();
+        if (_app.Settings.HomeCards.GetValueOrDefault("TIEMPO", true)) _app.Weather.Refresh();
         _ = RecheckPermissionAsync();
     }
 
@@ -146,7 +170,16 @@ public sealed partial class HomeView : UserControl, INotchPageView
         var task = cards.GetValueOrDefault("PRÓXIMA TAREA", false);
         TaskCard.Visibility = task ? Visibility.Visible : Visibility.Collapsed;
         TaskColumn.Width = task ? new GridLength(2.2, GridUnitType.Star) : new GridLength(0);
-        Chips.Visibility = system || task || MusicVolume.Visibility == Visibility.Visible ? Visibility.Visible : Visibility.Collapsed;
+        var weather = cards.GetValueOrDefault("TIEMPO", true) ? _app.Weather.Current : null;
+        _weatherChip.Visibility = weather is null ? Visibility.Collapsed : Visibility.Visible;
+        WeatherColumn.Width = weather is null ? new GridLength(0) : GridLength.Auto;
+        if (weather is not null)
+        {
+            _weatherGlyph.Glyph = weather.Glyph;
+            _weatherValue.Text = $"{weather.Temperature}°";
+            ToolTipService.SetToolTip(_weatherChip, Loc.Get("home_weather"));
+        }
+        Chips.Visibility = system || task || weather is not null || MusicVolume.Visibility == Visibility.Visible ? Visibility.Visible : Visibility.Collapsed;
     }
 
     // ---- MÚSICA ----
@@ -301,7 +334,7 @@ public sealed partial class HomeView : UserControl, INotchPageView
         if ((MusicVolume.Visibility == Visibility.Visible) != visible)
         {
             MusicVolume.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
-            VolumeColumn.Width = visible ? new GridLength(1.7, GridUnitType.Star) : new GridLength(0);
+            VolumeColumn.Width = visible ? new GridLength(1.4, GridUnitType.Star) : new GridLength(0);
             if (visible) Chips.Visibility = Visibility.Visible;
         }
         if (_musicApp is not { } app) return;

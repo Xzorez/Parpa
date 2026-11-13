@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Parpa.Interop;
 
@@ -208,6 +208,47 @@ public static partial class Win32
 
     [DllImport("kernel32.dll")]
     public static extern IntPtr GetCurrentProcess();
+
+    // ---- Cuentagotas y mascota: color bajo el cursor, teclas y tiempo sin tocar el PC ----
+    public const int WH_KEYBOARD_LL = 13;
+    public const uint WM_LBUTTONUP = 0x0202;
+    public const uint WM_RBUTTONUP = 0x0205;
+    public const uint WM_KEYDOWN = 0x0100;
+    public const int VK_ESCAPE = 0x1B;
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct KBDLLHOOKSTRUCT
+    {
+        public uint vkCode, scanCode, flags, time;
+        public IntPtr dwExtraInfo;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct LASTINPUTINFO
+    {
+        public uint cbSize;
+        public uint dwTime;
+    }
+
+    [DllImport("user32.dll")]
+    public static extern bool GetLastInputInfo(ref LASTINPUTINFO info);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetDC(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern int ReleaseDC(IntPtr hWnd, IntPtr hdc);
+
+    [DllImport("gdi32.dll")]
+    public static extern uint GetPixel(IntPtr hdc, int x, int y);
+
+    /// <summary>Tiempo desde la última tecla o movimiento de ratón en cualquier app.</summary>
+    public static TimeSpan IdleTime()
+    {
+        var info = new LASTINPUTINFO { cbSize = (uint)Marshal.SizeOf<LASTINPUTINFO>() };
+        if (!GetLastInputInfo(ref info)) return TimeSpan.Zero;
+        return TimeSpan.FromMilliseconds(unchecked((uint)Environment.TickCount - info.dwTime));
+    }
 
     [DllImport("kernel32.dll", EntryPoint = "K32EmptyWorkingSet")]
     public static extern bool EmptyWorkingSet(IntPtr process);

@@ -438,6 +438,7 @@ public sealed class SettingsWindow : Window
                 yield return new Head(L("windows_shelf"));
                 yield return new Row(L("settings_shelf_clear"), L("settings_shelf_clear_d"), () => Toggle(s.ShelfClear, v => Set(x => x.ShelfClear = v)));
                 yield return new Row(L("settings_shelf_screenshots"), L("settings_shelf_screenshots_d"), () => Toggle(s.ShelfScreenshots, v => Set(x => x.ShelfScreenshots = v)));
+                yield return new Row(L("settings_shelf_downloads"), L("settings_shelf_downloads_d"), () => Toggle(s.ShelfDownloads, v => Set(x => x.ShelfDownloads = v)));
                 yield return new Row(L("settings_shelf_actions"), L("settings_shelf_actions_d"), () => Chips(s.Actions, Loc.Sentence, (k, v) => Set(x => x.Actions[k] = v)));
                 break;
 
@@ -575,6 +576,7 @@ public sealed class SettingsWindow : Window
         "MÚSICA" => Loc.Get("home_music"),
         "SISTEMA" => Loc.Get("home_system"),
         "PRÓXIMA TAREA" => Loc.Get("home_next_task"),
+        "TIEMPO" => Loc.Get("home_weather"),
         _ => Loc.Sentence(key),
     };
 

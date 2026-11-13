@@ -202,13 +202,14 @@
                 </Grid>
             </Grid>
 
-            <!-- Píldoras: CPU, GPU, RAM (código), volumen de la app que suena y próxima tarea. -->
+            <!-- Píldoras: CPU, GPU, RAM (código), volumen de la app que suena, tiempo (código) y próxima tarea. -->
             <Grid x:Name="Chips" Grid.Row="1" Height="34" ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition x:Name="CpuColumn" Width="*" />
                     <ColumnDefinition x:Name="GpuColumn" Width="*" />
                     <ColumnDefinition x:Name="RamColumn" Width="*" />
                     <ColumnDefinition x:Name="VolumeColumn" Width="0" />
+                    <ColumnDefinition x:Name="WeatherColumn" Width="0" />
                     <ColumnDefinition x:Name="TaskColumn" Width="2.2*" />
                 </Grid.ColumnDefinitions>
 
@@ -243,7 +244,7 @@
                 <!-- PRÓXIMA TAREA: círculo para marcarla hecha, texto y hora. -->
                 <Border
                     x:Name="TaskCard"
-                    Grid.Column="4"
+                    Grid.Column="5"
                     Padding="10,0"
                     BorderBrush="{StaticResource PrimaryBrush}"
                     BorderThickness="1.5"

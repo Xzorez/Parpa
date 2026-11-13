@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using Microsoft.UI.Dispatching;
 using Parpa.Services;
 
@@ -33,9 +33,10 @@ public sealed record NotchPage(string Id, string TitleKey, string Glyph, string 
 /// <summary>
 /// Actividad en vivo del notch compacto. <see cref="SizeToken"/> da el ancho (tokens.json › notch).
 /// A la derecha: punto vivo en acento si <see cref="Live"/> (micro/cámara); si no, ecualizador si
-/// <see cref="RightText"/> es null, o ese texto en Doto (temporizadores).
+/// <see cref="RightText"/> es null, o ese texto en Doto (temporizadores). <see cref="Swatch"/>: círculo de ese
+/// color a la derecha (cuentagotas).
 /// </summary>
-public sealed record NotchActivity(string SizeToken, string Glyph, string Label, string Sub, bool IsPlaying, string? RightText = null, bool Live = false);
+public sealed record NotchActivity(string SizeToken, string Glyph, string Label, string Sub, bool IsPlaying, string? RightText = null, bool Live = false, Windows.UI.Color? Swatch = null);
 
 /// <summary>
 /// Indicador del sistema (340×40). <see cref="Level"/> 0–100 llena las 16 barras.
@@ -66,9 +67,11 @@ public sealed class NotchViewModel
 {
     public const string ActivityPrivacy = "privacy";
     public const string ActivityMusic = "music";
+    public const string ActivityPicker = "picker";
+    public const string ActivityDownload = "download";
 
     /// <summary>Orden de prioridad de las actividades (gana la primera presente). Micro/cámara siempre delante.</summary>
-    private static readonly string[] ActivityOrder = [ActivityPrivacy, ActivityMusic];
+    private static readonly string[] ActivityOrder = [ActivityPrivacy, ActivityPicker, ActivityDownload, ActivityMusic];
 
     /// <summary>Alto del modo minimal (tokens.json › notch › minimal).</summary>
     private const double MinimalHeight = 24;

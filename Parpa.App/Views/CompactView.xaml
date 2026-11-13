@@ -62,6 +62,17 @@
             VerticalAlignment="Center"
             Visibility="Collapsed" />
 
+        <!-- Cuentagotas: círculo del color bajo el cursor, con borde de tinta. -->
+        <Ellipse
+            x:Name="Swatch"
+            Grid.Column="3"
+            Width="16"
+            Height="16"
+            VerticalAlignment="Center"
+            Stroke="{StaticResource PrimaryBrush}"
+            StrokeThickness="1.5"
+            Visibility="Collapsed" />
+
         <!-- Ecualizador: 5 barras redondeadas de 3 px que suben y bajan. Tick 100 ms; se congela en pausa. -->
         <c:DotMatrix
             x:Name="Equalizer"

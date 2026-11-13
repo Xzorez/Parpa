@@ -1,4 +1,4 @@
-{
+﻿{
   "grid": "7x7",
   "on": "X",
   "off": ".",
@@ -227,6 +227,87 @@
       "..X.X.X",
       "X.X.X.X",
       "XXXXXXX"
+    ],
+    "sol": [
+      "X..X..X",
+      ".X...X.",
+      "..XXX..",
+      "XXXXXXX",
+      "..XXX..",
+      ".X...X.",
+      "X..X..X"
+    ],
+    "noche": [
+      "..XXX..",
+      ".XX....",
+      "XX.....",
+      "XX.....",
+      "XX.....",
+      ".XX....",
+      "..XXX.."
+    ],
+    "nube": [
+      ".......",
+      "...XX..",
+      "..XXXX.",
+      ".XXXXXX",
+      "XXXXXXX",
+      "XXXXXXX",
+      "......."
+    ],
+    "solnube": [
+      "X.X....",
+      ".XXX...",
+      "XXXXX..",
+      ".XX.XX.",
+      "..XXXXX",
+      ".XXXXXX",
+      "XXXXXXX"
+    ],
+    "niebla": [
+      ".......",
+      "XXXXX..",
+      ".......",
+      "..XXXXX",
+      ".......",
+      "XXXXX..",
+      "......."
+    ],
+    "lluvia": [
+      "..XXX..",
+      ".XXXXX.",
+      "XXXXXXX",
+      "XXXXXXX",
+      ".......",
+      "X.X.X..",
+      ".X.X.X."
+    ],
+    "nieve": [
+      "X..X..X",
+      ".X.X.X.",
+      "..XXX..",
+      "XXXXXXX",
+      "..XXX..",
+      ".X.X.X.",
+      "X..X..X"
+    ],
+    "tormenta": [
+      "..XXX..",
+      ".XXXXX.",
+      "XXXXXXX",
+      "...X...",
+      "..XX...",
+      "...XX..",
+      "...X..."
+    ],
+    "gotero": [
+      ".....XX",
+      "....XXX",
+      "...XXX.",
+      "..XXX..",
+      ".X.X...",
+      "X.X....",
+      "XX....."
     ]
   }
 }
