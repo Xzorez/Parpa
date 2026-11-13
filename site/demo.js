@@ -76,9 +76,9 @@
   const PAGES = ['home', 'clip', 'shelf', 'todo', 'notes', 'audio', 'quick'];
   const PAGE_GLYPH = { home: 'inicio', clip: 'copias', shelf: 'bandeja', todo: 'tareas', notes: 'notas', audio: 'sonido', quick: 'general', menu: 'menu' };
   const TRACKS = [
-    { title: 'Luz de neón', artist: 'Parpa FM', len: 208, art: 'linear-gradient(135deg,#e5383b,#5b1622)' },
-    { title: 'Puntos suspensivos', artist: 'Matriz', len: 187, art: 'linear-gradient(135deg,#2f7bf5,#14284f)' },
-    { title: 'Isla', artist: 'Notch', len: 231, art: 'linear-gradient(135deg,#00a64f,#0d3a22)' },
+    { title: 'Luz de neón', artist: 'Parpa FM', len: 208, art: 'radial-gradient(circle at 62% 38%,#fff 0 18%,#bbb 19% 21%,transparent 22%),repeating-linear-gradient(0deg,#222 0 5px,#999 5px 7px),linear-gradient(#eee,#111)' },
+    { title: 'Puntos suspensivos', artist: 'Matriz', len: 187, art: 'radial-gradient(circle at 30% 70%,#fff 0 12%,transparent 13%),repeating-radial-gradient(circle at 70% 30%,#eee 0 4px,#222 4px 9px)' },
+    { title: 'Isla', artist: 'Notch', len: 231, art: 'conic-gradient(from 45deg at 50% 60%,#fff,#333,#ddd,#111,#fff),radial-gradient(#fff,#000)' },
   ];
 
   // ---- Estado ----
@@ -189,25 +189,32 @@
       default: return homeView();
     }
   }
+  // Adornos de cartel del Inicio (píldora, onda, estrella) y cadena de círculos del pie del Menú, como en la app.
+  const DECO = '<svg viewBox="0 0 40 14" width="40" fill="none" stroke="currentColor" stroke-width="1.4"><rect x=".7" y=".7" width="38.6" height="12.6" rx="6.3"/><path d="M6 7h28"/></svg>'
+    + '<svg viewBox="0 0 48 14" width="48" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 7C4-1 7 15 10 7S16-1 19 7 25 15 28 7 34-1 37 7 43 15 46 7"/></svg>'
+    + '<svg viewBox="0 0 14 14" width="14" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="7" cy="7" r="6.2"/><path d="M7 1v12M1 7h12M2.8 2.8l8.4 8.4M11.2 2.8l-8.4 8.4"/></svg>';
+  const CHAIN = '<svg viewBox="0 0 54 22" fill="currentColor"><path d="M6 6L20 16L34 6L48 16" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="6" cy="6" r="5"/><circle cx="20" cy="16" r="5"/><circle cx="34" cy="6" r="5"/><circle cx="48" cy="16" r="5"/></svg>';
   function homeView() {
-    // Como HomeView: la música arriba, con la carátula de fondo, y una fila de píldoras (CPU, GPU, RAM y volumen).
+    // Como HomeView: carátula en duotono, título ancho, adornos y una píldora con el progreso y los controles;
+    // debajo, píldoras con marco (CPU, GPU, RAM; la cifra más alta, rellena) y volumen.
     const m = S.music, tr = track();
-    const music = m.playing || m.pos > 42 || m.i > 0
-      ? `<div class="mc" style="--art:${tr.art}"><div class="mc-bg"></div>
-          <div class="m-art">${gl('musica', 'm')}</div>
-          <div class="mc-body"><div class="mc-top"><div class="m-txt"><span class="m-title">${esc(tr.title)}</span><span class="m-src">${esc(tr.artist)} · Spotify</span></div>
-            <span class="m-btns"><button data-act="prev" aria-label="prev">${CTL.prev}</button><button data-act="play" aria-label="play">${m.playing ? CTL.pause : CTL.play}</button><button data-act="next" aria-label="next">${CTL.next}</button></span></div>
-           <div class="mc-prog"><span id="mpos">${mmss(m.pos)}</span><div class="m-prog" id="mprog">${progDots()}</div><span>${mmss(tr.len)}</span></div></div></div>`
-      : `<div class="mc mc-empty"><div class="m-art">${gl('musica', 'm')}</div><div class="mc-body" style="justify-content:center;gap:4px"><span class="card-l">${t('music')}</span><span class="m-title">${t('nothing')}</span><span class="m-src">${t('nothing_d')}</span></div><button class="np np-on" data-act="play">${CTL.play} Play</button></div>`;
-    const vol = m.playing || m.pos > 42 || m.i > 0 ? `<div class="chip chip-vol" data-wheel>${gl('sonido', 's')}${slider('app:0', 3, 8)}${valueOf('app:0')}</div>` : '';
+    const on = m.playing || m.pos > 42 || m.i > 0;
+    const music = on
+      ? `<div class="mc"><div class="duo" style="--art:${tr.art}"></div>
+          <div class="mc-body"><span class="m-title">${esc(tr.title)}</span><span class="deco">${DECO}</span><span class="m-src">${esc(tr.artist)} — Spotify</span>
+           <div class="mc-pill"><span id="mpos">${mmss(m.pos)}</span><div class="m-prog" id="mprog">${progDots()}</div><span>${mmss(tr.len)}</span>
+            <span class="m-btns"><button data-act="prev" aria-label="prev">${CTL.prev}</button><button data-act="play" aria-label="play">${m.playing ? CTL.pause : CTL.play}</button><button data-act="next" aria-label="next">${CTL.next}</button></span></div></div></div>`
+      : `<div class="mc mc-empty"><div class="duo">${gl('musica', 'm')}</div><div class="mc-body"><span class="card-l">${t('music')}</span><span class="m-title">${t('nothing')}</span><span class="m-src">${t('nothing_d')}</span><button class="np np-on" data-act="play">${CTL.play} Play</button></div></div>`;
+    const vol = on ? `<div class="chip chip-vol" data-wheel><span>Vol</span>${slider('app:0', 3, 8)}${valueOf('app:0')}</div>` : '';
     return `<div class="open">${head(t('home'))}
       ${music}
       <div class="chips"><div id="sys" style="display:contents">${sysRows()}</div>${vol}</div></div>`;
   }
   // CPU, GPU y RAM: en la app son las de tu PC; aquí, valores de ejemplo que se mueven cada segundo.
   function sysRows() {
-    const color = { CPU: '#30d158', GPU: '#0a84ff', RAM: '#ff9f0a' };
-    return Object.entries(S.sys).map(([k, v]) => `<div class="chip"><i style="background:${color[k]}"></i><span>${k}</span><b>${v}%</b></div>`).join('');
+    const entries = Object.entries(S.sys);
+    const top = Math.max(...entries.map(([, v]) => v));
+    return entries.map(([k, v]) => `<div class="chip${v === top ? ' chip-hot' : ''}"><span>${k}</span><b>${v}%</b></div>`).join('');
   }
   function progDots() {
     return `<b style="width:${(S.music.pos / track().len * 100).toFixed(1)}%"></b>`;
@@ -289,12 +296,21 @@
     setLevel(el.dataset.slider, x < 0 ? 0 : Math.min(BARS, Math.floor(x / (r.width - pad) * BARS) + 1) * (100 / BARS));
   }
   function menuView() {
-    // En forma de Dock, como LauncherView: Inicio (la mascota) y una baldosa de color por ventana.
+    // Como LauncherView: casillas con marco rosa (Inicio, la mascota) que se rellenan al pasar el ratón;
+    // debajo, el nombre de la casilla, una raya y la cadena de círculos.
     const badge = p => p === 'clip' && S.clip.length ? `<span class="badge">${S.clip.length}</span>` : '';
     return `<div class="launcher">${head(t('menu'))}
-      <div class="dock-area"><div class="dock">${PAGES.map((p, k) => `<button class="dk dk-${p}" data-act="page" data-p="${p}" style="--dl:${30 + k * 25}ms" aria-label="${t(p)}">${p === 'home' ? '<div class="mascot" id="lmascot"><b></b><b></b></div>' : gl(PAGE_GLYPH[p], 'm')}${badge(p)}<span class="dk-l">${t(p)}</span></button>`).join('')}</div></div>
+      <div class="dock-area"><div class="dock">${PAGES.map((p, k) => `<button class="dk dk-${p}" data-act="page" data-p="${p}" style="--dl:${30 + k * 25}ms" aria-label="${t(p)}">${p === 'home' ? '<div class="mascot" id="lmascot"><b></b><b></b></div>' : gl(PAGE_GLYPH[p], 'm')}${badge(p)}</button>`).join('')}</div>
+        <div class="dk-foot"><b id="dkname">${t('home')}</b><i></i>${CHAIN}</div></div>
     </div>`;
   }
+  // El pie del menú dice qué casilla se abriría.
+  document.addEventListener('mouseover', e => {
+    const name = document.getElementById('dkname');
+    if (!name) return;
+    const tile = e.target.closest && e.target.closest('.dk');
+    name.textContent = tile ? tile.getAttribute('aria-label') : t('home');
+  });
 
   // ---- Partes vivas (sin redibujar la vista) ----
   let tick = 0;
