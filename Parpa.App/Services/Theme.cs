@@ -17,10 +17,11 @@ public static class Theme
     /// </summary>
     private static readonly Dictionary<string, (Color Dark, Color Light)> Extra = new()
     {
-        ["windowBg"] = (Tokens.ParseHex("#121214"), Tokens.ParseHex("#f2f2f7")),
-        ["sideBg"] = (Tokens.ParseHex("#0b0b0c"), Tokens.ParseHex("#e8e8ed")),
-        ["navSelected"] = (Tokens.ParseHex("#2c2c2e"), Tokens.ParseHex("#dcdce1")),
-        ["hoverFill"] = (Tokens.ParseHex("#232325"), Tokens.ParseHex("#e5e5ea")),
+        // Estilo Akira: negro como el notch; lo elegido y el hover, en el rosa muy oscuro de las tarjetas.
+        ["windowBg"] = (Tokens.ParseHex("#000000"), Tokens.ParseHex("#f2f2f7")),
+        ["sideBg"] = (Tokens.ParseHex("#000000"), Tokens.ParseHex("#e8e8ed")),
+        ["navSelected"] = (Tokens.ParseHex("#2b1d23"), Tokens.ParseHex("#dcdce1")),
+        ["hoverFill"] = (Tokens.ParseHex("#1a1316"), Tokens.ParseHex("#e5e5ea")),
     };
 
     private static readonly Dictionary<string, SolidColorBrush> Brushes = new();

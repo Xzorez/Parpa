@@ -28,12 +28,12 @@ public sealed class SettingsWindow : Window
     private readonly ParpaSettings _s = SettingsService.Current.S;
     private readonly StackPanel _nav = new() { Spacing = 4 };
     private readonly StackPanel _content = new() { Spacing = 18 };
-    private readonly TextBlock _title = Ui.Text(string.Empty, 26, semibold: true);
+    private readonly TextBlock _title = Wide(string.Empty, 30);
     private readonly TextBlock _toast = Ui.Mono(string.Empty, 10, tracking: 80);
     private readonly TextBox _search = new();
     private readonly TextBlock _windowTitle = Ui.Text(string.Empty, 12);
-    private readonly TextBlock _brand = Ui.Text(string.Empty, 15, semibold: true);
-    private readonly TextBlock _version = Ui.Mono(string.Empty, 9, "tertiary");
+    private readonly TextBlock _brand = Wide(string.Empty, 18);
+    private readonly TextBlock _version = Tiny(string.Empty, "muted");
     private readonly DispatcherTimerLite _toastTimer;
     private string _section = "general";
     private bool _recording;
@@ -135,9 +135,11 @@ public sealed class SettingsWindow : Window
             OnBrush = Theme.Brush("primary"), Cells = MascotFrames.Awake(),
         };
         _windowTitle.VerticalAlignment = VerticalAlignment.Center;
-        _windowTitle.FontWeight = Microsoft.UI.Text.FontWeights.Medium;
+        _windowTitle.Style = Res<Style>("Tiny");
         titleBar.Children.Add(logo);
         titleBar.Children.Add(_windowTitle);
+        titleBar.BorderBrush = Theme.Brush("primary");
+        titleBar.BorderThickness = new Thickness(0, 0, 0, 1.5);
         root.Children.Add(titleBar);
         dragRegion = titleBar;
 
@@ -148,7 +150,13 @@ public sealed class SettingsWindow : Window
         root.Children.Add(body);
 
         // Lateral: buscador, secciones y la marca abajo.
-        var side = new Grid { Background = Theme.Brush("sideBg"), Padding = new Thickness(12, 8, 12, 16) };
+        var side = new Grid
+        {
+            Background = Theme.Brush("sideBg"),
+            Padding = new Thickness(12, 14, 12, 16),
+            BorderBrush = Theme.Brush("primary"),
+            BorderThickness = new Thickness(0, 0, 1.5, 0),
+        };
         side.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         side.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
         side.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
@@ -164,13 +172,14 @@ public sealed class SettingsWindow : Window
         searchRow.Children.Add(new TextBlock
         {
             Text = "", FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets"), FontSize = 12,
-            Foreground = Theme.Brush("muted"), VerticalAlignment = VerticalAlignment.Center,
+            Foreground = Theme.Brush("primary"), VerticalAlignment = VerticalAlignment.Center,
         });
         Grid.SetColumn(_search, 1);
         searchRow.Children.Add(_search);
         var searchBox = new Border
         {
-            Background = Theme.Brush("card"),
+            BorderBrush = Theme.Brush("primary"),
+            BorderThickness = new Thickness(1.5),
             CornerRadius = new CornerRadius(10),
             Margin = new Thickness(0, 0, 0, 12),
             Child = searchRow,
@@ -189,7 +198,7 @@ public sealed class SettingsWindow : Window
         var header = new Grid();
         header.Children.Add(_title);
         _toast.HorizontalAlignment = HorizontalAlignment.Right;
-        _toast.Foreground = new SolidColorBrush(Tokens.Current.Success);
+        _toast.Foreground = Theme.Brush("primary");
         header.Children.Add(_toast);
         var page = new StackPanel { Spacing = 16, Padding = new Thickness(32, 22, 32, 32) };
         page.Children.Add(header);
@@ -205,10 +214,10 @@ public sealed class SettingsWindow : Window
     private void Render()
     {
         Title = Loc.Get("settings_title");
-        _windowTitle.Text = Loc.Get("settings_title");
         _search.PlaceholderText = Loc.Get("settings_search");
-        _brand.Text = Loc.Upper(Loc.Get("app_name"));
-        _version.Text = $"{Loc.Upper(Loc.Get("settings_version"))} {TrayService.Version}";
+        _brand.Text = Up(Loc.Get("app_name"));
+        _windowTitle.Text = Up(Loc.Get("settings_title"));
+        _version.Text = $"{Up(Loc.Get("settings_version"))} {TrayService.Version}";
         ((Grid)Content).Background = Theme.Brush("windowBg");
 
         var query = _search.Text.Trim();
@@ -217,18 +226,18 @@ public sealed class SettingsWindow : Window
 
         if (query.Length > 0)
         {
-            _title.Text = Loc.Get("settings_results");
+            _title.Text = Up(Loc.Get("settings_results"));
             var rows = new StackPanel();
             foreach (var (id, key, _) in Sections)
                 foreach (var row in RowsFor(id).OfType<Row>())
                     if ($"{row.Label} {row.Desc}".Contains(query, StringComparison.CurrentCultureIgnoreCase))
                         rows.Children.Add(RowView(row, Loc.Get(key), rows.Children.Count == 0));
-            if (rows.Children.Count == 0) _content.Children.Add(new Border { Padding = new Thickness(0, 30, 0, 30), Child = Ui.Mono(Loc.Get("settings_no_results"), 11, "tertiary") });
+            if (rows.Children.Count == 0) _content.Children.Add(new Border { Padding = new Thickness(0, 30, 0, 30), Child = Tiny(Up(Loc.Get("settings_no_results")), "secondary") });
             else _content.Children.Add(Group(rows));
             return;
         }
 
-        _title.Text = Loc.Get(Sections.First(s => s.Id == _section).Key);
+        _title.Text = Up(Loc.Get(Sections.First(s => s.Id == _section).Key));
         if (_section == "position") _content.Children.Add(MonitorsPanel());
         if (_section == "look") _content.Children.Add(PreviewPanel());
         // Filas agrupadas en bloques redondeados bajo cada encabezado (como los ajustes del iPhone).
@@ -259,20 +268,10 @@ public sealed class SettingsWindow : Window
         }
     }
 
-    /// <summary>Color de la baldosa de cada sección del lateral (como los iconos de Ajustes del iPhone).</summary>
-    private static Windows.UI.Color SectionColor(string id) => Tokens.ParseHex(id switch
-    {
-        "position" => "#0a84ff",
-        "look" => "#5e5ce6",
-        "alerts" => "#ff453a",
-        "windows" => "#ff9f0a",
-        "sound" => "#ff375f",
-        "system" => "#30d158",
-        "shortcuts" => "#64d2ff",
-        _ => "#8e8e93",
-    });
-
-    /// <summary>Secciones del lateral: icono blanco en baldosa de color + nombre; la elegida con fondo gris.</summary>
+    /// <summary>
+    /// Secciones del lateral (estilo Akira, como el menú del notch): casilla con marco de tinta y el icono;
+    /// la elegida, rellena de tinta con el icono en negro. Nombre en letra ancha y mayúsculas.
+    /// </summary>
     private void RenderNav(bool searching)
     {
         _nav.Children.Clear();
@@ -282,21 +281,32 @@ public sealed class SettingsWindow : Window
             var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12 };
             row.Children.Add(new Border
             {
-                Width = 26,
-                Height = 26,
-                CornerRadius = new CornerRadius(7),
-                Background = new SolidColorBrush(SectionColor(id)),
+                Width = 28,
+                Height = 28,
+                CornerRadius = new CornerRadius(8),
+                BorderBrush = Theme.Brush("primary"),
+                BorderThickness = new Thickness(1.5),
+                Background = selected ? Theme.Brush("primary") : Ui.Clear,
                 VerticalAlignment = VerticalAlignment.Center,
                 Child = new DotMatrix
                 {
-                    Glyph = glyph, DotSize = 1.7, Gap = 0.8, OnColor = Microsoft.UI.Colors.White,
+                    Glyph = glyph, DotSize = 1.7, Gap = 0.8, OnColor = Theme.Get(selected ? "bg" : "primary"),
                     HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
                 },
             });
-            var label = Ui.Text(Loc.Get(key), 13.5, "primary", semibold: selected);
-            label.VerticalAlignment = VerticalAlignment.Center;
+            var label = new TextBlock
+            {
+                Text = Up(Loc.Get(key)),
+                FontFamily = Res<FontFamily>("FontWide"),
+                FontStretch = Windows.UI.Text.FontStretch.Expanded,
+                FontSize = 11,
+                FontWeight = selected ? Microsoft.UI.Text.FontWeights.Black : Microsoft.UI.Text.FontWeights.Bold,
+                Foreground = Theme.Brush(selected ? "primary" : "secondary"),
+                VerticalAlignment = VerticalAlignment.Center,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+            };
             row.Children.Add(label);
-            var item = new Border { Padding = new Thickness(8, 6, 8, 6), CornerRadius = new CornerRadius(10), Background = selected ? Theme.Brush("navSelected") : Ui.Clear, Child = row };
+            var item = new Border { Padding = new Thickness(6, 5, 8, 5), CornerRadius = new CornerRadius(10), Background = Ui.Clear, Child = row };
             Motion.SmoothBackground(item);
             item.PointerEntered += (_, _) => { if (!selected) item.Background = Theme.Brush("hoverFill"); };
             item.PointerExited += (_, _) => { if (!selected) item.Background = Ui.Clear; };
@@ -313,13 +323,24 @@ public sealed class SettingsWindow : Window
         }
     }
 
-    private static Border HeadView(string label) =>
-        new() { Padding = new Thickness(4, 20, 0, 8), Child = Ui.Text(label, 13, "secondary", semibold: true) };
+    /// <summary>Encabezado: etiqueta diminuta y espaciada seguida de una raya de tinta, como en el cartel.</summary>
+    private static Grid HeadView(string label)
+    {
+        var head = new Grid { Padding = new Thickness(2, 22, 0, 10), ColumnSpacing = 12 };
+        head.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        head.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        head.Children.Add(Tiny(Up(label)));
+        var rule = new Border { Height = 1.5, Background = Theme.Brush("primary"), VerticalAlignment = VerticalAlignment.Center };
+        Grid.SetColumn(rule, 1);
+        head.Children.Add(rule);
+        return head;
+    }
 
-    /// <summary>Bloque redondeado (fondo de tarjeta, radio 12) que agrupa filas.</summary>
+    /// <summary>Bloque con marco de tinta de 1,5 px (radio 12) que agrupa filas.</summary>
     private static Border Group(StackPanel rows) => new()
     {
-        Background = Theme.Brush("card"),
+        BorderBrush = Theme.Brush("primary"),
+        BorderThickness = new Thickness(1.5),
         CornerRadius = new CornerRadius(12),
         Child = rows,
     };
@@ -340,8 +361,8 @@ public sealed class SettingsWindow : Window
 
         var text = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
         var title = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-        title.Children.Add(Ui.Text(row.Label, 14));
-        if (where is not null) title.Children.Add(Ui.Mono(where, 10, "tertiary"));
+        title.Children.Add(Ui.Text(row.Label, 14, semibold: true));
+        if (where is not null) title.Children.Add(Tiny(Up(where), "muted"));
         text.Children.Add(title);
         if (row.Desc.Length > 0) text.Children.Add(Ui.Text(row.Desc, 12, "secondary"));
         grid.Children.Add(text);
@@ -356,6 +377,23 @@ public sealed class SettingsWindow : Window
     // ---- Secciones ----
 
     private static string L(string key) => Loc.Get(key);
+
+    private static T Res<T>(string key) => (T)Application.Current.Resources[key];
+
+    /// <summary>Mayúsculas de cartel (Loc.Upper deja el tipo frase del estilo anterior).</summary>
+    private static string Up(string text) => text.ToUpper(Loc.Culture);
+
+    /// <summary>Letra ancha y negrísima (estilo Wide de la app).</summary>
+    private static TextBlock Wide(string text, double size, string color = "primary")
+    {
+        var block = new TextBlock { Style = Res<Style>("Wide"), Text = text, FontSize = size, Foreground = Theme.Brush(color) };
+        block.VerticalAlignment = VerticalAlignment.Center;
+        return block;
+    }
+
+    /// <summary>Etiqueta diminuta, ancha y muy espaciada (estilo Tiny de la app).</summary>
+    private static TextBlock Tiny(string text, string color = "primary") =>
+        new() { Style = Res<Style>("Tiny"), Text = text, Foreground = Theme.Brush(color), HorizontalAlignment = HorizontalAlignment.Left };
 
     private static void Set(Action<ParpaSettings> change) => SettingsService.Current.Update(change);
 
@@ -414,7 +452,7 @@ public sealed class SettingsWindow : Window
                 break;
 
             case "alerts":
-                yield return new Head(Loc.Upper(L("settings_notif_apps")));
+                yield return new Head(Up(L("settings_notif_apps")));
                 foreach (var app in s.Apps.Keys.ToList())
                     yield return new Row(app, string.Empty, () => Toggle(s.Apps[app], v => Set(x => x.Apps[app] = v)));
                 yield return new Row(string.Empty, L("settings_notif_apps_d"), () => new Border());
@@ -427,9 +465,9 @@ public sealed class SettingsWindow : Window
                 break;
 
             case "windows":
-                yield return new Head(Loc.Upper(L("settings_win_order")));
+                yield return new Head(Up(L("settings_win_order")));
                 foreach (var row in OrderRows()) yield return row;
-                yield return new Head(Loc.Upper(L("settings_home_cards")));
+                yield return new Head(Up(L("settings_home_cards")));
                 yield return new Row(L("settings_home_cards"), L("settings_home_cards_d"), () => Chips(s.HomeCards, HomeCardName, (k, v) => Set(x => x.HomeCards[k] = v)));
                 yield return new Head(L("windows_clip"));
                 yield return new Row(L("settings_clip_limit"), L("settings_clip_limit_d"), () => Ui.Segmented(
@@ -499,24 +537,24 @@ public sealed class SettingsWindow : Window
         var fraction = Math.Clamp((value - min) / (max - min), 0, 1);
         // Zona de toque más alta que la barra para que sea fácil acertar.
         var hit = new Grid { Width = width, Height = 24, Background = Ui.Clear, VerticalAlignment = VerticalAlignment.Center };
-        hit.Children.Add(new Border { Height = 6, CornerRadius = new CornerRadius(3), Background = Theme.Brush("border"), VerticalAlignment = VerticalAlignment.Center });
+        hit.Children.Add(new Border { Height = 1.5, Background = Theme.Brush("border"), VerticalAlignment = VerticalAlignment.Center });
         hit.Children.Add(new Border
         {
-            Width = Math.Max(6, fraction * width),
-            Height = 6,
-            CornerRadius = new CornerRadius(3),
+            Width = Math.Max(2, fraction * width),
+            Height = 3,
+            CornerRadius = new CornerRadius(1.5),
             Background = Theme.Brush("primary"),
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center,
         });
         hit.Children.Add(new Ellipse
         {
-            Width = 18,
-            Height = 18,
-            Fill = new SolidColorBrush(Microsoft.UI.Colors.White),
+            Width = 14,
+            Height = 14,
+            Fill = Theme.Brush("primary"),
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(Math.Clamp(fraction * width - 9, 0, width - 18), 0, 0, 0),
+            Margin = new Thickness(Math.Clamp(fraction * width - 7, 0, width - 14), 0, 0, 0),
         });
         hit.Tapped += (_, e) =>
         {
@@ -526,8 +564,8 @@ public sealed class SettingsWindow : Window
             set(Math.Round(raw / step) * step);
         };
         panel.Children.Add(hit);
-        var text = Ui.Text(format(value), 13, "secondary");
-        text.Width = 58;
+        var text = Wide(format(value), 13);
+        text.Width = 76;
         text.TextAlignment = TextAlignment.Right;
         text.VerticalAlignment = VerticalAlignment.Center;
         panel.Children.Add(text);
@@ -539,7 +577,7 @@ public sealed class SettingsWindow : Window
     {
         var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10 };
         panel.Children.Add(Circle("−", () => set(Math.Max(min, value - step))));
-        var text = Ui.Doto(Loc.Format("time_min", ("n", value)), 16);
+        var text = Wide(Up(Loc.Format("time_min", ("n", value))), 15);
         text.MinWidth = 92;
         text.TextAlignment = TextAlignment.Center;
         panel.Children.Add(text);
@@ -557,7 +595,9 @@ public sealed class SettingsWindow : Window
             Width = 28,
             Height = 28,
             CornerRadius = new CornerRadius(14),
-            Background = Theme.Brush("border"),
+            BorderBrush = Theme.Brush("primary"),
+            BorderThickness = new Thickness(1.5),
+            Background = Ui.Clear,
             Child = label,
         };
         circle.Tapped += (_, e) =>
@@ -647,7 +687,7 @@ public sealed class SettingsWindow : Window
             yield return new Row(label.Length > 0 ? char.ToUpper(label[0]) + label[1..].ToLower(Loc.Culture) : id, string.Empty, () =>
             {
                 var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
-                var number = Ui.Doto((index + 1).ToString("00"), 14, color: "tertiary");
+                var number = Wide((index + 1).ToString("00"), 13, "muted");
                 number.Width = 22;
                 panel.Children.Add(number);
                 panel.Children.Add(Circle("↑", () => Move(index, -1)));
@@ -686,11 +726,10 @@ public sealed class SettingsWindow : Window
             panel.Children.Add(new Border
             {
                 Padding = new Thickness(8, 5, 8, 5),
-                CornerRadius = new CornerRadius(8),
-                Background = Theme.Brush("glyphOff"),
-                BorderBrush = Theme.Brush("border"),
-                BorderThickness = new Thickness(0, 0, 0, 2),
-                Child = Ui.Mono(key, 10, "primary", 0, medium: true),
+                CornerRadius = new CornerRadius(6),
+                BorderBrush = Theme.Brush("primary"),
+                BorderThickness = new Thickness(1.5),
+                Child = Wide(key, 11),
             });
         }
         var change = new PillButton
@@ -736,11 +775,11 @@ public sealed class SettingsWindow : Window
 
     private FrameworkElement MonitorsPanel()
     {
-        var panel = new StackPanel { Spacing = 14, Padding = new Thickness(22), Background = Theme.Brush("card"), CornerRadius = new CornerRadius(16) };
+        var panel = new StackPanel { Spacing = 14, Padding = new Thickness(22), BorderBrush = Theme.Brush("primary"), BorderThickness = new Thickness(1.5), CornerRadius = new CornerRadius(14) };
         var monitors = Ui.MonitorPicker(_s, 170, 96, 22, n => Set(x => x.Monitor = n));
         monitors.Height = 110;
         panel.Children.Add(monitors);
-        var hint = Ui.Mono(L("settings_monitor_hint"), 10, "tertiary", 60);
+        var hint = Tiny(Up(L("settings_monitor_hint")), "secondary");
         hint.HorizontalAlignment = HorizontalAlignment.Center;
         panel.Children.Add(hint);
         return panel;
@@ -750,11 +789,16 @@ public sealed class SettingsWindow : Window
     private FrameworkElement PreviewPanel()
     {
         var light = Theme.IsLight;
-        // Fondo de escritorio de colores (morado → azul), como el de la maqueta.
-        var gradient = new LinearGradientBrush { StartPoint = new Windows.Foundation.Point(0, 0), EndPoint = new Windows.Foundation.Point(1, 1) };
-        gradient.GradientStops.Add(new GradientStop { Color = Tokens.ParseHex(light ? "#c9b8f0" : "#3a2a5c"), Offset = 0 });
-        gradient.GradientStops.Add(new GradientStop { Color = Tokens.ParseHex(light ? "#a9d4f0" : "#12425e"), Offset = 1 });
-        var wall = new Grid { Height = 120, CornerRadius = new CornerRadius(16), Background = gradient };
+        // Escritorio: fondo con trama de puntos de tinta y marco, como la pantalla de la web.
+        var wall = new Grid
+        {
+            Height = 120,
+            CornerRadius = new CornerRadius(14),
+            Background = Theme.Brush(light ? "cardAlt" : "card"),
+            BorderBrush = Theme.Brush("primary"),
+            BorderThickness = new Thickness(1.5),
+        };
+        wall.Children.Add(new DotPattern { DotColor = Theme.Get("dotPattern"), Spacing = 10, CornerRadius = new CornerRadius(12) });
 
         var notch = new StackPanel
         {
@@ -777,7 +821,7 @@ public sealed class SettingsWindow : Window
                     Columns = MascotFrames.Columns, Rows = MascotFrames.Rows, Merge = DotMerge.Blobs, DotSize = 3, Gap = 1.5, VerticalAlignment = VerticalAlignment.Center,
                     OnBrush = Theme.Brush("primary"), Cells = MascotFrames.At(10, _s.Mood, false).Cells,
                 });
-            if (_s.Clock) inner.Children.Add(Ui.Doto(ClockService.Format(DateTime.Now, _s.H24), 16));
+            if (_s.Clock) inner.Children.Add(Wide(ClockService.Format(DateTime.Now, _s.H24), 14));
             inner.Children.Add(new Ellipse { Width = 6, Height = 6, Fill = new SolidColorBrush(Tokens.Current.Accent(_s.Accent)), VerticalAlignment = VerticalAlignment.Center });
             notch.Children.Add(inner);
             notch.Padding = new Thickness(0);
@@ -785,8 +829,7 @@ public sealed class SettingsWindow : Window
         }
         wall.Children.Add(notch);
 
-        var caption = Ui.Mono(L("settings_preview"), 9, "secondary", 100);
-        caption.Foreground = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(200, 255, 255, 255));
+        var caption = Tiny(Up(L("settings_preview")));
         caption.HorizontalAlignment = HorizontalAlignment.Left;
         caption.VerticalAlignment = VerticalAlignment.Bottom;
         caption.Margin = new Thickness(14, 0, 0, 10);
