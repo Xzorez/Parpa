@@ -65,6 +65,17 @@ public sealed class TrayService : IDisposable
 
     private static T Res<T>(string key) => (T)Application.Current.Resources[key];
 
+    private static string Up(string text) => text.ToUpper(Loc.Culture);
+
+    /// <summary>Letra ancha y negrísima (estilo Wide de la app).</summary>
+    private static TextBlock Wide(string text, double size, string color = "primary") =>
+        new() { Style = (Style)Application.Current.Resources["Wide"], Text = text, FontSize = size, Foreground = Theme.Brush(color), VerticalAlignment = VerticalAlignment.Center };
+
+    /// <summary>Etiqueta diminuta, ancha y muy espaciada (estilo Tiny de la app).</summary>
+    private static TextBlock Tiny(string text, string color = "primary") =>
+        new() { Style = (Style)Application.Current.Resources["Tiny"], Text = text, Foreground = Theme.Brush(color), HorizontalAlignment = HorizontalAlignment.Left };
+
+
     private Flyout BuildMenu()
     {
         var flyout = new Flyout { FlyoutPresenterStyle = PresenterStyle() };
@@ -72,7 +83,7 @@ public sealed class TrayService : IDisposable
         return flyout;
     }
 
-    /// <summary>Menú 260 px, fondo #111113, radio 12, padding 6. Se rehace al tocar un interruptor.</summary>
+    /// <summary>Menú 260 px estilo Akira: negro con marco de tinta de 1,5 px, radio 12. Se rehace al tocar un interruptor.</summary>
     private void Fill(Flyout flyout)
     {
         var list = new StackPanel();
@@ -81,6 +92,8 @@ public sealed class TrayService : IDisposable
             Width = 260,
             Padding = new Thickness(6),
             Background = Theme.Brush("windowBg"),
+            BorderBrush = Theme.Brush("primary"),
+            BorderThickness = new Thickness(1.5),
             CornerRadius = new CornerRadius(12),
             Child = list,
         };
@@ -90,8 +103,8 @@ public sealed class TrayService : IDisposable
         {
             Padding = new Thickness(10, 10, 10, 12),
             Margin = new Thickness(0, 0, 0, 4),
-            BorderBrush = Theme.Brush("divider"),
-            BorderThickness = new Thickness(0, 0, 0, 1),
+            BorderBrush = Theme.Brush("primary"),
+            BorderThickness = new Thickness(0, 0, 0, 1.5),
             ColumnSpacing = 10,
         };
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -102,16 +115,9 @@ public sealed class TrayService : IDisposable
             Columns = MascotFrames.Columns, Rows = MascotFrames.Rows, Merge = DotMerge.Blobs, DotSize = 2, Gap = 1, VerticalAlignment = VerticalAlignment.Center,
             OnBrush = Theme.Brush("primary"), OffBrush = Theme.Brush("glyphOff"), Cells = MascotFrames.Awake(),
         };
-        var name = new TextBlock
-        {
-            Text = Loc.Upper(Loc.Get("app_name")), FontFamily = Res<FontFamily>("FontDisplay"), FontSize = 16,
-            FontWeight = Microsoft.UI.Text.FontWeights.Bold, Foreground = Theme.Brush("primary"), VerticalAlignment = VerticalAlignment.Center,
-        };
-        var version = new TextBlock
-        {
-            Text = Version, FontFamily = Res<FontFamily>("FontMono"), FontSize = 11, Foreground = Theme.Brush("tertiary"),
-            VerticalAlignment = VerticalAlignment.Center,
-        };
+        var name = Wide(Up(Loc.Get("app_name")), 16);
+        var version = Tiny(Version, "muted");
+        version.VerticalAlignment = VerticalAlignment.Center;
         Grid.SetColumn(name, 1);
         Grid.SetColumn(version, 2);
         header.Children.Add(face);
@@ -134,16 +140,15 @@ public sealed class TrayService : IDisposable
             () => SettingsService.Current.Update(s => s.Startup = !s.Startup), flyout));
 
         var welcome = Item(Loc.Get("tray_welcome"), string.Empty, () => { flyout.Hide(); App.Current.ShowWelcome(); });
-        welcome.BorderBrush = Theme.Brush("divider");
-        welcome.BorderThickness = new Thickness(0, 1, 0, 0);
+        welcome.BorderBrush = Theme.Brush("primary");
+        welcome.BorderThickness = new Thickness(0, 1.5, 0, 0);
         welcome.CornerRadius = new CornerRadius(0, 0, 8, 8);
         list.Children.Add(welcome);
         var quit = Item(Loc.Get("tray_quit"), string.Empty, () => { flyout.Hide(); App.Current.Quit(); });
-        ((TextBlock)((Grid)quit.Child).Children[0]).Foreground = new SolidColorBrush(Tokens.ParseOklch("oklch(0.7 0.18 27)"));
         list.Children.Add(quit);
     }
 
-    /// <summary>Fila: padding 9 10, radio 8, Geist 13 px; hover #1a1a1d; a la derecha texto mono 9 px.</summary>
+    /// <summary>Fila: padding 9 10, radio 8; nombre en letra ancha y mayúsculas; a la derecha, etiqueta diminuta.</summary>
     private static Border Item(string label, string right, Action onClick, FrameworkElement? toggle = null)
     {
         var grid = new Grid { ColumnSpacing = 10 };
@@ -152,19 +157,17 @@ public sealed class TrayService : IDisposable
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         grid.Children.Add(new TextBlock
         {
-            Text = label, FontFamily = Res<FontFamily>("FontUi"), FontSize = 13, Foreground = Theme.Brush("primary"),
-            VerticalAlignment = VerticalAlignment.Center,
+            Text = Up(label), FontFamily = Res<FontFamily>("FontWide"), FontStretch = Windows.UI.Text.FontStretch.Expanded,
+            FontSize = 10.5, FontWeight = Microsoft.UI.Text.FontWeights.Bold, CharacterSpacing = 40,
+            Foreground = Theme.Brush("primary"), VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis,
         });
         if (toggle is not null)
         {
             Grid.SetColumn(toggle, 1);
             grid.Children.Add(toggle);
         }
-        var rightText = new TextBlock
-        {
-            Text = right, FontFamily = Res<FontFamily>("FontMono"), FontSize = 11, Foreground = Theme.Brush("quaternary"),
-            VerticalAlignment = VerticalAlignment.Center,
-        };
+        var rightText = Tiny(Up(right), "secondary");
+        rightText.VerticalAlignment = VerticalAlignment.Center;
         Grid.SetColumn(rightText, 2);
         grid.Children.Add(rightText);
 
@@ -190,7 +193,7 @@ public sealed class TrayService : IDisposable
     /// <summary>Fila con interruptor 30×16 (perilla 10 px); el menú se rehace para reflejar el cambio.</summary>
     private Border Toggle(string label, string right, bool on, Action change, Flyout flyout)
     {
-        var view = SwitchVisual.Create(on, 30, 16, 10);
+        var view = SwitchVisual.Create(on, 32, 18, 10);
         return Item(label, right, () =>
         {
             // La perilla se desliza y después se aplica (el menú se rehace para mostrar el estado nuevo).

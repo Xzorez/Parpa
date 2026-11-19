@@ -27,7 +27,7 @@ public sealed class WelcomeWindow : Window
     private readonly ParpaSettings _s = SettingsService.Current.S;
     private readonly StackPanel _dots = new() { Orientation = Orientation.Horizontal, Spacing = 6 };
     private readonly Grid _stepHost = new();
-    private readonly TextBlock _back = Ui.Mono(string.Empty, 10, tracking: 80, medium: true);
+    private readonly TextBlock _back = Tiny(string.Empty);
     private readonly PillButton _next = new() { Primary = true, Padding = new Thickness(18, 10, 18, 10) };
     private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _faceTimer;
     private DotMatrix? _face;
@@ -71,6 +71,17 @@ public sealed class WelcomeWindow : Window
 
     [DllImport("user32.dll")]
     private static extern uint GetDpiForWindow(IntPtr hwnd);
+
+    private static string Up(string text) => text.ToUpper(Loc.Culture);
+
+    /// <summary>Letra ancha y negrísima (estilo Wide de la app).</summary>
+    private static TextBlock Wide(string text, double size, string color = "primary") =>
+        new() { Style = (Style)Application.Current.Resources["Wide"], Text = text, FontSize = size, Foreground = Theme.Brush(color), VerticalAlignment = VerticalAlignment.Center };
+
+    /// <summary>Etiqueta diminuta, ancha y muy espaciada (estilo Tiny de la app).</summary>
+    private static TextBlock Tiny(string text, string color = "primary") =>
+        new() { Style = (Style)Application.Current.Resources["Tiny"], Text = text, Foreground = Theme.Brush(color), HorizontalAlignment = HorizontalAlignment.Left };
+
 
     private Grid BuildShell()
     {
@@ -131,7 +142,8 @@ public sealed class WelcomeWindow : Window
         _slide = 0;
 
         // Paso final: "VER DE NUEVO" a la izquierda y el botón cierra.
-        _back.Text = _step == Steps - 1 ? Loc.Get("welcome_again") : "‹ " + Loc.Get("welcome_back");
+        _back.Text = Up(_step == Steps - 1 ? Loc.Get("welcome_again") : "‹ " + Loc.Get("welcome_back"));
+        _back.VerticalAlignment = VerticalAlignment.Center;
         _back.Opacity = _step == 0 ? 0 : 1;
         _next.Text = _step switch
         {
@@ -187,6 +199,8 @@ public sealed class WelcomeWindow : Window
             Height = 96,
             CornerRadius = new CornerRadius(0, 0, 40, 40),
             Background = Theme.Brush("bg"),
+            BorderBrush = Theme.Brush("primary"),
+            BorderThickness = new Thickness(1.5, 0, 1.5, 1.5),
             HorizontalAlignment = HorizontalAlignment.Center,
             Child = _face,
         };
@@ -204,11 +218,11 @@ public sealed class WelcomeWindow : Window
         var panel = new StackPanel { Spacing = 22, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
         panel.Children.Add(BigNotch());
         var texts = new StackPanel { Spacing = 8, MaxWidth = 420 };
-        var hello = Ui.Doto(Loc.Get("welcome_hello"), 40, black: true);
+        var hello = Wide(Up(Loc.Get("welcome_hello")), 30);
         hello.HorizontalAlignment = HorizontalAlignment.Center;
         hello.TextAlignment = TextAlignment.Center;
         texts.Children.Add(hello);
-        var intro = Ui.Text(Loc.Get("welcome_intro"), 15, "soft");
+        var intro = Ui.Text(Loc.Get("welcome_intro"), 15, "secondary");
         intro.TextAlignment = TextAlignment.Center;
         intro.LineHeight = 22.5;
         texts.Children.Add(intro);
@@ -219,7 +233,9 @@ public sealed class WelcomeWindow : Window
     private static StackPanel StepTitle(string titleKey, string subKey)
     {
         var panel = new StackPanel { Spacing = 6 };
-        panel.Children.Add(Ui.Text(Loc.Get(titleKey), 22, semibold: true));
+        var title = Wide(Up(Loc.Get(titleKey)), 22);
+        title.HorizontalAlignment = HorizontalAlignment.Left;
+        panel.Children.Add(title);
         panel.Children.Add(Ui.Text(Loc.Get(subKey), 13, "secondary"));
         return panel;
     }
@@ -232,8 +248,9 @@ public sealed class WelcomeWindow : Window
         {
             Height = 140,
             Padding = new Thickness(22),
-            Background = Theme.Brush("card"),
-            CornerRadius = new CornerRadius(16),
+            BorderBrush = Theme.Brush("primary"),
+            BorderThickness = new Thickness(1.5),
+            CornerRadius = new CornerRadius(14),
             Child = Ui.MonitorPicker(_s, 150, 84, 20, n => Change(s => s.Monitor = n)),
         };
         panel.Children.Add(monitors);
@@ -245,7 +262,7 @@ public sealed class WelcomeWindow : Window
         return panel;
     }
 
-    /// <summary>Teclas grandes (Doto 700 26, padding 14 20, radio 12) y CAMBIAR ATAJO.</summary>
+    /// <summary>Teclas grandes con marco de tinta y letra ancha, y CAMBIAR ATAJO.</summary>
     private Grid Shortcut()
     {
         var grid = new Grid { RowSpacing = 20 };
@@ -260,11 +277,10 @@ public sealed class WelcomeWindow : Window
             keys.Children.Add(new Border
             {
                 Padding = new Thickness(20, 14, 20, 14),
-                CornerRadius = new CornerRadius(16),
-                Background = Theme.Brush("glyphOff"),
-                BorderBrush = Theme.Brush("border"),
-                BorderThickness = new Thickness(0, 0, 0, 4),
-                Child = Ui.Doto(key, 26),
+                CornerRadius = new CornerRadius(12),
+                BorderBrush = Theme.Brush("primary"),
+                BorderThickness = new Thickness(1.5),
+                Child = Wide(key, 24),
             });
         }
         center.Children.Add(keys);
@@ -286,7 +302,7 @@ public sealed class WelcomeWindow : Window
         return grid;
     }
 
-    /// <summary>Apps en dos columnas (gap 8): encendida en claro, apagada en tarjeta.</summary>
+    /// <summary>Apps en dos columnas (gap 8): encendida rellena de tinta, apagada solo con el marco.</summary>
     private StackPanel Apps()
     {
         var panel = new StackPanel { Spacing = 20 };
@@ -303,13 +319,16 @@ public sealed class WelcomeWindow : Window
             var tile = new Grid
             {
                 Padding = new Thickness(16, 14, 16, 14),
-                CornerRadius = new CornerRadius(16),
-                Background = Theme.Brush(on ? "primary" : "card"),
+                CornerRadius = new CornerRadius(12),
+                BorderBrush = Theme.Brush("primary"),
+                BorderThickness = new Thickness(1.5),
+                Background = on ? Theme.Brush("primary") : Ui.Clear,
             };
-            var name = Ui.Text(app, 14, on ? "bg" : "primary");
-            name.FontWeight = Microsoft.UI.Text.FontWeights.Medium;
+            var name = Wide(Up(app), 12, on ? "bg" : "primary");
+            name.HorizontalAlignment = HorizontalAlignment.Left;
             tile.Children.Add(name);
-            var state = Ui.Mono(Loc.Get(on ? "settings_on" : "settings_off"), 9, on ? "bg" : "primary");
+            var state = Tiny(Up(Loc.Get(on ? "settings_on" : "settings_off")), on ? "bg" : "primary");
+            state.VerticalAlignment = VerticalAlignment.Center;
             state.Opacity = 0.7;
             state.HorizontalAlignment = HorizontalAlignment.Right;
             tile.Children.Add(state);
@@ -331,10 +350,10 @@ public sealed class WelcomeWindow : Window
     {
         var panel = new StackPanel { Spacing = 18, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
         panel.Children.Add(BigNotch());
-        var title = Ui.Doto(Loc.Get("welcome_done_title"), 36, black: true);
+        var title = Wide(Up(Loc.Get("welcome_done_title")), 36);
         title.HorizontalAlignment = HorizontalAlignment.Center;
         panel.Children.Add(title);
-        var text = Ui.Text(Loc.Get("welcome_done_text"), 14, "soft");
+        var text = Ui.Text(Loc.Get("welcome_done_text"), 14, "secondary");
         text.TextAlignment = TextAlignment.Center;
         text.MaxWidth = 400;
         text.LineHeight = 21;

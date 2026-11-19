@@ -15,7 +15,7 @@ namespace Parpa.Views;
 /// </summary>
 public sealed partial class TimerView : Grid, INotchPageView
 {
-    private static readonly int[] Presets = [1, 3, 5, 10, 15, 25, 30, 45, 60];
+    private static readonly int[] Presets = [1, 5, 10, 15, 25, 30, 45, 60];
 
     private readonly NotchServices _app;
     private readonly TimerService _timer;
@@ -27,7 +27,7 @@ public sealed partial class TimerView : Grid, INotchPageView
     private readonly Border _secondsHit = new() { Background = Ui.Clear };
     private readonly Grid _progress = new() { Height = 9 };
     private readonly Border _progressFill = new() { Height = 3, CornerRadius = new CornerRadius(1.5), HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center };
-    private readonly StackPanel _presets = new() { Orientation = Orientation.Horizontal, Spacing = 5 };
+    private readonly StackPanel _presets = new() { Orientation = Orientation.Horizontal, Spacing = 4 };
     private readonly StackPanel _actions = new() { Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
     private readonly Border _left;
     private TimerState? _builtFor;
@@ -69,7 +69,7 @@ public sealed partial class TimerView : Grid, INotchPageView
         _presets.Children.Add(minLabel);
         foreach (var minutes in Presets)
         {
-            var chip = new PillButton { Text = $"{minutes}", Padding = new Thickness(8, 4, 8, 4) };
+            var chip = new PillButton { Text = $"{minutes}", Padding = new Thickness(7, 4, 7, 4) };
             chip.Click += (_, _) => _timer.Set(TimeSpan.FromMinutes(minutes));
             _presets.Children.Add(chip);
         }
