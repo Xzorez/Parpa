@@ -67,6 +67,14 @@ public sealed class ClipboardService
         if (announce) Copied?.Invoke(entry);
     }
 
+    /// <summary>Quita una entrada del historial (clic derecho en el portapapeles).</summary>
+    public void Remove(ClipEntry entry)
+    {
+        if (!_store.Items.Remove(entry)) return;
+        _store.Save();
+        Changed?.Invoke();
+    }
+
     public void Clear()
     {
         _store.Items.Clear();

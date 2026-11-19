@@ -156,6 +156,7 @@
   <data name="clip_copy" xml:space="preserve"><value>Copiar</value></data>
   <data name="clip_pin" xml:space="preserve"><value>Fijar</value></data>
   <data name="clip_clear" xml:space="preserve"><value>Borrar todo</value></data>
+  <data name="clip_hint" xml:space="preserve"><value>Clic copia · Derecho borra</value></data>
   <data name="todo_today" xml:space="preserve"><value>Hoy</value></data>
   <data name="todo_new" xml:space="preserve"><value>+ Nueva tarea</value></data>
   <data name="todo_new_ph" xml:space="preserve"><value>¿Qué tienes que hacer?</value></data>

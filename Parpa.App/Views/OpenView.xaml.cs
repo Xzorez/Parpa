@@ -17,6 +17,7 @@ public sealed partial class OpenView : UserControl
     private LauncherView? _launcher;
     private FrameworkElement? _current;
     private bool _menuHover;
+    private int _currentIndex = -1;
 
     public OpenView(NotchServices app)
     {
@@ -91,8 +92,16 @@ public sealed partial class OpenView : UserControl
         {
             if (_current is INotchPageView old) old.OnHidden();
             if (_current is not null) _current.Visibility = Visibility.Collapsed;
-            // Cambio de ventana con el notch ya abierto: la nueva entra con un fundido corto.
-            if (_current is not null && !_hidden) Motion.FadeUp(next, 6, TimeSpan.Zero, Motion.Quick);
+            // Cambio de ventana con el notch ya abierto: la nueva entra con un fundido corto, deslizándose desde el
+            // lado de su posición en el menú (la siguiente desde la derecha, la anterior desde la izquierda) y,
+            // el menú, desde abajo.
+            var index = launcher ? -1 : NotchPage.Implemented.ToList().IndexOf(page);
+            if (_current is not null && !_hidden)
+            {
+                if (launcher || _currentIndex < 0) Motion.FadeUp(next, 6, TimeSpan.Zero, TimeSpan.FromMilliseconds(240));
+                else Motion.FadeUp(next, 0, TimeSpan.Zero, TimeSpan.FromMilliseconds(260), fromX: Math.Sign(index - _currentIndex) * 18);
+            }
+            _currentIndex = index;
             _current = next;
             next.Visibility = Visibility.Visible;
         }

@@ -183,7 +183,8 @@
     "empty":      { "es": "Copia algo con {keys} y aparecerá aquí", "en": "Copy something with {keys} and it shows up here" },
     "copy":       { "es": "Copiar", "en": "Copy" },
     "pin":        { "es": "Fijar", "en": "Pin" },
-    "clear":      { "es": "Borrar todo", "en": "Clear all" }
+    "clear":      { "es": "Borrar todo", "en": "Clear all" },
+    "hint":       { "es": "Clic copia · Derecho borra", "en": "Click copies · Right-click deletes" }
   },
   "todo": {
     "today":      { "es": "Hoy", "en": "Today" },

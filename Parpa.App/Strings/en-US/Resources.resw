@@ -156,6 +156,7 @@
   <data name="clip_copy" xml:space="preserve"><value>Copy</value></data>
   <data name="clip_pin" xml:space="preserve"><value>Pin</value></data>
   <data name="clip_clear" xml:space="preserve"><value>Clear all</value></data>
+  <data name="clip_hint" xml:space="preserve"><value>Click copies · Right-click deletes</value></data>
   <data name="todo_today" xml:space="preserve"><value>Today</value></data>
   <data name="todo_new" xml:space="preserve"><value>+ New task</value></data>
   <data name="todo_new_ph" xml:space="preserve"><value>What do you need to do?</value></data>

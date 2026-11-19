@@ -31,6 +31,8 @@ public sealed partial class TimerView : Grid, INotchPageView
     private readonly StackPanel _actions = new() { Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
     private readonly Border _left;
     private TimerState? _builtFor;
+    private string _lastMinutes = string.Empty;
+    private string _lastSeconds = string.Empty;
     private bool _shown;
 
     public TimerView(NotchServices app)
@@ -109,7 +111,12 @@ public sealed partial class TimerView : Grid, INotchPageView
         Render();
     }
 
-    public void OnHidden() => _shown = false;
+    public void OnHidden()
+    {
+        _shown = false;
+        _builtFor = null; // al volver se rehacen los botones y, si suena, vuelve el latido
+        Pulse(false);
+    }
 
     private void Wheel(PointerRoutedEventArgs e, TimeSpan step)
     {
@@ -139,6 +146,14 @@ public sealed partial class TimerView : Grid, INotchPageView
         var cut = time.LastIndexOf(':');
         _minutes.Text = time[..cut];
         _seconds.Text = time[(cut + 1)..];
+        // En marcha, cada cifra que cambia cae desde arriba con un fundido corto (como un marcador).
+        if (state == TimerState.Running)
+        {
+            if (_seconds.Text != _lastSeconds) Motion.FadeUp(_seconds, -7, TimeSpan.Zero, TimeSpan.FromMilliseconds(200));
+            if (_minutes.Text != _lastMinutes) Motion.FadeUp(_minutes, -7, TimeSpan.Zero, TimeSpan.FromMilliseconds(200));
+        }
+        _lastSeconds = _seconds.Text;
+        _lastMinutes = _minutes.Text;
         _state.Text = Up(state switch
         {
             TimerState.Running => "timer_running",
@@ -161,9 +176,30 @@ public sealed partial class TimerView : Grid, INotchPageView
     private void DrawProgress() =>
         _progressFill.Width = Math.Max(0, _progress.ActualWidth * (_timer.State == TimerState.Ready ? 0 : _timer.Elapsed));
 
+    /// <summary>Sonando: el bloque late al ritmo de la alarma (1,4 s); al pararla vuelve a su tamaño.</summary>
+    private void Pulse(bool on)
+    {
+        var visual = Microsoft.UI.Xaml.Hosting.ElementCompositionPreview.GetElementVisual(_left);
+        visual.StopAnimation("Scale");
+        visual.Scale = System.Numerics.Vector3.One;
+        if (!on || Motion.Reduced) return;
+        var c = visual.Compositor;
+        visual.CenterPoint = new System.Numerics.Vector3((float)_left.ActualWidth / 2, (float)_left.ActualHeight / 2, 0);
+        var ease = c.CreateCubicBezierEasingFunction(new System.Numerics.Vector2(.4f, 0f), new System.Numerics.Vector2(.2f, 1f));
+        var beat = c.CreateVector3KeyFrameAnimation();
+        beat.InsertKeyFrame(0f, System.Numerics.Vector3.One);
+        beat.InsertKeyFrame(0.12f, new System.Numerics.Vector3(1.025f, 1.025f, 1), ease);
+        beat.InsertKeyFrame(0.45f, System.Numerics.Vector3.One, ease);
+        beat.InsertKeyFrame(1f, System.Numerics.Vector3.One);
+        beat.Duration = TimeSpan.FromMilliseconds(1400);
+        beat.IterationBehavior = Microsoft.UI.Composition.AnimationIterationBehavior.Forever;
+        visual.StartAnimation("Scale", beat);
+    }
+
     private void BuildActions(TimerState state)
     {
         _builtFor = state;
+        Pulse(state == TimerState.Ringing);
         _actions.Children.Clear();
         switch (state)
         {

@@ -27,6 +27,7 @@ public sealed partial class NotchShape : Grid
     private readonly List<FrameworkElement> _views = new();
     private FrameworkElement? _current;
     private int _transitionId;
+    private NotchGeometry? _target;
 
     /// <summary>Fin de la animación de forma más reciente (para ajustar la región de la ventana).</summary>
     public event Action? TransitionCompleted;
@@ -92,6 +93,7 @@ public sealed partial class NotchShape : Grid
             _props.InsertScalar("W", (float)target.Width);
             _props.InsertScalar("H", (float)target.Height);
             _props.InsertScalar("R", (float)target.Radius);
+            _target = target;
             foreach (var v in _views)
             {
                 v.Visibility = v == view ? Visibility.Visible : Visibility.Collapsed;
@@ -101,11 +103,22 @@ public sealed partial class NotchShape : Grid
             return;
         }
 
-        var batch = _compositor.CreateScopedBatch(CompositionBatchTypes.Animation);
+        // Crecer con el rebote suave del diseño; encoger (cerrar, quitar un aviso) sin rebote y algo más rápido,
+        // como algo que se recoge: un rebote al cerrar se ve como un tirón.
+        var shrinking = _target is { } before && target.Width * target.Height < before.Width * before.Height;
+        _target = target;
+        var duration = m.Duration;
         var easing = _compositor.CreateCubicBezierEasingFunction(m.P1, m.P2);
-        AnimateProp("W", target.Width, m.Duration, easing);
-        AnimateProp("H", target.Height, m.Duration, easing);
-        AnimateProp("R", target.Radius, m.Duration, easing);
+        if (shrinking && !Motion.Reduced)
+        {
+            duration = TimeSpan.FromMilliseconds(m.Duration.TotalMilliseconds * 0.78);
+            easing = _compositor.CreateCubicBezierEasingFunction(new Vector2(.32f, .72f), new Vector2(0f, 1f));
+        }
+        var batch = _compositor.CreateScopedBatch(CompositionBatchTypes.Animation);
+        AnimateProp("W", target.Width, duration, easing);
+        AnimateProp("H", target.Height, duration, easing);
+        AnimateProp("R", target.Radius, duration, easing);
+        m = m with { Duration = duration };
 
         if (previous != view)
         {
@@ -137,7 +150,7 @@ public sealed partial class NotchShape : Grid
             if (previous is not null)
             {
                 var fadeOut = _compositor.CreateScalarKeyFrameAnimation();
-                fadeOut.InsertKeyFrame(1f, 0f, _compositor.CreateLinearEasingFunction());
+                fadeOut.InsertKeyFrame(1f, 0f, _compositor.CreateCubicBezierEasingFunction(new Vector2(.4f, 0f), new Vector2(1f, 1f)));
                 fadeOut.Duration = lead;
                 ElementCompositionPreview.GetElementVisual(previous).StartAnimation("Opacity", fadeOut);
             }
