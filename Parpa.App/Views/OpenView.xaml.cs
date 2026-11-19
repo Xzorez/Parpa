@@ -49,6 +49,7 @@ public sealed partial class OpenView : UserControl
             "todo" => CreateTasks(),
             "notes" => new NotesView(_app),
             "audio" => new AudioView(_app),
+            "timer" => new TimerView(_app),
             "quick" => new QuickView(_app),
             _ => _pages.GetValueOrDefault(NotchPage.Home) ?? new HomeView(_app),
         };

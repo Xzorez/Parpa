@@ -22,6 +22,7 @@
     "todo":     { "es": "Tareas", "en": "Tasks" },
     "notes":    { "es": "Notas", "en": "Notes" },
     "audio":    { "es": "Audio", "en": "Audio" },
+    "timer":    { "es": "Temporizador", "en": "Timer" },
     "quick":    { "es": "Ajustes", "en": "Settings" },
     "menu":     { "es": "Menú", "en": "Menu" }
   },
@@ -122,6 +123,19 @@
     "link_clip":  { "es": "Al portapapeles", "en": "To clipboard" },
     "working":    { "es": "Un momento…", "en": "One moment…" },
     "failed":     { "es": "No se pudo", "en": "Couldn’t do it" }
+  },
+  "timer": {
+    "ready":      { "es": "Listo", "en": "Ready" },
+    "running":    { "es": "En marcha", "en": "Running" },
+    "paused":     { "es": "En pausa", "en": "Paused" },
+    "ringing":    { "es": "¡Tiempo!", "en": "Time’s up!" },
+    "start":      { "es": "Empezar", "en": "Start" },
+    "resume":     { "es": "Seguir", "en": "Resume" },
+    "pause":      { "es": "Pausar", "en": "Pause" },
+    "reset":      { "es": "Reiniciar", "en": "Reset" },
+    "stop":       { "es": "Parar", "en": "Stop" },
+    "add":        { "es": "+1 min", "en": "+1 min" },
+    "done_body":  { "es": "Se acabó el temporizador de {t}", "en": "Your {t} timer is done" }
   },
   "audio": {
     "output":     { "es": "Salida", "en": "Output" },

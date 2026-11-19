@@ -14,6 +14,7 @@
   <data name="windows_todo" xml:space="preserve"><value>Tasks</value></data>
   <data name="windows_notes" xml:space="preserve"><value>Notes</value></data>
   <data name="windows_audio" xml:space="preserve"><value>Audio</value></data>
+  <data name="windows_timer" xml:space="preserve"><value>Timer</value></data>
   <data name="windows_quick" xml:space="preserve"><value>Settings</value></data>
   <data name="windows_menu" xml:space="preserve"><value>Menu</value></data>
   <data name="compact_idle" xml:space="preserve"><value>Idle</value></data>
@@ -102,6 +103,17 @@
   <data name="drop_link_clip" xml:space="preserve"><value>To clipboard</value></data>
   <data name="drop_working" xml:space="preserve"><value>One moment…</value></data>
   <data name="drop_failed" xml:space="preserve"><value>Couldn’t do it</value></data>
+  <data name="timer_ready" xml:space="preserve"><value>Ready</value></data>
+  <data name="timer_running" xml:space="preserve"><value>Running</value></data>
+  <data name="timer_paused" xml:space="preserve"><value>Paused</value></data>
+  <data name="timer_ringing" xml:space="preserve"><value>Time’s up!</value></data>
+  <data name="timer_start" xml:space="preserve"><value>Start</value></data>
+  <data name="timer_resume" xml:space="preserve"><value>Resume</value></data>
+  <data name="timer_pause" xml:space="preserve"><value>Pause</value></data>
+  <data name="timer_reset" xml:space="preserve"><value>Reset</value></data>
+  <data name="timer_stop" xml:space="preserve"><value>Stop</value></data>
+  <data name="timer_add" xml:space="preserve"><value>+1 min</value></data>
+  <data name="timer_done_body" xml:space="preserve"><value>Your {t} timer is done</value></data>
   <data name="audio_output" xml:space="preserve"><value>Output</value></data>
   <data name="audio_no_output" xml:space="preserve"><value>No audio output</value></data>
   <data name="audio_mic" xml:space="preserve"><value>Microphone</value></data>

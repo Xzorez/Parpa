@@ -24,6 +24,8 @@ public static class SoundService
     private static ParpaSettings _s = null!;
     private static DispatcherQueueTimer? _closeTimer;
     private static DispatcherQueueTimer? _ringTimer;
+    private static DispatcherQueueTimer? _alarmTimer;
+    private static readonly TimeSpan AlarmEvery = TimeSpan.FromSeconds(1.4);
     private static MixingSampleProvider? _mixer;
     private static WasapiOut? _output;
 
@@ -51,6 +53,9 @@ public static class SoundService
         _ringTimer = dispatcher.CreateTimer();
         _ringTimer.Interval = RingEvery;
         _ringTimer.Tick += (_, _) => Play("ring");
+        _alarmTimer = dispatcher.CreateTimer();
+        _alarmTimer.Interval = AlarmEvery;
+        _alarmTimer.Tick += (_, _) => PlayAlarm();
     }
 
     /// <summary>click, tick, page, open, close, notify, ring, confirm, send, decline.</summary>
@@ -74,6 +79,42 @@ public static class SoundService
         catch (Exception ex)
         {
             Log.Error("Sonido: no se pudo reproducir", ex);
+            CloseOutput();
+        }
+    }
+
+    /// <summary>
+    /// Alarma del temporizador: "alarm" cada 1,4 s hasta pararla. Es un aviso que se ha pedido, así que suena aunque
+    /// los sonidos estén apagados, haya No molestar o pantalla completa, y como mínimo al 50 % de volumen.
+    /// </summary>
+    public static void SetAlarm(bool on)
+    {
+        if (_alarmTimer is null || on == _alarmTimer.IsRunning) return;
+        if (on)
+        {
+            PlayAlarm();
+            _alarmTimer.Start();
+        }
+        else _alarmTimer.Stop();
+    }
+
+    private static void PlayAlarm()
+    {
+        if (!Sounds.TryGetValue("alarm", out var samples)) return;
+        var gain = (float)Math.Clamp(Math.Max(_s.Vol, 50) / 100.0, 0, 1);
+        try
+        {
+            lock (Gate)
+            {
+                EnsureOutput();
+                _mixer!.AddMixerInput(new BufferProvider(samples, gain));
+            }
+            _closeTimer?.Stop();
+            _closeTimer?.Start();
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Sonido: no se pudo reproducir la alarma", ex);
             CloseOutput();
         }
     }

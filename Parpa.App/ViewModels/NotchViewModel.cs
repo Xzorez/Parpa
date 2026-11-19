@@ -25,9 +25,10 @@ public sealed record NotchPage(string Id, string TitleKey, string Glyph, string 
     public static readonly NotchPage Notes = new("notes", "windows_notes", "notas", "notes");
     public static readonly NotchPage Audio = new("audio", "windows_audio", "sonido", "audio");
     public static readonly NotchPage Quick = new("quick", "windows_quick", "general", "quick");
+    public static readonly NotchPage Timer = new("timer", "windows_timer", "temporizador", "timer");
 
     /// <summary>Ventanas con vista propia.</summary>
-    public static readonly IReadOnlyList<NotchPage> Implemented = [Home, Clip, Shelf, Todo, Notes, Audio, Quick];
+    public static readonly IReadOnlyList<NotchPage> Implemented = [Home, Clip, Shelf, Todo, Notes, Audio, Timer, Quick];
 }
 
 /// <summary>
@@ -56,7 +57,7 @@ public sealed record NotchPeek(
     string PrimaryLabel, string SecondaryLabel,
     int Priority, bool IsCall,
     Action? OnPrimary = null, Action? OnSecondary = null,
-    string? Key = null, bool ErrorDot = false)
+    string? Key = null, bool ErrorDot = false, bool Sticky = false)
 {
     public const int PriorityInfo = 0;
     public const int PriorityMessage = 1;
@@ -69,9 +70,10 @@ public sealed class NotchViewModel
     public const string ActivityMusic = "music";
     public const string ActivityPicker = "picker";
     public const string ActivityDownload = "download";
+    public const string ActivityTimer = "timer";
 
     /// <summary>Orden de prioridad de las actividades (gana la primera presente). Micro/cámara siempre delante.</summary>
-    private static readonly string[] ActivityOrder = [ActivityPrivacy, ActivityPicker, ActivityDownload, ActivityMusic];
+    private static readonly string[] ActivityOrder = [ActivityPrivacy, ActivityPicker, ActivityTimer, ActivityDownload, ActivityMusic];
 
     /// <summary>Alto del modo minimal (tokens.json › notch › minimal).</summary>
     private const double MinimalHeight = 24;
@@ -205,6 +207,9 @@ public sealed class NotchViewModel
         var next = ActivityOrder.Select(s => _activities.GetValueOrDefault(s)).FirstOrDefault(a => a is not null);
         if (next == Activity) return;
         Activity = next;
+        // Abierto, con un aviso o un indicador, la actividad no se ve: no hace falta redibujar (el temporizador y
+        // las descargas cambian cada segundo y redibujarían la ventana abierta).
+        if (State is NotchState.Open or NotchState.Peek or NotchState.Osd or NotchState.Drop) return;
         Update();
     }
 
@@ -241,6 +246,13 @@ public sealed class NotchViewModel
         }
         _queue.Add(peek);
         if (Peek is null) TryShowNextPeek(update: true);
+    }
+
+    /// <summary>Quita un aviso (visible o en cola) por su clave, p. ej. la alarma ya parada desde otra parte.</summary>
+    public void RemovePeek(string key)
+    {
+        _queue.RemoveAll(p => p.Key == key);
+        if (Peek?.Key == key) EndPeek();
     }
 
     /// <summary>Botón principal del aviso.</summary>
@@ -289,7 +301,7 @@ public sealed class NotchViewModel
         _peekTotal = TimeSpan.FromSeconds(Math.Max(1, _s.NotifDur));
         _peekRemaining = _peekTotal;
         _peekPaused = true;
-        if (!_pointerInside) ResumePeek(); // con el ratón encima el tiempo no corre
+        if (!_pointerInside && !next.Sticky) ResumePeek(); // con el ratón encima el tiempo no corre; los fijos esperan
         Update();
         return true;
     }
@@ -304,7 +316,7 @@ public sealed class NotchViewModel
 
     private void ResumePeek()
     {
-        if (Peek is null || !_peekPaused) return;
+        if (Peek is null || !_peekPaused || Peek.Sticky) return;
         _peekPaused = false;
         _peekDeadline = DateTime.UtcNow + _peekRemaining;
         _peekTimer.Interval = _peekRemaining > TimeSpan.Zero ? _peekRemaining : TimeSpan.FromMilliseconds(1);

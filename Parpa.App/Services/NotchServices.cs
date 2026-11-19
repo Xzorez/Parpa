@@ -25,7 +25,8 @@ public sealed record NotchServices(
     TasksService Tasks,
     NotesService Notes,
     WeatherService Weather,
-    Eyedropper Picker);
+    Eyedropper Picker,
+    TimerService Timer);
 
 /// <summary>Una ventana del notch abierto (Inicio, Portapapeles…).</summary>
 public interface INotchPageView

@@ -308,6 +308,15 @@
       ".X.X...",
       "X.X....",
       "XX....."
+    ],
+    "temporizador": [
+      "XXXXXXX",
+      ".X...X.",
+      "..X.X..",
+      "...X...",
+      "..X.X..",
+      ".XXXXX.",
+      "XXXXXXX"
     ]
   }
 }

@@ -99,6 +99,11 @@
       true
     ],
     [
+      "timer",
+      "Temporizador",
+      true
+    ],
+    [
       "quick",
       "Ajustes rápidos",
       true

@@ -41,6 +41,7 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
     private readonly DownloadWatcher _downloads = new();
     private readonly WeatherService _weather = new();
     private readonly Eyedropper _picker = new();
+    private readonly TimerService _timer;
     private readonly TasksService _tasks = new();
     private readonly NotesService _notes = new();
     private readonly MemoryTrim _trim;
@@ -104,7 +105,8 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
         _notices = new NoticeCenter(_vm, _s);
         _clipboard = new ClipboardService(_hwnd, _s);
         _shelf = new ShelfService(_s, _clipboard);
-        _open = new OpenView(new NotchServices(_vm, _s, this, _system, _notices, _clipboard, _shelf, _tasks, _notes, _weather, _picker));
+        _timer = new TimerService(_s);
+        _open = new OpenView(new NotchServices(_vm, _s, this, _system, _notices, _clipboard, _shelf, _tasks, _notes, _weather, _picker, _timer));
         _vm.Changed += OnStateChanged;
         _trim = new MemoryTrim(() => !_vm.IsOpen);
 
@@ -376,6 +378,41 @@ public sealed partial class NotchWindow : Window, IKeyboardHost
                 Key: "download"));
         };
         _downloads.Start();
+
+        // Temporizador: cuenta atrás en el notch cerrado; al acabar, aviso fijo con la alarma sonando hasta PARAR.
+        _timer.Changed += () =>
+        {
+            var state = _timer.State;
+            if (state != TimerState.Ringing) _vm.RemovePeek("timer");
+            _vm.SetActivity(NotchViewModel.ActivityTimer, state == TimerState.Ready ? null : new NotchActivity(
+                SizeToken: "download",
+                Glyph: "temporizador",
+                Label: Loc.Get(state == TimerState.Ringing ? "timer_ringing" : "windows_timer"),
+                Sub: state == TimerState.Paused ? Loc.Get("timer_paused") : string.Empty,
+                IsPlaying: false,
+                RightText: TimerService.Format(_timer.Remaining)));
+        };
+        _timer.Finished += () =>
+        {
+            if (_vm.IsOpen)
+            {
+                _vm.ShowPage(NotchPage.Timer);
+                return;
+            }
+            _vm.EnqueuePeek(new NotchPeek(
+                Glyph: "temporizador",
+                Head: Loc.Get("windows_timer"),
+                When: string.Empty,
+                Body: Loc.Get("timer_done_body").Replace("{t}", TimerService.Format(_timer.Duration)),
+                PrimaryLabel: Loc.Get("timer_stop"),
+                SecondaryLabel: Loc.Get("timer_add"),
+                Priority: NotchPeek.PriorityMessage,
+                IsCall: false,
+                OnPrimary: _timer.Stop,
+                OnSecondary: _timer.AddMinute,
+                Key: "timer",
+                Sticky: true));
+        };
 
         // Cuentagotas (Ajustes rápidos): el notch se cierra y enseña el color bajo el cursor; el clic lo copia.
         _picker.Hover += color => _vm.SetActivity(NotchViewModel.ActivityPicker, new NotchActivity(

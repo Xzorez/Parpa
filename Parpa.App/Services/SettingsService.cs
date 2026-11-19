@@ -169,6 +169,7 @@ public sealed class ParpaSettings
     /// <summary>Las capturas que guarda Windows (Win+Mayús+S, Impr Pant) aparecen en la bandeja.</summary>
     [JsonPropertyName("shelfScreenshots")] public bool ShelfScreenshots { get; set; } = true;
     [JsonPropertyName("shelfDownloads")] public bool ShelfDownloads { get; set; } = true;
+    [JsonPropertyName("timer")] public int Timer { get; set; } = 300;
     /// <summary>Bienvenida completada (no se vuelve a mostrar al arrancar).</summary>
     [JsonPropertyName("welcomeDone")] public bool WelcomeDone { get; set; }
     /// <summary>Avisos en pausa hasta esta hora (menú de bandeja: "Pausar avisos 1 hora").</summary>
