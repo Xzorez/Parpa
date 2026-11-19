@@ -22,6 +22,7 @@
     demo_open: 'Open',
     demo_volume: 'Volume',
     demo_speakers: 'Speakers',
+    demo_timer: 'Timer',
     tick_size: '43 MB',
     tick_license: 'MIT license',
     tick_admin: 'No admin rights',
@@ -38,9 +39,15 @@
     f4_t: 'Audio and volume',
     f4_d: 'Switch from speakers to headphones, mute the mic and set each app’s volume, including whatever’s playing. Plus clean volume, brightness and battery indicators.',
     f5_t: 'Clipboard',
-    f5_d: 'The last things you copied, always at hand. Passwords are never saved.',
+    f5_d: 'The last things you copied, always at hand: click to copy, right-click to delete. Passwords are never saved.',
     f6_t: 'Tasks, notes and system',
     f6_d: 'Drop text to turn it into a note or task, save links with their title and check CPU, GPU and RAM usage from the top.',
+    f7_t: 'Timer',
+    f7_d: 'Pick any time and watch it count down from the closed notch. When it ends, an alarm rings until you stop it.',
+    f8_t: 'Weather and downloads',
+    f8_d: 'The temperature on Home, with no account, and your browser downloads with their progress. When done, the file lands on the shelf.',
+    f9_t: 'Eyedropper and mascot',
+    f9_d: 'Copy the color of any pixel in one click. Plus a dot mascot that follows you with its eyes and naps when you leave.',
     privacy_eyebrow: 'Privacy',
     privacy_title: 'Everything stays on your PC.',
     privacy_lead: 'Parpa reads your notifications and clipboard to show them at the top. That’s why it has no accounts, sends nothing to any server and its code is open for anyone to read.',
@@ -118,6 +125,7 @@
     { k: 'music', w: 290, h: 34, r: 16, es: 'Música', en: 'Music' },
     { k: 'peek', w: 420, h: 112, r: 26, es: 'Aviso', en: 'Notification' },
     { k: 'osd', w: 340, h: 40, r: 16, es: 'Volumen', en: 'Volume' },
+    { k: 'timer', w: 250, h: 34, r: 16, es: 'Temporizador', en: 'Timer' },
   ];
   const notch = document.getElementById('notch');
   const body = document.getElementById('notch-body');
@@ -127,6 +135,10 @@
   const mascot = document.getElementById('mascot');
   const eq = [...document.querySelectorAll('#eq i')];
   const dots = document.getElementById('dots');
+  // Temporizador de la portada: una cuenta de 25 minutos que baja mientras se ve.
+  const htimer = document.getElementById('htimer');
+  let heroLeft = 1500;
+  const heroTime = () => { htimer.textContent = `${String(Math.floor(heroLeft / 60)).padStart(2, '0')}:${String(heroLeft % 60).padStart(2, '0')}`; };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let i = 0, tick = 0;
 
@@ -154,6 +166,7 @@
     void dots.offsetWidth;
     all[i]?.classList.add('on');
     stateName.textContent = s[lang];
+    if (s.k === 'timer') { heroLeft = 1500; heroTime(); }
   }
 
   function frame() {
@@ -171,6 +184,7 @@
   setInterval(() => {
     tick++;
     if (!reduced && tick % 13 === 0) { i = (i + 1) % S.length; show(); }
+    if (S[i].k === 'timer' && tick % 5 === 0 && heroLeft > 0) { heroLeft--; heroTime(); }
     frame();
   }, 200);
   new ResizeObserver(scale).observe(screen);

@@ -360,7 +360,7 @@ kbd.k { font: 700 11px var(--ui); font-stretch: 125%; border-radius: 6px; border
 .tips li::before { background: var(--ink); }
 
 /* Menú (como LauncherView): casillas con marco que se rellenan; pie con nombre, raya y cadena */
-.launcher { width: 460px; padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 12px; }
+.launcher { width: 510px; padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 12px; }
 .dock-area { height: 96px; display: flex; flex-direction: column; justify-content: space-between; }
 .dock { display: flex; gap: 8px; justify-content: center; padding-top: 4px; }
 .dk { position: relative; width: 50px; height: 50px; border: 1.5px solid var(--ink); border-radius: 12px; background: #000; color: var(--ink); display: flex; align-items: center; justify-content: center; cursor: pointer; animation: pop .3s cubic-bezier(.3, 1.4, .5, 1) backwards; animation-delay: var(--dl); transition: transform .2s cubic-bezier(.3, 1.4, .5, 1), background .15s, color .15s; }
@@ -404,3 +404,43 @@ kbd.k { font: 700 11px var(--ui); font-stretch: 125%; border-radius: 6px; border
 .chip-hot { background: var(--ink); color: #000; }
 .chip-vol .vbars { flex: 1; height: 14px; }
 .chip-vol [data-val] { font: 900 13px var(--ui); font-stretch: 125%; min-width: 32px; text-align: right; }
+
+/* Temporizador (como TimerView): bloque con marco, cifras enormes, tiempos rápidos y botones a la derecha */
+.tm { display: grid; grid-template-columns: 1fr 168px; gap: 10px; }
+.tm-box { border: 1.5px solid var(--ink); border-radius: 12px; padding: 10px 16px 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; color: var(--ink); transition: background .25s, color .25s; }
+.tm-state { font: 600 9.5px var(--ui); font-stretch: 125%; letter-spacing: .14em; text-transform: uppercase; }
+.tm-dig { display: flex; gap: 2px; font: 900 50px/52px var(--ui); font-stretch: 125%; font-variant-numeric: tabular-nums; user-select: none; }
+.tm-dig span { display: inline-block; }
+.tm-dig [data-unit] { cursor: ns-resize; }
+.tm-dig .drop { animation: tdrop .2s cubic-bezier(.2, .8, .2, 1); }
+@keyframes tdrop { from { transform: translateY(-7px); opacity: 0; } to { transform: none; opacity: 1; } }
+.tm-prog { position: relative; height: 9px; }
+.tm-prog::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1.5px; margin-top: -.75px; background: var(--border); }
+.tm-prog b { position: absolute; left: 0; top: 50%; height: 3px; margin-top: -1.5px; border-radius: 2px; background: currentColor; transition: width .25s linear; }
+.tm-pre { display: flex; align-items: center; gap: 4px; transition: opacity .2s; }
+.tm-pre.off { opacity: .35; pointer-events: none; }
+.tm-pre > span { font: 600 9px var(--ui); font-stretch: 125%; letter-spacing: .14em; margin-right: 3px; }
+.tp { font: 700 9px var(--ui); font-stretch: 125%; padding: 4px 7px; border: 1.5px solid var(--ink); border-radius: 999px; background: none; color: var(--ink); cursor: pointer; transition: background .15s, transform .12s; }
+.tp:hover { background: rgba(232, 138, 171, .14); }
+.tp:active { transform: scale(.94); }
+.tm-act { display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+.tm-act .np { justify-content: center; width: 100%; padding: 8px; }
+.tm-act .tm-big { padding: 12px; font-size: 11px; }
+.tm-act .tm-big.tall { padding: 22px 12px; }
+.tm-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.tm-box.ring { background: var(--ink); color: #000; animation: tbeat 1.4s infinite; }
+.tm-box.ring .tm-prog::before { background: rgba(0, 0, 0, .3); }
+@keyframes tbeat { 0%, 45%, 100% { transform: none; } 12% { transform: scale(1.025); } }
+.c-time { font: 900 13px var(--ui); font-stretch: 125%; font-variant-numeric: tabular-nums; color: var(--ink); }
+.c-row.ringing .c-time { animation: tblink 1s steps(1) infinite; }
+@keyframes tblink { 50% { opacity: .25; } }
+
+/* Portapapeles: copiar destella en tinta; clic derecho borra deslizando la fila */
+.row.flashed { background: var(--ink) !important; }
+.row.flashed .idx, .row.flashed .txt, .row.flashed .meta { color: #000; }
+.row.gone { animation: rowout .22s ease-in forwards; pointer-events: none; }
+@keyframes rowout { to { transform: translateX(-28px); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-box.ring, .tm-dig .drop, .row.gone, .c-row.ringing .c-time { animation: none; }
+}

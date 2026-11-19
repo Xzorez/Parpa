@@ -21,6 +21,9 @@ window.PARPA_ICONS = (() => {
     sistema: '<path d="M4 20V14M10 20V8M16 20v-9M22 20V4"/>',
     juego: '<rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4M15 12h.01M18 13.5h.01"/>',
     ojo: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    temporizador: '<path d="M6 2.5h12M6 21.5h12"/><path d="M7.5 2.5v3.2c0 1.6.8 2.6 2.2 3.9L12 12l-2.3 2.4c-1.4 1.3-2.2 2.3-2.2 3.9v3.2M16.5 2.5v3.2c0 1.6-.8 2.6-2.2 3.9L12 12l2.3 2.4c1.4 1.3 2.2 2.3 2.2 3.9v3.2"/>',
+    descarga: '<path d="M12 3v12M7 10l5 5 5-5M4 20h16"/>',
+    gotero: '<path d="M14 4.5 19.5 10"/><path d="M15.8 3.2a2.4 2.4 0 0 1 3.4 0l1.6 1.6a2.4 2.4 0 0 1 0 3.4L18 11l-5-5z"/><path d="M15.5 8.5 7 17l-3.5 1 1-3.5L13 6"/>',
   };
   return name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[name] || P.menu}</svg>`;
 })();

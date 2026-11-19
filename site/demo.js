@@ -14,6 +14,10 @@
       tip1: 'Pasa el ratón por el notch para abrirlo; al salir se cierra.', tip2: 'La rueda del ratón cambia de ventana. Esc lo cierra.',
       tip3: 'Arrastra archivos, un enlace o un texto de esta página hasta el notch: según en qué mitad lo sueltes, hace una cosa u otra.', tip4: 'Selecciona cualquier texto de esta página y pulsa Ctrl + C: aparecerá en el Portapapeles.',
       tip5: 'Las barras de volumen se pulsan o se arrastran. En Audio, toca el nombre de una app para silenciarla.',
+      tip6: 'En el Portapapeles, clic copia y clic derecho borra. En el Temporizador, la rueda sobre los números cambia el tiempo.',
+      timer: 'Temporizador', t_ready: 'Listo', t_running: 'En marcha', t_paused: 'En pausa', t_ringing: '¡Tiempo!',
+      t_start: 'Empezar', t_resume: 'Seguir', t_pause: 'Pausar', t_reset: 'Reiniciar', t_stop: 'Parar', t_add: '+1 min',
+      t_done: 'Se acabó el temporizador de {t}', sim_timer: 'Temporizador de 10 s', flash_timer: 'Temporizador de 10 s en marcha', flash_deleted: 'Borrado del portapapeles',
       footer: 'Código abierto con licencia MIT', footer_home: 'Web', footer_download: 'Descargar',
       home: 'Inicio', clip: 'Portapapeles', shelf: 'Bandeja', todo: 'Tareas', notes: 'Notas', audio: 'Audio', quick: 'Ajustes rápidos', menu: 'Menú',
       output: 'Salida', outputs: ['Auriculares', 'Altavoces'], mic: 'Micrófono', mic_on: 'Activo', mic_off: 'Silenciado', vol: 'Vol', muted: 'Mudo',
@@ -40,6 +44,10 @@
       tip1: 'Hover the notch to open it; it closes when you leave.', tip2: 'The mouse wheel switches windows. Esc closes it.',
       tip3: 'Drag files, a link or some text from this page onto the notch: which half you drop it on decides what happens.', tip4: 'Select any text on this page and press Ctrl + C: it shows up in the Clipboard.',
       tip5: 'Volume bars can be clicked or dragged. In Audio, tap an app’s name to mute it.',
+      tip6: 'In Clipboard, click copies and right-click deletes. In Timer, scroll over the numbers to change the time.',
+      timer: 'Timer', t_ready: 'Ready', t_running: 'Running', t_paused: 'Paused', t_ringing: 'Time’s up!',
+      t_start: 'Start', t_resume: 'Resume', t_pause: 'Pause', t_reset: 'Reset', t_stop: 'Stop', t_add: '+1 min',
+      t_done: 'Your {t} timer is done', sim_timer: '10 s timer', flash_timer: '10 s timer running', flash_deleted: 'Removed from the clipboard',
       footer: 'Open source under the MIT license', footer_home: 'Website', footer_download: 'Download',
       home: 'Home', clip: 'Clipboard', shelf: 'Shelf', todo: 'Tasks', notes: 'Notes', audio: 'Audio', quick: 'Quick settings', menu: 'Menu',
       output: 'Output', outputs: ['Headphones', 'Speakers'], mic: 'Microphone', mic_on: 'On', mic_off: 'Muted', vol: 'Vol', muted: 'Muted',
@@ -72,9 +80,9 @@
 
   // ---- Medidas (tokens.json › notch, radius) ----
   const SIZE = { idle: [120, 34], music: [290, 34], minimal: [96, 24], osd: [340, 40], peek: [420, 112], drop: [420, 84],
-    menu: [460, 166], home: [580, 214], clip: [580, 214], shelf: [580, 272], todo: [580, 280], notes: [580, 222], audio: [580, 300], quick: [580, 246] };
-  const PAGES = ['home', 'clip', 'shelf', 'todo', 'notes', 'audio', 'quick'];
-  const PAGE_GLYPH = { home: 'inicio', clip: 'copias', shelf: 'bandeja', todo: 'tareas', notes: 'notas', audio: 'sonido', quick: 'general', menu: 'menu' };
+    menu: [510, 166], home: [580, 214], clip: [580, 214], shelf: [580, 272], todo: [580, 280], notes: [580, 222], audio: [580, 300], timer: [580, 222], quick: [580, 246] };
+  const PAGES = ['home', 'clip', 'shelf', 'todo', 'notes', 'audio', 'timer', 'quick'];
+  const PAGE_GLYPH = { home: 'inicio', clip: 'copias', shelf: 'bandeja', todo: 'tareas', notes: 'notas', audio: 'sonido', timer: 'temporizador', quick: 'general', menu: 'menu' };
   const TRACKS = [
     { title: 'Luz de neón', artist: 'Parpa FM', len: 208, art: 'radial-gradient(circle at 62% 38%,#fff 0 18%,#bbb 19% 21%,transparent 22%),repeating-linear-gradient(0deg,#222 0 5px,#999 5px 7px),linear-gradient(#eee,#111)' },
     { title: 'Puntos suspensivos', artist: 'Matriz', len: 187, art: 'radial-gradient(circle at 30% 70%,#fff 0 12%,transparent 13%),repeating-radial-gradient(circle at 70% 30%,#eee 0 4px,#222 4px 9px)' },
@@ -106,6 +114,7 @@
     if (S.peek) return { key: 'peek:' + S.peek.id, size: SIZE.peek, r: 26, html: peekView };
     if (S.osd) return { key: 'osd:' + S.osd.kind, size: SIZE.osd, r: 16, html: osdView };
     if (S.minimal) return { key: 'minimal', size: SIZE.minimal, r: 12, html: () => '<div class="c-min"><i></i></div>' };
+    if (TM.state !== 'ready') return { key: 'timer', size: [252, 34], r: 16, html: timerCompact };
     if (S.music.playing) return { key: 'music', size: SIZE.music, r: 16, html: musicView };
     return { key: 'idle', size: SIZE.idle, r: 16, html: idleView };
   }
@@ -149,7 +158,7 @@
     return `<div class="peek" data-peek><div class="peek-h">${gl(p.glyph)}<span class="c-label">${esc(p.head)}</span><span class="peek-when">${t('now')}</span></div>
       <div class="peek-b">${esc(p.body)}</div>
       <div class="peek-a"><button class="np" data-act="peek-secondary">${p.secondary}</button><button class="np np-on" data-act="peek-primary">${p.primary}</button></div>
-      <div class="peek-bar" style="--dur:${p.ms}ms"><i></i></div></div>`;
+      ${p.sticky ? '' : `<div class="peek-bar" style="--dur:${p.ms}ms"><i></i></div>`}</div>`;
   }
   function osdView() {
     const o = S.osd, value = o.kind === 'volume' ? S.volume : S.brightness;
@@ -185,6 +194,7 @@
       case 'todo': return todoView();
       case 'notes': return notesView();
       case 'audio': return audioView();
+      case 'timer': return timerView();
       case 'quick': return quickView();
       default: return homeView();
     }
@@ -273,6 +283,116 @@
       <div class="a-apps">${apps}</div></div>`;
   }
 
+  // ---- Temporizador (como TimerService): cuenta atrás, pausa, +1 min y alarma hasta pararla ----
+  const TM = { state: 'ready', dur: 300, left: 300, end: 0, rang: 0 };
+  const tLeft = () => TM.state === 'running' ? Math.max(0, (TM.end - Date.now()) / 1000) : TM.state === 'ringing' ? 0 : TM.left;
+  const tFmt = s => {
+    const n = Math.ceil(Math.max(0, s) - 0.001), h = Math.floor(n / 3600), m = Math.floor(n / 60) % 60, x = n % 60;
+    return h ? `${h}:${two(m)}:${two(x)}` : `${two(m)}:${two(x)}`;
+  };
+  const tSplit = () => { const f = tFmt(tLeft()), cut = f.lastIndexOf(':'); return [f.slice(0, cut), f.slice(cut + 1)]; };
+  function tSet(sec) {
+    if (TM.state === 'running' || TM.state === 'ringing') return;
+    TM.dur = TM.left = Math.max(1, Math.min(86400, sec));
+    TM.state = 'ready';
+    render();
+  }
+  function tStart() {
+    audio(); // el navegador solo deja sonar si el audio se prepara con un clic
+    if (TM.state === 'ringing') alarm(false);
+    if (TM.left <= 0) TM.left = TM.dur;
+    TM.end = Date.now() + TM.left * 1000;
+    TM.state = 'running';
+    render();
+  }
+  function tPause() { TM.left = tLeft(); TM.state = 'paused'; render(); }
+  function tReset() { alarm(false); dropTimerPeek(); TM.left = TM.dur; TM.state = 'ready'; render(); }
+  function tAdd() {
+    if (TM.state === 'running') TM.end += 60000;
+    else if (TM.state === 'ringing') { alarm(false); dropTimerPeek(); TM.left = 60; TM.state = 'paused'; tStart(); return; }
+    else { TM.left = Math.min(86400, TM.left + 60); if (TM.state === 'ready') TM.dur = TM.left; }
+    render();
+  }
+  function tFinish() {
+    TM.state = 'ringing'; TM.left = 0; TM.rang = Date.now();
+    alarm(true);
+    if (S.open) { S.page = S.last = 'timer'; render(); return; }
+    showPeek({ glyph: 'temporizador', head: t('timer'), body: t('t_done', { t: tFmt(TM.dur) }), primary: t('t_stop'), secondary: t('t_add'), sticky: true, key: 'timer', onPrimary: tReset, onSecondary: tAdd });
+  }
+  function dropTimerPeek() { if (S.peek?.key === 'timer') dismissPeek(); }
+  // Alarma: tres pitidos cada 1,4 s (como el sonido "alarm" de la app); se calla sola a los 10 minutos.
+  let actx = null, alarmTimer = 0;
+  function audio() { try { actx ??= new (window.AudioContext || window.webkitAudioContext)(); actx.resume?.(); } catch { /* sin audio */ } }
+  function beep() {
+    if (!actx) return;
+    const now = actx.currentTime;
+    [[1046, 0, .11], [1046, .16, .11], [1318, .32, .22]].forEach(([f, s, d]) => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = 'square'; o.frequency.value = f;
+      g.gain.setValueAtTime(0, now + s);
+      g.gain.linearRampToValueAtTime(.05, now + s + .01);
+      g.gain.setValueAtTime(.05, now + s + d - .02);
+      g.gain.linearRampToValueAtTime(0, now + s + d);
+      o.connect(g).connect(actx.destination);
+      o.start(now + s); o.stop(now + s + d + .02);
+    });
+  }
+  function alarm(on) {
+    clearInterval(alarmTimer); alarmTimer = 0;
+    if (!on) return;
+    beep();
+    alarmTimer = setInterval(() => { if (Date.now() - TM.rang > 600000) { clearInterval(alarmTimer); return; } beep(); }, 1400);
+  }
+  function timerCompact() {
+    const st = TM.state;
+    return `<div class="c-row ${st === 'ringing' ? 'ringing' : ''}">${gl('temporizador')}<span class="c-label">${t(st === 'ringing' ? 't_ringing' : 'timer')}${st === 'paused' ? `<span class="c-sub">${t('t_paused')}</span>` : ''}</span><span class="c-time" id="ctime">${tFmt(tLeft())}</span></div>`;
+  }
+  function timerView() {
+    const st = TM.state, [mm, ss] = tSplit();
+    const prog = st === 'ready' || !TM.dur ? 0 : (1 - tLeft() / TM.dur) * 100;
+    const presets = [1, 5, 10, 15, 25, 30, 45, 60].map(m => `<button class="tp" data-act="tset" data-i="${m * 60}">${m}</button>`).join('');
+    const btn = (label, act, extra = '', i = '') => `<button class="np ${extra}" data-act="${act}"${i !== '' ? ` data-i="${i}"` : ''}>${label}</button>`;
+    const pair = (a, b) => `<div class="tm-pair">${a}${b}</div>`;
+    const nudge = (label, sec) => btn(label, 'tnudge', '', sec);
+    const actions = {
+      ready: btn(t('t_start'), 'tstart', 'np-on tm-big') + pair(nudge('−1 H', -3600), nudge('+1 H', 3600)) + pair(nudge('−1 MIN', -60), nudge('+1 MIN', 60)) + pair(nudge('−10 S', -10), nudge('+10 S', 10)),
+      running: btn(t('t_pause'), 'tpause', 'np-on tm-big') + btn(t('t_add'), 'tadd') + btn(t('t_reset'), 'treset'),
+      paused: btn(t('t_resume'), 'tstart', 'np-on tm-big') + btn(t('t_add'), 'tadd') + btn(t('t_reset'), 'treset'),
+      ringing: btn(t('t_stop'), 'treset', 'np-on tm-big tall') + btn(t('t_add'), 'tadd'),
+    }[st];
+    return `<div class="open">${head(t('timer'))}
+      <div class="tm"><div class="tm-box ${st === 'ringing' ? 'ring' : ''}"><span class="tm-state">${t('t_' + st)}</span>
+        <div class="tm-dig"><span id="tmin" data-unit="60">${mm}</span><span>:</span><span id="tsec" data-unit="5">${ss}</span></div>
+        <div class="tm-prog"><b id="tprog" style="width:${prog.toFixed(2)}%"></b></div>
+        <div class="tm-pre ${st === 'ready' ? '' : 'off'}"><span>MIN</span>${presets}</div></div>
+      <div class="tm-act">${actions}</div></div></div>`;
+  }
+  // Cada 250 ms: la cuenta baja sin redibujar la ventana; las cifras que cambian caen desde arriba.
+  setInterval(() => {
+    if (TM.state !== 'running') return;
+    if (tLeft() <= 0) { tFinish(); return; }
+    const c = document.getElementById('ctime'); if (c) c.textContent = tFmt(tLeft());
+    const [mm, ss] = tSplit();
+    [['tmin', mm], ['tsec', ss]].forEach(([id, text]) => {
+      const el = document.getElementById(id);
+      if (!el || el.textContent === text) return;
+      el.textContent = text;
+      el.classList.remove('drop'); void el.offsetWidth; if (!reduced) el.classList.add('drop');
+    });
+    const p = document.getElementById('tprog'); if (p) p.style.width = ((1 - tLeft() / TM.dur) * 100).toFixed(2) + '%';
+  }, 250);
+
+  // Portapapeles: clic derecho en una fila la borra (sale deslizándose).
+  ncontent.addEventListener('contextmenu', e => {
+    const row = e.target.closest('.row[data-act="copy"]');
+    if (!row) return;
+    e.preventDefault();
+    if (row.classList.contains('gone')) return;
+    row.classList.add('gone');
+    const entry = S.clip[Number(row.dataset.i)];
+    setTimeout(() => { S.clip = S.clip.filter(c => c !== entry); flash(t('flash_deleted')); render(); }, reduced ? 0 : 220);
+  });
+
   // ---- Barras de volumen: 20 barras (5 % cada una), como BarSlider en la app ----
   const BARS = 20;
   const appOf = key => S.audio.apps[Number(key.split(':')[1])];
@@ -352,6 +472,7 @@
   const hint = document.getElementById('hint');
   function open(page = S.last) {
     clearTimeout(openTimer); clearTimeout(closeTimer);
+    if (TM.state === 'ringing') page = 'timer';
     if (S.peek) { clearTimeout(S.peek.timer); S.peek = null; }
     S.osd = null;
     S.open = true; S.page = page; if (page !== 'menu') S.last = page;
@@ -384,6 +505,8 @@
   wrap.addEventListener('wheel', e => {
     e.preventDefault();
     // Sobre una fila con barras, la rueda sube o baja 5 % en vez de cambiar de ventana.
+    const unit = S.open && S.page === 'timer' && TM.state === 'ready' && e.target.closest?.('[data-unit]');
+    if (unit) { tSet(TM.dur + Number(unit.dataset.unit) * (e.deltaY < 0 ? 1 : -1)); return; }
     const bars = S.open && e.target.closest?.('[data-wheel]')?.querySelector('[data-slider]');
     if (bars) { const key = bars.dataset.slider; setLevel(key, level(key) + (e.deltaY < 0 ? 5 : -5)); return; }
     if (wheelLock) return;
@@ -413,7 +536,13 @@
       case 'play': S.music.playing = !S.music.playing; break;
       case 'prev': S.music.pos > 3 ? (S.music.pos = 0) : (S.music.i = (S.music.i + TRACKS.length - 1) % TRACKS.length, S.music.pos = 0); break;
       case 'next': S.music.i = (S.music.i + 1) % TRACKS.length; S.music.pos = 0; break;
-      case 'copy': navigator.clipboard?.writeText(S.clip[i].text).catch(() => {}); flash(t('flash_copied')); return;
+      case 'copy': {
+        navigator.clipboard?.writeText(S.clip[i].text).catch(() => {});
+        const meta = a.querySelector('.meta'), was = meta.textContent;
+        a.classList.add('flashed'); meta.textContent = t('copied');
+        setTimeout(() => { a.classList.remove('flashed'); meta.textContent = was; }, 900);
+        return;
+      }
       case 'unshelf': S.shelf.splice(i, 1); flash(t('flash_removed')); break;
       case 'task': S.tasks[i].done = !S.tasks[i].done; break;
       case 'tile': S[a.dataset.k] = !S[a.dataset.k]; break;
@@ -421,7 +550,13 @@
       case 'mic': S.audio.mic = !S.audio.mic; break;
       case 'appmute': S.audio.apps[i].muted = !S.audio.apps[i].muted; break;
       case 'peek-primary': S.peek.onPrimary?.(); dismissPeek(); return;
-      case 'peek-secondary': dismissPeek(); return;
+      case 'peek-secondary': S.peek.onSecondary?.(); dismissPeek(); return;
+      case 'tset': tSet(i); return;
+      case 'tnudge': tSet(TM.dur + i); return;
+      case 'tstart': tStart(); return;
+      case 'tpause': tPause(); return;
+      case 'treset': tReset(); return;
+      case 'tadd': tAdd(); return;
       default: return;
     }
     render();
@@ -452,7 +587,7 @@
   }));
   // Pasar el ratón por un aviso lo pausa (y la barra se detiene).
   ncontent.addEventListener('pointerenter', () => { if (S.peek) clearTimeout(S.peek.timer); }, true);
-  ncontent.addEventListener('pointerleave', e => { if (S.peek && e.target === ncontent) armPeek(1500); }, true);
+  ncontent.addEventListener('pointerleave', e => { if (S.peek && !S.peek.sticky && e.target === ncontent) armPeek(1500); }, true);
 
   // ---- Avisos, indicadores y soltar ----
   let peekId = 0;
@@ -463,7 +598,7 @@
     S.osd = null;
     S.peek = { ...p, id: ++peekId, ms: 4500 };
     render();
-    armPeek(4500);
+    if (!p.sticky) armPeek(4500);
   }
   function armPeek(ms) { clearTimeout(S.peek.timer); S.peek.timer = setTimeout(dismissPeek, ms); }
   function dismissPeek() { if (!S.peek) return; clearTimeout(S.peek.timer); S.peek = null; render(); }
@@ -587,6 +722,7 @@
       case 'copy': addClip(t('copy_text')); break;
       case 'file': addFiles([{ name: lang === 'es' ? 'Presupuesto 2026.pdf' : 'Budget 2026.pdf', size: 482113 }]); break;
       case 'toggle': S.open ? close() : open(); break;
+      case 'timer': alarm(false); dropTimerPeek(); TM.state = 'ready'; tSet(10); tStart(); flash(t('flash_timer')); break;
     }
   });
 
